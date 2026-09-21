@@ -1,0 +1,115 @@
+"use client";
+
+const INFO = [
+  {
+    icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.4}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5A2.25 2.25 0 0012.75 4.5h-1.5A2.25 2.25 0 009 6.75v1.5M8.25 21h7.5A2.25 2.25 0 0018 18.75v-7.5A2.25 2.25 0 0015.75 9h-7.5A2.25 2.25 0 006 11.25v7.5A2.25 2.25 0 008.25 21z" /></svg>,
+    label: "Birth", value: "2002. 12. 06",
+  },
+  {
+    icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.4}><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>,
+    label: "Location", value: "대한민국 대구광역시",
+  },
+  {
+    icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.4}><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>,
+    label: "Email", value: "nova021206@gmail.com",
+  },
+  {
+    icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.004.071 1.532 1.032 1.532 1.032.892 1.529 2.341 1.087 2.912.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z" /></svg>,
+    label: "GitHub", value: "github.com/d3vkj",
+  },
+];
+
+const TIMELINE = [
+  { year: "2026", title: "프리랜서 개발자", desc: "자동차 카본 파츠 업체 외주 — 풀스택 단독 구현", current: true },
+  { year: "2025", title: "자체 프로젝트 다수 완성", desc: "Airport Typing Game, Genesis, Apple 클론 제작 및 배포" },
+  { year: "2024", title: "프론트엔드 개발 시작", desc: "React, Next.js 독학 및 첫 프로젝트 배포" },
+];
+
+export default function AboutMe() {
+  return (
+    <section className="h-full flex pl-40 overflow-hidden">
+
+      {/* ── 1열: 사진 ── */}
+      <div className="flex-1 flex flex-col items-center justify-center border-r border-white/[0.08] gap-6 px-8">
+        <div className="w-48 aspect-[3/4] rounded-3xl border-2 border-dashed border-white/[0.15] bg-white/[0.03] flex flex-col items-center justify-center gap-3 text-white/20 hover:border-white/30 hover:bg-white/[0.05] transition-all cursor-pointer">
+          <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+          </svg>
+          <span className="text-[9px] tracking-[0.2em] uppercase">Photo</span>
+        </div>
+        <div className="text-center">
+          <p className="text-lg font-semibold text-white/80">장경진</p>
+          <p className="text-xs text-white/35 mt-1">Frontend Developer</p>
+        </div>
+      </div>
+
+      {/* ── 2열: 내 정보 ── */}
+      <div className="flex-1 flex flex-col justify-center border-r border-white/[0.08] px-10 gap-5">
+        <div>
+          <h2 className="text-3xl font-semibold tracking-tight">About</h2>
+          <p className="mt-2 text-sm text-white/45 leading-6">
+            사용자 경험을 세심하게 고민하는 개발자.<br />
+            인터랙션과 애니메이션에 관심이 많으며<br />
+            플랫폼을 가리지 않고 도전합니다.
+          </p>
+        </div>
+
+        <div className="h-px bg-white/[0.08]" />
+
+        <div className="flex flex-col gap-2.5">
+          {INFO.map(({ icon, label, value }) => (
+            <div key={label} className="flex items-center gap-4 px-5 py-3.5 rounded-xl border border-white/[0.1] bg-white/[0.04]">
+              <span className="text-white/35 shrink-0">{icon}</span>
+              <span className="text-[10px] text-white/25 uppercase tracking-widest w-16 shrink-0">{label}</span>
+              <span className="text-sm text-white/65">{value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── 3열: 걸어온 길 ── */}
+      <div className="flex-1 flex flex-col justify-center px-10 gap-5 overflow-y-auto py-12">
+        <div>
+          <h2 className="text-3xl font-semibold tracking-tight">History</h2>
+          <p className="mt-2 text-sm text-white/35">걸어온 길</p>
+        </div>
+
+        <div className="h-px bg-white/[0.08]" />
+
+        <div className="relative flex flex-col gap-0">
+          {/* 수직 선 */}
+          <div className="absolute left-[5px] top-2 bottom-2 w-px bg-white/[0.1]" />
+
+          {TIMELINE.map((item, i) => (
+            <div key={i} className="relative flex gap-6 pb-8 last:pb-0">
+              {/* 도트 */}
+              <div className="relative shrink-0 mt-[5px]">
+                {item.current ? (
+                  <>
+                    <span className="absolute -inset-2 rounded-full bg-white/[0.07] animate-ping" style={{ animationDuration: "2.5s" }} />
+                    <span className="relative block w-2.5 h-2.5 rounded-full bg-white/80" />
+                  </>
+                ) : (
+                  <span className="block w-2.5 h-2.5 rounded-full border border-white/25" />
+                )}
+              </div>
+
+              {/* 내용 */}
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-xs font-mono text-white/30">{item.year}</span>
+                  {item.current && (
+                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.07] border border-white/[0.12] text-white/45 uppercase tracking-widest">현재</span>
+                  )}
+                </div>
+                <p className="text-base font-semibold text-white/80 leading-snug">{item.title}</p>
+                <p className="text-sm text-white/40 mt-1.5 leading-6">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </section>
+  );
+}
