@@ -31,9 +31,9 @@ export default function AboutMe() {
     <div className="mx-auto flex min-h-full max-w-[var(--content-max)] flex-col lg:h-full lg:flex-row">
 
       {/* ── 1열: 사진 ── */}
-      <div className="flex flex-col items-center justify-center gap-6 border-white/[0.08] px-8 py-12 lg:flex-1 lg:border-r lg:py-0">
+      <div className="flex flex-col items-center justify-center gap-6 border-white/[0.08] px-4 py-10 sm:px-8 sm:py-12 lg:flex-1 lg:border-r lg:py-0">
         <div className="flex flex-col items-center gap-6 lg:-translate-y-12">
-          <div className="relative w-48 aspect-[3/4] overflow-hidden rounded-3xl glass-ios shadow-2xl transition-transform duration-300 hover:scale-[1.02]">
+          <div className="relative w-40 aspect-[3/4] overflow-hidden rounded-3xl glass-ios shadow-2xl transition-transform duration-300 hover:scale-[1.02] sm:w-48">
             <Image
               src="/profile.png"
               alt="장경진 프로필 사진"
@@ -43,19 +43,21 @@ export default function AboutMe() {
               priority
             />
           </div>
-          <div className="text-center">
+          <div className="px-2 text-center">
             <p className="text-lg font-semibold text-white/80">장경진</p>
-            <p className="text-xs text-white/35 mt-1">Publisher / Front-End / Full-Stack</p>
+            <p className="mt-1 text-[11px] leading-relaxed text-white/35 sm:text-xs">
+              Publisher / Front-End / Full-Stack
+            </p>
           </div>
         </div>
       </div>
 
       {/* ── 2열: 내 정보 ── */}
-      <div className="flex flex-col justify-center border-t border-white/[0.08] px-8 py-12 lg:flex-1 lg:border-t-0 lg:border-r lg:px-10 lg:py-0">
-        <div className="flex w-full flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
+      <div className="flex flex-col justify-center border-t border-white/[0.08] px-4 py-10 sm:px-8 sm:py-12 lg:flex-1 lg:border-t-0 lg:border-r lg:px-10 lg:py-0">
+        <div className="flex w-full min-w-0 flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
           <div className="flex flex-col justify-start lg:min-h-[136px]">
             <h2 className="section-title">About Me</h2>
-            <p className="mt-2 text-sm text-white/45 leading-6">
+            <p className="mt-2 text-sm leading-6 text-white/45 break-keep">
               웹, 데스크톱 앱, 모바일 앱 그리고 AI까지<br />
               다양한 분야에 호기심을 가지고 공부하고 있어요.<br />
               뛰어난 습득력과 적용력을 바탕으로 더욱 발전하는 중이에요.
@@ -64,12 +66,19 @@ export default function AboutMe() {
 
           <div className="h-px bg-white/[0.08]" />
 
-          <div className="flex flex-col gap-2.5">
+          <div className="flex min-w-0 flex-col gap-2.5">
             {INFO.map(({ icon, label, value }) => (
-              <div key={label} className="glass-ios flex items-center gap-4 rounded-2xl px-5 py-3.5">
-                <span className="text-white/35 shrink-0">{icon}</span>
-                <span className="text-[10px] text-white/25 uppercase tracking-widest w-16 shrink-0">{label}</span>
-                <span className="text-sm text-white/65">{value}</span>
+              <div
+                key={label}
+                className="glass-ios flex min-w-0 items-start gap-3 rounded-2xl px-3.5 py-3 sm:items-center sm:gap-4 sm:px-5 sm:py-3.5"
+              >
+                <span className="shrink-0 self-center text-white/35">{icon}</span>
+                <div className="min-w-0 flex-1 sm:flex sm:items-center sm:gap-4">
+                  <span className="mb-0.5 block text-[10px] uppercase tracking-widest text-white/25 sm:mb-0 sm:w-16 sm:shrink-0">
+                    {label}
+                  </span>
+                  <span className="block break-all text-sm leading-snug text-white/65">{value}</span>
+                </div>
               </div>
             ))}
           </div>
@@ -77,8 +86,8 @@ export default function AboutMe() {
       </div>
 
       {/* ── 3열: History ── */}
-      <div className="flex flex-col justify-center border-t border-white/[0.08] px-8 py-12 lg:flex-1 lg:border-t-0 lg:px-10 lg:py-0">
-        <div className="flex w-full flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
+      <div className="flex flex-col justify-center border-t border-white/[0.08] px-4 py-10 sm:px-8 sm:py-12 lg:flex-1 lg:border-t-0 lg:px-10 lg:py-0">
+        <div className="flex w-full min-w-0 flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
           <div className="flex flex-col justify-start lg:min-h-[136px]">
             <h2 className="section-title">History</h2>
             {/* <p className="mt-2 text-sm text-white/35 leading-6">
@@ -88,13 +97,13 @@ export default function AboutMe() {
 
           <div className="h-px bg-white/[0.08]" />
 
-          <div className="relative flex flex-col gap-0">
+          <div className="relative flex min-w-0 flex-col gap-0">
             {/* 수직 선 */}
             <div className="absolute left-[5px] top-2 bottom-2 w-px bg-white/[0.1]" />
 
             {TIMELINE.map((item, i) => (
-              <div key={i} className="relative flex gap-6 pb-8 last:pb-0">
-                <div className="relative w-2.5 h-2.5 shrink-0 self-start mt-[5px]">
+              <div key={i} className="relative flex min-w-0 gap-4 pb-8 last:pb-0 sm:gap-6">
+                <div className="relative mt-[5px] h-2.5 w-2.5 shrink-0 self-start">
                   {item.current ? (
                     <>
                       <span
@@ -105,23 +114,22 @@ export default function AboutMe() {
                           animation: "dotGlow 2.4s ease-in-out infinite",
                         }}
                       />
-                      <span className="relative block w-2.5 h-2.5 rounded-full" style={{ background: "var(--accent)" }} />
+                      <span className="relative block h-2.5 w-2.5 rounded-full" style={{ background: "var(--accent)" }} />
                     </>
                   ) : (
-                    <span className="block w-2.5 h-2.5 rounded-full border border-white/25" />
+                    <span className="block h-2.5 w-2.5 rounded-full border border-white/25" />
                   )}
                 </div>
 
-                {/* 내용 */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-xs font-mono text-white/30">{item.year}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1.5 flex flex-wrap items-center gap-2">
+                    <span className="font-mono text-xs text-white/30">{item.year}</span>
                     {item.current && (
-                      <span className="glass-soft text-[9px] px-2 py-0.5 rounded-full text-white/45 uppercase tracking-widest">현재</span>
+                      <span className="glass-soft rounded-full px-2 py-0.5 text-[9px] uppercase tracking-widest text-white/45">현재</span>
                     )}
                   </div>
-                  <p className="text-base font-semibold text-white/80 leading-snug">{item.title}</p>
-                  <p className="text-sm text-white/40 mt-1.5 leading-6">{item.desc}</p>
+                  <p className="text-base font-semibold leading-snug break-keep text-white/80">{item.title}</p>
+                  <p className="mt-1.5 text-sm leading-6 break-keep text-white/40">{item.desc}</p>
                 </div>
               </div>
             ))}
