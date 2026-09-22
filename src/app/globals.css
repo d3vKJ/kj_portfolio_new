@@ -8,7 +8,7 @@
   --my: 50%;
   --content-max: 1680px;
   --header-space: 5.75rem;
-  --bg: #040404;
+  --bg: #020202;
   /* 투명한 글래스모피즘 */
   --glass-bg: rgba(255, 255, 255, 0.04);
   --glass-bg-strong: rgba(255, 255, 255, 0.07);
@@ -114,15 +114,15 @@ body {
     inset 0 0.5px 0 rgba(255, 255, 255, 0.22);
 }
 
-/* 모달용 — 밝은 글래스 + 약한 틴트로 가독성 확보 */
+/* 모달용 — 어두운 글래스로 본문 가독성 확보 */
 .glass-modal {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(10, 10, 14, 0.88);
   backdrop-filter: blur(28px) saturate(160%);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
-  border: 0.5px solid rgba(255, 255, 255, 0.18);
+  border: 0.5px solid rgba(255, 255, 255, 0.14);
   box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.28),
-    inset 0 0.5px 0 rgba(255, 255, 255, 0.28);
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.12);
 }
 
 .glass-nav {
@@ -167,7 +167,8 @@ body {
 }
 
 html {
-  scroll-behavior: smooth;
+  /* 히어로 스크럽과 충돌하므로 smooth 비활성 — 앵커는 JS로 처리 */
+  scroll-behavior: auto;
 }
 
 @keyframes skillsFadeIn {
@@ -276,12 +277,37 @@ html {
   display: none;
 }
 
-.noise::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-  opacity: 0.025;
-  pointer-events: none;
-  z-index: 9999;
+/* 키보드 포커스 링 — 인터랙티브 요소만 (섹션 컨테이너 제외) */
+:focus-visible:not([role="region"]) {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+[role="region"]:focus,
+[role="region"]:focus-visible {
+  outline: none;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  transform: translateY(-160%);
+  border-radius: 9999px;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 0.65rem 1.1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }

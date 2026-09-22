@@ -12,11 +12,23 @@ function emitChange(index: number, inSlider: boolean) {
   window.dispatchEvent(new CustomEvent("section-change", { detail: { index, inSlider } }));
 }
 
+function isEditableTarget(el: EventTarget | null) {
+  if (!(el instanceof HTMLElement)) return false;
+  const tag = el.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
+}
+
+function isInteractiveTarget(el: EventTarget | null) {
+  if (!(el instanceof HTMLElement)) return false;
+  return Boolean(el.closest("a, button, [role='button'], input, textarea, select, [contenteditable='true']"));
+}
+
 const SLIDE_MS = 650;
 const WHEEL_COOLDOWN_MS = 350;
 /** 히어로 → About 진입 직후, 관성 스크롤로 다음 섹션 넘어가지 않게 */
 const ENTER_HOLD_MS = 1100;
 const EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
+const SLIDE_LABELS = ["About", "Projects", "Skills", "Contact"];
 
 export default function SectionSlider({ children }: { children: ReactNode }) {
   const slides = Children.toArray(children);
@@ -41,6 +53,22 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
     s.current.cur = cur;
     if (s.current.locked) emitChange(cur, true);
   }, [cur]);
+
+  // 잠금·섹션 전환 후 inert 해제된 뒤 현재 슬라이드로 포커스 이동
+  const prevFocusKey = useRef<string>("");
+  useEffect(() => {
+    if (!locked) {
+      prevFocusKey.current = "";
+      return;
+    }
+    const key = `${locked}:${cur}`;
+    if (prevFocusKey.current === key) return;
+    prevFocusKey.current = key;
+    const id = window.setTimeout(() => {
+      slideRefs.current[cur]?.focus({ preventScroll: true });
+    }, 0);
+    return () => window.clearTimeout(id);
+  }, [locked, cur]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -198,6 +226,77 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
       }
     };
 
+    const goPrevOrHome = () => {
+      if (s.current.cur > 0) {
+        void runTransition(s.current.cur - 1);
+        return;
+      }
+      unlock();
+      window.scrollTo(0, 0);
+      window.dispatchEvent(new Event("scroll"));
+      setTimeout(() => { s.current.cooldown = false; }, 500);
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!s.current.locked) return;
+      if (isEditableTarget(e.target)) return;
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      // 모달 열린 동안에는 섹션 전환 키를 막고 Esc 등에 양보
+      if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+      if (s.current.animating || performance.now() < s.current.wheelLockUntil) {
+        if (["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight", "PageDown", "PageUp", "Home", "End", " "].includes(e.key)) {
+          e.preventDefault();
+        }
+        return;
+      }
+
+      const activeSlide = slideRefs.current[s.current.cur];
+      const key = e.key;
+
+      const wantsNext =
+        key === "ArrowDown" ||
+        key === "ArrowRight" ||
+        key === "PageDown" ||
+        (key === " " && !e.shiftKey && !isInteractiveTarget(e.target));
+      const wantsPrev =
+        key === "ArrowUp" ||
+        key === "ArrowLeft" ||
+        key === "PageUp" ||
+        (key === " " && e.shiftKey && !isInteractiveTarget(e.target));
+
+      if (key === "Home") {
+        e.preventDefault();
+        void runTransition(0);
+        return;
+      }
+      if (key === "End") {
+        e.preventDefault();
+        void runTransition(n - 1);
+        return;
+      }
+
+      if (wantsNext) {
+        if (activeSlide && hasScrollRoom(activeSlide, true) && (key === "ArrowDown" || key === "PageDown" || key === " ")) {
+          return;
+        }
+        if (s.current.cur < n - 1) {
+          e.preventDefault();
+          void runTransition(s.current.cur + 1);
+        } else if (key !== "ArrowDown" && key !== "PageDown" && key !== " ") {
+          e.preventDefault();
+        }
+        return;
+      }
+
+      if (wantsPrev) {
+        if (activeSlide && hasScrollRoom(activeSlide, false) && (key === "ArrowUp" || key === "PageUp" || key === " ")) {
+          return;
+        }
+        e.preventDefault();
+        goPrevOrHome();
+      }
+    };
+
     const onNavigate = (e: Event) => {
       const { action, index } = (e as CustomEvent).detail;
       if (action === "home") {
@@ -220,12 +319,14 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
 
     window.addEventListener("scroll", check, { passive: true });
     window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("keydown", onKeyDown);
     window.addEventListener("navigate-section", onNavigate);
     window.addEventListener("hero-crossfade", onCrossfade);
     window.addEventListener("slide-scroll-top", onScrollTop);
     return () => {
       window.removeEventListener("scroll", check);
       window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("navigate-section", onNavigate);
       window.removeEventListener("hero-crossfade", onCrossfade);
       window.removeEventListener("slide-scroll-top", onScrollTop);
@@ -251,6 +352,7 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
           visibility: showLayer ? "visible" : "hidden",
           pointerEvents: locked ? "auto" : "none",
         }}
+        aria-hidden={!locked}
       >
         <div
           className="flex h-full"
@@ -260,16 +362,25 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
             transition: sliding ? `transform ${SLIDE_MS}ms ${EASE}` : "none",
           }}
         >
-          {slides.map((slide, i) => (
-            <div
-              key={i}
-              ref={(el) => { slideRefs.current[i] = el; }}
-              className="h-full overflow-auto"
-              style={{ width: "100vw" }}
-            >
-              {slide}
-            </div>
-          ))}
+          {slides.map((slide, i) => {
+            const active = locked && i === cur;
+            const label = SLIDE_LABELS[i] ?? `섹션 ${i + 1}`;
+            return (
+              <div
+                key={i}
+                ref={(el) => { slideRefs.current[i] = el; }}
+                className="h-full overflow-auto outline-none focus:outline-none focus-visible:outline-none"
+                style={{ width: "100vw" }}
+                tabIndex={active ? -1 : undefined}
+                role="region"
+                aria-label={label}
+                aria-hidden={!active}
+                inert={!active || undefined}
+              >
+                {slide}
+              </div>
+            );
+          })}
         </div>
       </div>
     </>

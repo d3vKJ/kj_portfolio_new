@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
         />
       </head>
-      <body className="noise relative min-h-full text-white">
+      <body className="relative min-h-full text-white">
         <div className="ambient" aria-hidden />
         <div className="relative z-[2]">
           <CursorGlow />

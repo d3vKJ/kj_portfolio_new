@@ -20,6 +20,8 @@ function easeOutCubic(t: number) {
   return 1 - Math.pow(1 - t, 3);
 }
 
+const SCROLL_TO_ABOUT_MS = 8000;
+
 function getHeroMode(): HeroMode {
   if (window.matchMedia("(min-width: 1024px)").matches) return "desktop";
   if (window.matchMedia("(max-width: 639px)").matches) return "phone";
@@ -35,7 +37,11 @@ export default function Hero() {
   const lastT = useRef(-1);
   const readyRef = useRef(false);
   const enteringRef = useRef(false);
+  const playingAllRef = useRef(false);
+  const playAllFnRef = useRef<(() => void) | null>(null);
   const [mode, setMode] = useState<HeroMode>("desktop");
+  const [playingAll, setPlayingAll] = useState(false);
+  const [heroHintsVisible, setHeroHintsVisible] = useState(true);
 
   const touchSectionRef = useRef<HTMLElement>(null);
   const touchEnteringRef = useRef(false);
@@ -86,16 +92,54 @@ export default function Hero() {
     if (!video || !section || !overlay || !sticky) return;
 
     let targetTime = 0;
-    let rafPending = false;
+    let scrubRaf = 0;
     let enterRaf = 0;
+    let playAllRaf = 0;
+    let inSlider = false;
+    let isSeeking = false;
+    let hintsOn = true;
+    let sectionTop = 0;
+    let sectionRange = 1;
 
-    const seek = () => {
-      rafPending = false;
-      if (!isFinite(video.duration)) return;
-      const el = video as HTMLVideoElement & { fastSeek?: (t: number) => void };
-      if (typeof el.fastSeek === "function") el.fastSeek(targetTime);
-      else el.currentTime = targetTime;
+    const measureSection = () => {
+      sectionTop = window.scrollY + section.getBoundingClientRect().top;
+      sectionRange = Math.max(1, section.offsetHeight - window.innerHeight);
     };
+    measureSection();
+
+    const setHints = (on: boolean) => {
+      if (hintsOn === on) return;
+      hintsOn = on;
+      setHeroHintsVisible(on);
+    };
+
+    /** seek 진행 중이면 대기, 끝나면 최신 target만 적용 — seek 폭주 방지 */
+    const flushSeek = () => {
+      scrubRaf = 0;
+      if (!isFinite(video.duration) || isSeeking) return;
+
+      const next = targetTime;
+      if (Math.abs(video.currentTime - next) < 1 / 30) return;
+
+      if (!video.paused) video.pause();
+      isSeeking = true;
+      video.currentTime = next;
+    };
+
+    const queueSeek = (time: number) => {
+      // 30fps 격자로 양자화 → 불필요한 근접 seek 감소
+      const dur = video.duration || 0;
+      targetTime = dur > 0 ? Math.round(time * 30) / 30 : time;
+      if (!scrubRaf) scrubRaf = requestAnimationFrame(flushSeek);
+    };
+
+    const onSeeked = () => {
+      isSeeking = false;
+      if (playingAllRef.current) return;
+      if (Math.abs(video.currentTime - targetTime) < 1 / 30) return;
+      if (!scrubRaf) scrubRaf = requestAnimationFrame(flushSeek);
+    };
+    video.addEventListener("seeked", onSeeked);
 
     const setCrossfade = (t: number) => {
       sticky.style.opacity = String(1 - t);
@@ -105,9 +149,59 @@ export default function Hero() {
       }
     };
 
+    /** 로고/투명도/스케일만 (영상 프레임은 seek 또는 play로 따로) */
+    const applyVisual = (progress: number) => {
+      const p = Math.max(0, Math.min(1, progress));
+
+      if (p >= FADE_OUT_END) {
+        readyRef.current = true;
+        video.style.opacity = "0";
+        overlay.style.opacity = "0";
+        return;
+      }
+
+      readyRef.current = false;
+      overlay.style.opacity = String(Math.max(0, 1 - p / LOGO_OUT_END));
+
+      let videoOpacity = 0;
+      if (p < VIDEO_IN_START) {
+        videoOpacity = 0;
+      } else if (p < VIDEO_IN_END) {
+        videoOpacity = (p - VIDEO_IN_START) / (VIDEO_IN_END - VIDEO_IN_START);
+      } else if (p < SCRUB_END) {
+        videoOpacity = 1;
+      } else if (p < FADE_OUT_END) {
+        videoOpacity = 1 - (p - SCRUB_END) / (FADE_OUT_END - SCRUB_END);
+      }
+
+      const scaleProgress = Math.min(1, p / SCRUB_END);
+      video.style.opacity = String(videoOpacity);
+      video.style.transform = `scale(${0.5 + 0.5 * scaleProgress})`;
+      sticky.style.opacity = "1";
+    };
+
+    /** 수동 스크롤: progress → 영상 seek */
+    const applyProgress = (progress: number) => {
+      const p = Math.max(0, Math.min(1, progress));
+      applyVisual(p);
+
+      if (p >= FADE_OUT_END) return;
+      if (p < VIDEO_IN_START) return;
+
+      const scrubProgress = Math.max(
+        0,
+        Math.min(1, (p - VIDEO_IN_END) / (SCRUB_END - VIDEO_IN_END)),
+      );
+      queueSeek(scrubProgress * (video.duration || 0));
+    };
+
     const runEnter = () => {
-      if (enteringRef.current) return;
+      if (enteringRef.current || inSlider) return;
       enteringRef.current = true;
+      playingAllRef.current = false;
+      setPlayingAll(false);
+      setHints(false);
+      video.pause();
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const dur = reduce ? 280 : ENTER_MS;
       const start = performance.now();
@@ -121,27 +215,163 @@ export default function Hero() {
       enterRaf = requestAnimationFrame(tick);
     };
 
+    /**
+     * 자동 스크롤 재생: 프레임마다 seek 하지 않고,
+     * 스크럽 구간에서 video.play()로 부드럽게 재생 + 비주얼 progress 동기화
+     */
+    const runScrollToAbout = () => {
+      if (playingAllRef.current || enteringRef.current || inSlider) return;
+
+      if (readyRef.current) {
+        runEnter();
+        return;
+      }
+
+      playingAllRef.current = true;
+      setPlayingAll(true);
+      setHints(false);
+      measureSection();
+
+      const startProgress = Math.max(
+        0,
+        Math.min(FADE_OUT_END, (window.scrollY - sectionTop) / sectionRange),
+      );
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const dur = reduce ? 500 : SCROLL_TO_ABOUT_MS;
+      const start = performance.now();
+      const progressSpan = Math.max(0.001, FADE_OUT_END - startProgress);
+
+      const html = document.documentElement;
+      const prevBehavior = html.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
+
+      let videoStarted = false;
+      let videoEnded = false;
+      let lastScrollY = -1;
+
+      const scrubWallMs = ((SCRUB_END - VIDEO_IN_END) / progressSpan) * dur;
+      const rate =
+        isFinite(video.duration) && video.duration > 0
+          ? Math.min(4, Math.max(0.5, video.duration / Math.max(0.4, scrubWallMs / 1000)))
+          : 1;
+
+      const finish = () => {
+        html.style.scrollBehavior = prevBehavior;
+        video.pause();
+        video.playbackRate = 1;
+        playingAllRef.current = false;
+        setPlayingAll(false);
+        window.scrollTo({ top: sectionTop + FADE_OUT_END * sectionRange, behavior: "auto" });
+        runEnter();
+      };
+
+      const tick = (now: number) => {
+        if (!playingAllRef.current) {
+          html.style.scrollBehavior = prevBehavior;
+          video.pause();
+          video.playbackRate = 1;
+          return;
+        }
+
+        const t = Math.min(1, (now - start) / dur);
+        const progress = startProgress + progressSpan * t;
+        applyVisual(progress);
+
+        const y = sectionTop + progress * sectionRange;
+        if (Math.abs(y - lastScrollY) > 24) {
+          lastScrollY = y;
+          window.scrollTo({ top: y, behavior: "auto" });
+        }
+
+        if (!videoStarted && progress >= VIDEO_IN_END) {
+          videoStarted = true;
+          try {
+            video.pause();
+            video.currentTime = Math.max(
+              0,
+              ((Math.max(progress, VIDEO_IN_END) - VIDEO_IN_END) / (SCRUB_END - VIDEO_IN_END)) *
+                (video.duration || 0),
+            );
+            video.playbackRate = rate;
+            void video.play();
+          } catch {
+            /* autoplay 정책 등 */
+          }
+        }
+
+        if (!videoEnded && progress >= SCRUB_END) {
+          videoEnded = true;
+          video.pause();
+        }
+
+        if (t < 1) {
+          playAllRaf = requestAnimationFrame(tick);
+          return;
+        }
+
+        finish();
+      };
+      playAllRaf = requestAnimationFrame(tick);
+    };
+
+    playAllFnRef.current = runScrollToAbout;
+
     const onWheel = (e: WheelEvent) => {
-      if (!readyRef.current || enteringRef.current) return;
+      if (playingAllRef.current) {
+        e.preventDefault();
+        return;
+      }
+      if (!readyRef.current || enteringRef.current || inSlider) return;
       if (e.deltaY <= 0) return;
       e.preventDefault();
       runEnter();
     };
 
-    const onScroll = () => {
-      if (enteringRef.current) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (inSlider || enteringRef.current) return;
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      if (t?.closest("a, button, [role='button']")) return;
 
-      const { top, height } = section.getBoundingClientRect();
-      const range = height - window.innerHeight;
-      const progress = Math.max(0, Math.min(1, -top / range));
+      if (e.key === "ArrowDown" || e.key === "PageDown") {
+        e.preventDefault();
+        if (readyRef.current) runEnter();
+        else runScrollToAbout();
+        return;
+      }
+
+      if ((e.key === "Enter" || e.key === " ") && readyRef.current) {
+        e.preventDefault();
+        runEnter();
+      }
+    };
+
+    const onSection = (e: Event) => {
+      inSlider = Boolean((e as CustomEvent).detail?.inSlider);
+      if (inSlider) {
+        playingAllRef.current = false;
+        setPlayingAll(false);
+        setHints(false);
+      } else {
+        setHints(true);
+      }
+    };
+
+    const onScroll = () => {
+      if (enteringRef.current || playingAllRef.current) return;
+
+      const progress = Math.max(0, Math.min(1, (window.scrollY - sectionTop) / sectionRange));
+
+      setHints(progress <= 0.02 && !inSlider);
 
       if (progress >= FADE_OUT_END) {
-        const snapY = window.scrollY + top + FADE_OUT_END * range;
+        const snapY = sectionTop + FADE_OUT_END * sectionRange;
         if (!readyRef.current) {
           readyRef.current = true;
-          window.scrollTo(0, snapY);
+          window.scrollTo({ top: snapY, behavior: "auto" });
         } else if (Math.abs(window.scrollY - snapY) > 2) {
-          window.scrollTo(0, snapY);
+          window.scrollTo({ top: snapY, behavior: "auto" });
         }
         video.style.opacity = "0";
         overlay.style.opacity = "0";
@@ -149,49 +379,34 @@ export default function Hero() {
         return;
       }
 
-      if (readyRef.current) {
-        readyRef.current = false;
-        setCrossfade(0);
-      }
-
-      const scrubProgress = Math.max(
-        0,
-        Math.min(1, (progress - VIDEO_IN_END) / (SCRUB_END - VIDEO_IN_END)),
-      );
-      targetTime = scrubProgress * (video.duration || 0);
-
-      overlay.style.opacity = String(Math.max(0, 1 - progress / LOGO_OUT_END));
-
-      let videoOpacity = 0;
-      if (progress < VIDEO_IN_START) {
-        videoOpacity = 0;
-      } else if (progress < VIDEO_IN_END) {
-        videoOpacity = (progress - VIDEO_IN_START) / (VIDEO_IN_END - VIDEO_IN_START);
-      } else if (progress < SCRUB_END) {
-        videoOpacity = 1;
-      } else if (progress < FADE_OUT_END) {
-        videoOpacity = 1 - (progress - SCRUB_END) / (FADE_OUT_END - SCRUB_END);
-      }
-
-      const scaleProgress = Math.min(1, progress / SCRUB_END);
-      video.style.opacity = String(videoOpacity);
-      video.style.transform = `scale(${0.5 + 0.5 * scaleProgress})`;
-      sticky.style.opacity = "1";
-
-      if (!rafPending) {
-        rafPending = true;
-        requestAnimationFrame(seek);
-      }
+      applyProgress(progress);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("section-change", onSection);
+    window.addEventListener("resize", measureSection);
     return () => {
+      playAllFnRef.current = null;
+      playingAllRef.current = false;
+      video.pause();
+      video.playbackRate = 1;
+      video.removeEventListener("seeked", onSeeked);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("section-change", onSection);
+      window.removeEventListener("resize", measureSection);
       if (enterRaf) cancelAnimationFrame(enterRaf);
+      if (playAllRaf) cancelAnimationFrame(playAllRaf);
+      if (scrubRaf) cancelAnimationFrame(scrubRaf);
     };
   }, [mode]);
+
+  const handlePlayAll = () => {
+    playAllFnRef.current?.();
+  };
 
   // 폰/태블릿: 스크롤로 섹션 넘어가는 것 차단
   useEffect(() => {
@@ -337,16 +552,26 @@ export default function Hero() {
     const onPointerMove = (e: PointerEvent) => onMove(e.clientX);
     const onPointerUp = () => onEnd();
 
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (touchEnteringRef.current) return;
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        finishEnter(0);
+      }
+    };
+
     thumb.addEventListener("pointerdown", onPointerDown);
     thumb.addEventListener("pointermove", onPointerMove);
     thumb.addEventListener("pointerup", onPointerUp);
     thumb.addEventListener("pointercancel", onPointerUp);
+    thumb.addEventListener("keydown", onKeyDown);
     window.addEventListener("resize", measure);
     return () => {
       thumb.removeEventListener("pointerdown", onPointerDown);
       thumb.removeEventListener("pointermove", onPointerMove);
       thumb.removeEventListener("pointerup", onPointerUp);
       thumb.removeEventListener("pointercancel", onPointerUp);
+      thumb.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("resize", measure);
     };
   }, [mode]);
@@ -375,7 +600,7 @@ export default function Hero() {
     return (
       <section
         ref={touchSectionRef}
-        className="relative z-20 flex h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[#040404] will-change-[opacity]"
+        className="relative z-20 flex h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[#020202] will-change-[opacity]"
         style={{ touchAction: "none" }}
       >
         <Image src="/logo.png" alt="logo" width={220} height={220} className="object-contain" priority />
@@ -398,8 +623,8 @@ export default function Hero() {
             <button
               ref={unlockThumbRef}
               type="button"
-              aria-label="Slide to enter"
-              className="unlock-thumb relative z-[1] flex h-12 w-12 shrink-0 touch-none items-center justify-center rounded-full"
+              aria-label="Enter 키로 About 섹션 입장"
+              className="unlock-thumb relative z-[1] flex h-12 w-12 shrink-0 touch-none items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
               style={{ touchAction: "none" }}
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
@@ -417,7 +642,7 @@ export default function Hero() {
     return (
       <section
         ref={touchSectionRef}
-        className="relative z-20 h-[100dvh] overflow-hidden bg-[#040404] will-change-[opacity]"
+        className="relative z-20 h-[100dvh] overflow-hidden bg-[#020202] will-change-[opacity]"
       >
         <button
           type="button"
@@ -445,12 +670,12 @@ export default function Hero() {
   // 데스크톱: 영상 스크럽
   return (
     <section ref={sectionRef} className="relative z-20 h-[850vh]">
-      <div ref={stickyRef} className="sticky top-0 h-screen overflow-hidden bg-[#040404] will-change-[opacity]">
+      <div ref={stickyRef} className="sticky top-0 h-screen overflow-hidden bg-[#020202] will-change-[opacity]">
         <video
           ref={videoRef}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover will-change-[opacity,transform]"
           style={{ opacity: 0, transform: "scale(0.5)", transformOrigin: "center center" }}
-          src="/hero_scrub.mp4"
+          src="/hero_scrub.mp4?v=scrub2"
           muted
           playsInline
           preload="auto"
@@ -468,13 +693,28 @@ export default function Hero() {
             Publisher | Front-End | Full-Stack
           </p>
 
-          <div className="absolute bottom-10 flex flex-col items-center gap-2 text-white/40">
-            <svg width="16" height="26" viewBox="0 0 16 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="0.75" y="0.75" width="14.5" height="24.5" rx="7.25" stroke="currentColor" strokeWidth="1.5" />
-              <line x1="8" y1="0.75" x2="8" y2="10" stroke="currentColor" strokeWidth="1" strokeOpacity="0.4" />
-              <rect x="7" y="5" width="2" height="4" rx="1" fill="currentColor" className="animate-bounce" />
-            </svg>
-            <span className="text-[10px] tracking-[0.2em] uppercase">Scroll</span>
+          <div
+            className="absolute bottom-10 flex flex-col items-center gap-3 transition-opacity duration-300"
+            style={{ opacity: heroHintsVisible && !playingAll ? 1 : 0, pointerEvents: heroHintsVisible && !playingAll ? "auto" : "none" }}
+          >
+            <button
+              type="button"
+              onClick={handlePlayAll}
+              disabled={playingAll}
+              aria-label="Enter — 히어로 연출 후 About으로 이동"
+              className="glass-ios inline-flex min-h-11 items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-medium tracking-wide text-white/80 transition-all duration-200 hover:border-white/30 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] disabled:opacity-50"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+              </svg>
+              Enter
+            </button>
+            <p className="text-[11px] tracking-[0.14em] text-white/35">
+              휠 또는 <kbd className="rounded px-1 text-white/45">↓</kbd> 키로도 이동
+            </p>
+            <span className="sr-only">
+              스크롤하거나 아래 방향키, 또는 Enter 버튼으로 영상을 스크럽하며 About으로 이동할 수 있습니다.
+            </span>
           </div>
         </div>
       </div>
