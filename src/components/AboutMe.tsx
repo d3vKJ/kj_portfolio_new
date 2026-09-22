@@ -27,7 +27,7 @@ const TIMELINE = [
 
 export default function AboutMe() {
   return (
-    <section className="min-h-full pb-10 pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[var(--header-space)] lg:h-full">
+    <section className="min-h-full pb-24 pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[var(--header-space)] sm:pb-10 lg:h-full">
     <div className="mx-auto flex min-h-full max-w-[var(--content-max)] flex-col lg:h-full lg:flex-row">
 
       {/* ── 1열: 사진 ── */}
@@ -88,14 +88,10 @@ export default function AboutMe() {
       {/* ── 3열: History ── */}
       <div className="flex flex-col justify-center border-t border-white/[0.08] px-4 py-10 sm:px-8 sm:py-12 lg:flex-1 lg:border-t-0 lg:px-10 lg:py-0">
         <div className="flex w-full min-w-0 flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
-          <div className="flex flex-col justify-start lg:min-h-[136px]">
+          <div className="flex flex-col gap-3">
             <h2 className="section-title">History</h2>
-            {/* <p className="mt-2 text-sm text-white/35 leading-6">
-              경험
-            </p> */}
+            <div className="h-px bg-white/[0.08]" />
           </div>
-
-          <div className="h-px bg-white/[0.08]" />
 
           <div className="relative flex min-w-0 flex-col gap-0">
             {/* 수직 선 */}

@@ -132,7 +132,7 @@ export default function Skills() {
   const group = GROUPS[active];
 
   return (
-    <section className="pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[var(--header-space)] pb-12">
+    <section className="pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[var(--header-space)] pb-24 sm:pb-12">
       <div className="mx-auto mb-8 flex max-w-[var(--content-max)] flex-wrap items-baseline gap-x-4 gap-y-1">
         <h2 className="section-title">Skills</h2>
         <p className="text-sm text-white/40 sm:text-base">사용 가능한 기술 스택들이에요.</p>

@@ -98,6 +98,13 @@ body {
     inset 0 0.5px 0 rgba(255, 255, 255, 0.28);
 }
 
+/* 모바일 메뉴 — 불투명 + 라운드 */
+.glass-menu {
+  background: #0c0c10;
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
 /* transform 조상(섹션 슬라이더) 안에서는 backdrop-filter가 깨져 전체가 흐려 보임 */
 .glass-panel {
   background: rgba(255, 255, 255, 0.07);

@@ -28,7 +28,7 @@ const EMAIL = "nova021206@kakao.com";
 
 export default function Contact() {
   return (
-    <section className="flex min-h-full flex-col items-center justify-center px-6 pb-10 pt-[var(--header-space)] text-center">
+    <section className="flex min-h-full flex-col items-center justify-center px-6 pb-24 pt-[var(--header-space)] text-center sm:pb-10">
       <span className="text-[10px] uppercase tracking-[0.35em] text-white/30">Contact</span>
 
       <h2 className="headline-glow mt-1 max-w-3xl text-[clamp(1.75rem,5vw,3.5rem)] font-bold leading-[1.15] tracking-tight">

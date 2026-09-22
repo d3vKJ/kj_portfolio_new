@@ -52,8 +52,8 @@ function CardThumb({ item }: { item: (typeof PROJECTS)[number] }) {
       layoutId={`card-${item.name}`}
       transition={{ layout: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }}
       style={{ pointerEvents: "none" }}
-      className={`relative aspect-[16/10] w-full overflow-hidden rounded-2xl glass-ios transition-colors duration-200 group-hover:border-[var(--accent)]/45 ${
-        item.image ? "" : "border-dashed"
+      className={`relative aspect-[16/10] w-full overflow-hidden bg-white/[0.03] ${
+        item.image ? "" : "border-b border-dashed border-white/10"
       }`}
     >
       {item.image ? (
@@ -62,7 +62,7 @@ function CardThumb({ item }: { item: (typeof PROJECTS)[number] }) {
           alt={`${item.nameKo} 대표 스크린샷`}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-          className="object-cover object-top"
+          className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
         />
       ) : (
         <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-white/20">
@@ -92,7 +92,7 @@ export default function Projects() {
   const p = selected !== null ? list[selected] : null;
 
   return (
-    <section className="pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[var(--header-space)] pb-12">
+    <section className="pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[var(--header-space)] pb-24 sm:pb-12">
       <div className="mx-auto w-full max-w-[var(--content-max)]">
         <div className="mb-8 flex flex-wrap items-baseline gap-x-4 gap-y-1">
           <h2 className="section-title">Projects</h2>
@@ -124,23 +124,27 @@ export default function Projects() {
         {list.length === 0 ? (
           <p className="py-16 text-center text-white/30">해당 카테고리에 표시할 프로젝트가 없습니다.</p>
         ) : (
-          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
             {list.map((item, i) => (
               <button
                 key={item.name}
                 onClick={() => setSelected(i)}
-                className="group flex flex-col text-left"
+                className="group glass-ios flex flex-col overflow-hidden rounded-2xl text-left transition-colors duration-200 hover:border-[var(--accent)]/40"
                 style={{ animation: `cardIn 400ms ease-out ${i * 60}ms both` }}
               >
                 <CardThumb item={item} />
-                <div className="mt-3 flex items-baseline justify-between">
-                  <div className="flex items-baseline gap-2">
-                    <h3 className="text-lg font-semibold text-white/85 transition-colors group-hover:text-white">{item.nameKo}</h3>
-                    <span className="text-sm text-white/30">{item.name}</span>
+                <div className="flex flex-1 flex-col gap-2 border-t border-white/[0.06] px-4 py-4 sm:px-5 sm:py-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="truncate text-base font-semibold tracking-tight text-white/90 transition-colors group-hover:text-white sm:text-lg">
+                        {item.nameKo}
+                      </h3>
+                      <p className="mt-0.5 truncate text-[12px] tracking-wide text-white/35">{item.name}</p>
+                    </div>
+                    <span className="shrink-0 font-mono text-[11px] text-white/30">{item.year}</span>
                   </div>
-                  <span className="font-mono text-xs text-white/30">{item.year}</span>
+                  <p className="line-clamp-2 text-sm leading-relaxed text-white/45">{item.desc}</p>
                 </div>
-                <p className="mt-1 text-sm text-white/45 line-clamp-2">{item.desc}</p>
               </button>
             ))}
           </div>

@@ -68,6 +68,11 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
       setSliding(false);
       s.current.animating = false;
       s.current.wheelLockUntil = performance.now() + WHEEL_COOLDOWN_MS;
+      const target = slideRefs.current[next];
+      if (target && target.scrollTop > 0) {
+        const smooth = !s.current.reduceMotion;
+        target.scrollTo({ top: 0, behavior: smooth ? "smooth" : "auto" });
+      }
       bindSlideScroll();
     };
 
@@ -75,13 +80,21 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
       const el = slideRefs.current[s.current.cur];
       const mobile = window.matchMedia("(max-width: 639px)").matches;
       const scrollTop = el?.scrollTop ?? 0;
+      const clientH = el?.clientHeight ?? 0;
+      const scrollH = el?.scrollHeight ?? 0;
+      const noScroll = scrollH <= clientH + 1;
+      const atBottom = noScroll || scrollTop + clientH >= scrollH - 56;
       // Projects: 항상 / About: 모바일에서만 스크롤 시 헤더 숨김
       const hideOnScroll = s.current.cur === 1 || (s.current.cur === 0 && mobile);
       const hide = s.current.locked && hideOnScroll && scrollTop > 32;
       window.dispatchEvent(new CustomEvent("header-auto-hide", { detail: { hide } }));
       window.dispatchEvent(
         new CustomEvent("slide-scroll-state", {
-          detail: { showTop: s.current.locked && mobile && scrollTop > 80 },
+          detail: {
+            showTop: s.current.locked && mobile && scrollTop > 80,
+            showRemote: s.current.locked && mobile && atBottom,
+            index: s.current.cur,
+          },
         }),
       );
     };
@@ -128,7 +141,7 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
       emitChange(s.current.cur, false);
       window.dispatchEvent(new CustomEvent("hero-crossfade", { detail: { t: 0 } }));
       window.dispatchEvent(new CustomEvent("header-auto-hide", { detail: { hide: false } }));
-      window.dispatchEvent(new CustomEvent("slide-scroll-state", { detail: { showTop: false } }));
+      window.dispatchEvent(new CustomEvent("slide-scroll-state", { detail: { showTop: false, showRemote: false } }));
       slideRefs.current.forEach((el) => el?.removeEventListener("scroll", onSlideScroll));
       setTimeout(() => { s.current.cooldown = false; }, 500);
     };
