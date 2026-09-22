@@ -68,11 +68,9 @@ export default function Hero() {
     const seek = () => {
       rafPending = false;
       if (!isFinite(video.duration)) return;
-      if ("fastSeek" in video) {
-        (video as HTMLVideoElement & { fastSeek(t: number): void }).fastSeek(targetTime);
-      } else {
-        video.currentTime = targetTime;
-      }
+      const el = video as HTMLVideoElement & { fastSeek?: (t: number) => void };
+      if (typeof el.fastSeek === "function") el.fastSeek(targetTime);
+      else el.currentTime = targetTime;
     };
 
     const setCrossfade = (t: number) => {
