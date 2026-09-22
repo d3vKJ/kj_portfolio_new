@@ -2,9 +2,6 @@
 
 import { useRef, useEffect, ReactNode } from "react";
 
-// 진입: 오른쪽에서 슬라이드 + 페이드 인 (0→10%)
-// 유지: 완전히 보임 (10→85%)
-// 퇴장: 왼쪽으로 사라지며 페이드 아웃 (85→100%)
 export default function ScrollReveal({ children, scrollHeight = "350vh" }: { children: ReactNode; scrollHeight?: string }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);

@@ -29,7 +29,6 @@ const ICON_SLUG: Record<string, { slug: string; light?: boolean }> = {
 type Category = "Web" | "Desktop" | "Android" | "All";
 const CATEGORIES: Category[] = ["All", "Web", "Desktop", "Android"];
 
-/** code: URL | null(비공개) | "#"(링크 미등록). image: null이면 준비 중 카드로 표시 */
 const PROJECTS = [
   { name: "daimon",         nameKo: "다이몬",          year: "2026", solo: true, desc: "외주 작업 자동차 카본 파츠 업체 프론트, 백 및 토스 결제까지 모두 구현", tech: ["Next.js","TypeScript","Tailwind CSS","Framer Motion","Supabase","Cloudflare","Swiper"], category: "Web" as Category, href: "https://daimon-web.nova021206.workers.dev/", code: null, image: "/projects/daimon.png" },
   { name: "apple",          nameKo: "애플",             year: "2026", solo: true, desc: "Apple 제품 소개 클론. 스크롤 인터랙션과 반응형 레이아웃.", tech: ["React","TypeScript","Vite","Sass","React Router"], category: "Web" as Category, href: "http://103.218.172.76:1004", code: "#", image: "/projects/apple.png" },
@@ -53,8 +52,8 @@ function CardThumb({ item }: { item: (typeof PROJECTS)[number] }) {
       layoutId={`card-${item.name}`}
       transition={{ layout: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }}
       style={{ pointerEvents: "none" }}
-      className={`relative aspect-[16/10] w-full overflow-hidden rounded-xl border bg-[#0a0a0a] transition-colors duration-200 group-hover:border-[var(--accent)]/40 ${
-        item.image ? "border-white/[0.1]" : "border-dashed border-white/[0.15]"
+      className={`relative aspect-[16/10] w-full overflow-hidden rounded-2xl glass-ios transition-colors duration-200 group-hover:border-[var(--accent)]/45 ${
+        item.image ? "" : "border-dashed"
       }`}
     >
       {item.image ? (
@@ -93,11 +92,11 @@ export default function Projects() {
   const p = selected !== null ? list[selected] : null;
 
   return (
-    <section className="pl-[var(--content-pl)] pr-[var(--content-pr)] pt-12 pb-24 sm:pb-12">
+    <section className="pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[var(--header-space)] pb-12">
       <div className="mx-auto w-full max-w-[var(--content-max)]">
-        <div className="mb-2">
+        <div className="mb-8 flex flex-wrap items-baseline gap-x-4 gap-y-1">
           <h2 className="section-title">Projects</h2>
-          <p className="mt-2 text-sm text-white/40">{list.length} works</p>
+          <p className="text-sm text-white/40 sm:text-base">모든 프로젝트는 1인 작업물이에요.</p>
         </div>
 
         {/* 카테고리 필터 */}
@@ -108,11 +107,11 @@ export default function Projects() {
               <button
                 key={cat}
                 onClick={() => { setFilterCat(cat); setSelected(null); }}
-                className="shrink-0 rounded-full px-4 py-1.5 text-xs transition-all duration-200"
+                className="glass-ios shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200"
                 style={{
-                  color: isActive ? "var(--accent)" : "rgba(255,255,255,0.4)",
-                  background: isActive ? "rgba(255,255,255,0.08)" : "transparent",
-                  border: `1px solid ${isActive ? "var(--accent)" : "rgba(255,255,255,0.1)"}`,
+                  color: isActive ? "var(--accent)" : "rgba(255,255,255,0.45)",
+                  background: isActive ? "color-mix(in srgb, var(--accent) 14%, transparent)" : undefined,
+                  borderColor: isActive ? "color-mix(in srgb, var(--accent) 50%, transparent)" : undefined,
                 }}
               >
                 {cat}
@@ -121,7 +120,7 @@ export default function Projects() {
           })}
         </div>
 
-        {/* 카드 갤러리 — 카드 비율 고정(16:10)으로 항상 정렬, 넘치면 자연스럽게 페이지 스크롤 */}
+          {/* 카드 갤러리 */}
         {list.length === 0 ? (
           <p className="py-16 text-center text-white/30">해당 카테고리에 표시할 프로젝트가 없습니다.</p>
         ) : (
@@ -148,15 +147,12 @@ export default function Projects() {
         )}
       </div>
 
-      {/* 상세 모달 — SectionSlider가 슬라이드를 transform으로 옮기기 때문에, 그 안에서 position:fixed를 쓰면
-          뷰포트가 아니라 transform이 걸린 조상 기준으로 배치된다. body에 포탈로 렌더링해 이 문제를 피한다.
-          이미지는 카드와 같은 layoutId를 공유해서, 클릭한 카드가 그 자리에서 모달 크기로 "확장"되는 것처럼 보인다. */}
       {typeof document !== "undefined" && createPortal(
         <AnimatePresence>
           {p && (
           <motion.div
             key="modal-backdrop"
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -164,7 +160,7 @@ export default function Projects() {
             onClick={() => setSelected(null)}
           >
             <motion.div
-              className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-white/[0.1] bg-[#0a0a0a]"
+              className="glass-modal max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl"
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.97 }}
@@ -189,7 +185,7 @@ export default function Projects() {
                 <button
                   onClick={() => setSelected(null)}
                   aria-label="닫기"
-                  className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.14] bg-black/50 text-white/70 backdrop-blur transition-colors hover:border-[var(--accent)]/50 hover:text-[var(--accent)]"
+                  className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/85 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.2)] backdrop-blur-md transition-colors hover:border-white/35 hover:bg-black/45 hover:text-white"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -224,7 +220,7 @@ export default function Projects() {
                     href={p.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center gap-2 border border-white/[0.14] px-4 py-2.5 text-sm text-white/70 transition-all duration-200 hover:border-[var(--accent)]/40 hover:bg-white/[0.06] hover:text-[var(--accent)]"
+                    className="glass-ios inline-flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-white/75 transition-all duration-200 hover:border-[var(--accent)]/40 hover:text-[var(--accent)]"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
@@ -241,7 +237,7 @@ export default function Projects() {
                     href={p.code}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center gap-2 border border-white/[0.14] px-4 py-2.5 text-sm text-white/70 transition-all duration-200 hover:border-[var(--accent)]/40 hover:bg-white/[0.06] hover:text-[var(--accent)]"
+                    className="glass-ios inline-flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-white/75 transition-all duration-200 hover:border-[var(--accent)]/40 hover:text-[var(--accent)]"
                   >
                     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.004.071 1.532 1.032 1.532 1.032.892 1.529 2.341 1.087 2.912.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z" />

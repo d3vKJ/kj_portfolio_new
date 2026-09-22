@@ -53,30 +53,46 @@ export default function Skills() {
   const gridRef = useRef<HTMLDivElement>(null);
   const tabScrollRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const underlineRef = useRef<HTMLSpanElement>(null);
 
-  // 탭 활성 언더라인 위치 갱신 + 모바일에서 잘리지 않게 가로 스크롤만 이동
-  // (scrollIntoView는 window까지 스크롤을 전파시켜 SectionSlider의 스크롤 하이재킹과 충돌하므로 사용하지 않는다)
   useEffect(() => {
     const tab = tabRefs.current[active];
-    const underline = underlineRef.current;
     const scroller = tabScrollRef.current;
-    if (!tab || !underline) return;
-    underline.style.transform = `translateX(${tab.offsetLeft}px)`;
-    underline.style.width = `${tab.offsetWidth}px`;
+    if (!tab || !scroller) return;
 
-    if (scroller) {
-      const tabLeft = tab.offsetLeft;
-      const tabRight = tabLeft + tab.offsetWidth;
-      if (tabLeft < scroller.scrollLeft) {
-        scroller.scrollTo({ left: tabLeft - 16, behavior: "smooth" });
-      } else if (tabRight > scroller.scrollLeft + scroller.clientWidth) {
-        scroller.scrollTo({ left: tabRight - scroller.clientWidth + 16, behavior: "smooth" });
-      }
+    if (active === 0) {
+      scroller.scrollTo({ left: 0, behavior: "auto" });
+      return;
+    }
+
+    // 잘린 부분만 최소로 보정 — 왼쪽에 반쯤 묻히지 않게
+    const pad = 12;
+    const sRect = scroller.getBoundingClientRect();
+    const tRect = tab.getBoundingClientRect();
+    if (tRect.left < sRect.left + pad) {
+      scroller.scrollBy({ left: tRect.left - sRect.left - pad, behavior: "smooth" });
+    } else if (tRect.right > sRect.right - pad) {
+      scroller.scrollBy({ left: tRect.right - sRect.right + pad, behavior: "smooth" });
     }
   }, [active]);
 
-  // 커서에서 가까운 아이콘일수록 살짝 확대/부상 — 반경 140px 이내만 반응
+  // Skills 섹션 진입 시 Frontend부터 보이도록 리셋
+  useEffect(() => {
+    const onSection = (e: Event) => {
+      const { index, inSlider } = (e as CustomEvent).detail as {
+        index: number;
+        inSlider: boolean;
+      };
+      if (!inSlider || index !== 2) return;
+      setActive(0);
+      setDir(1);
+      requestAnimationFrame(() => {
+        tabScrollRef.current?.scrollTo({ left: 0, behavior: "auto" });
+      });
+    };
+    window.addEventListener("section-change", onSection);
+    return () => window.removeEventListener("section-change", onSection);
+  }, []);
+
   useEffect(() => {
     const root = gridRef.current;
     if (!root) return;
@@ -116,47 +132,48 @@ export default function Skills() {
   const group = GROUPS[active];
 
   return (
-    <section className="pl-[var(--content-pl)] pr-[var(--content-pr)] pt-12 pb-24 sm:pb-12">
-      <div className="mb-8 max-w-[var(--content-max)]">
+    <section className="pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[var(--header-space)] pb-12">
+      <div className="mb-8 flex max-w-[var(--content-max)] flex-wrap items-baseline gap-x-4 gap-y-1">
         <h2 className="section-title">Skills</h2>
-        <p className="mt-1.5 text-xs text-white/35">사용 가능한 기술 스택</p>
+        <p className="text-sm text-white/40 sm:text-base">사용 가능한 기술 스택들이에요.</p>
       </div>
 
-      {/* 카테고리 탭 */}
-      <div ref={tabScrollRef} className="relative mb-10 max-w-[var(--content-max)] overflow-x-auto border-b border-white/[0.08]">
-        <div className="flex gap-1">
-          {GROUPS.map((g, i) => (
+      <div
+        ref={tabScrollRef}
+        className="mb-10 flex max-w-[var(--content-max)] justify-start gap-2 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        style={{ scrollSnapType: "none" }}
+      >
+        {GROUPS.map((g, i) => {
+          const isActive = active === i;
+          return (
             <button
               key={g.label}
               ref={(el) => { tabRefs.current[i] = el; }}
               onClick={() => { setDir(i > active ? 1 : -1); setActive(i); }}
-              className="shrink-0 whitespace-nowrap px-4 py-3 text-sm transition-colors duration-200"
-              style={{ color: active === i ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.35)" }}
+              className="glass-panel shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 sm:text-[15px]"
+              style={{
+                color: isActive ? "var(--accent)" : "rgba(255,255,255,0.45)",
+                background: isActive ? "color-mix(in srgb, var(--accent) 12%, transparent)" : undefined,
+                borderColor: isActive ? "color-mix(in srgb, var(--accent) 40%, transparent)" : undefined,
+              }}
             >
               {g.label}
-              <span className="ml-2 text-xs text-white/25">{g.skills.length}</span>
+              <span className="ml-2 text-xs opacity-60">{g.skills.length}</span>
             </button>
-          ))}
-        </div>
-        <span
-          ref={underlineRef}
-          className="absolute bottom-0 left-0 h-[2px] transition-all duration-300"
-          style={{ background: "var(--accent)", transitionTimingFunction: "cubic-bezier(0.34, 1.2, 0.64, 1)" }}
-        />
+          );
+        })}
       </div>
 
-      {/* 활성 카테고리 카드 그리드 — 탭 전환 시 방향에 따라 살짝 회전하며 슬라이드(단순 페이드 대신) */}
-      <div className="max-w-[var(--content-max)]" style={{ perspective: 1200 }}>
+      <div className="max-w-[var(--content-max)]">
         <AnimatePresence mode="wait" custom={dir}>
           <motion.div
             key={group.label}
             ref={gridRef}
             custom={dir}
-            initial={{ opacity: 0, x: dir * 60, rotateY: dir * -10 }}
-            animate={{ opacity: 1, x: 0, rotateY: 0 }}
-            exit={{ opacity: 0, x: dir * -60, rotateY: dir * 10 }}
-            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            style={{ transformStyle: "preserve-3d" }}
+            initial={{ opacity: 0, x: dir * 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: dir * -24 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-4">
               {group.skills.map((name, i) => {
@@ -165,7 +182,7 @@ export default function Skills() {
                   <div
                     key={name}
                     data-skill-card
-                    className="group relative flex flex-col items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-7 hover:bg-white/[0.06]"
+                    className="glass-panel group relative flex flex-col items-center gap-3 rounded-2xl px-4 py-7"
                     style={{
                       "--icon-color": info?.color ?? "var(--accent)",
                       transition: "transform 150ms ease-out, background-color 200ms, border-color 200ms, box-shadow 250ms",

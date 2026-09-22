@@ -1,36 +1,156 @@
 @import "tailwindcss";
 
 :root {
-  /* 모바일: Sidebar가 하단 바라 좌측 여백은 일반 거터면 충분 */
-  --content-pl: 1.5rem;
-  --content-pr: clamp(1.5rem, 5vw, 4rem);
+  --content-pl: clamp(1.25rem, 4vw, 3rem);
+  --content-pr: clamp(1.25rem, 4vw, 3rem);
   --accent: #c4b5fd;
   --mx: 50%;
   --my: 50%;
   --content-max: 1680px;
+  --header-space: 5.75rem;
+  --bg: #040404;
+  /* 투명한 글래스모피즘 */
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-bg-strong: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-highlight: rgba(255, 255, 255, 0.2);
+  --glass-blur: 24px;
+  --glass-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.12),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.22);
 }
 
 @media (min-width: 640px) {
   :root {
-    /* sm 이상: 좌측 컬럼 Sidebar(w-36 = 9rem) 폭을 확실히 넘는 값으로 */
-    --content-pl: clamp(9.5rem, 8vw, 11rem);
+    --content-pl: clamp(2rem, 5vw, 4rem);
+    --content-pr: clamp(2rem, 5vw, 4rem);
+    --header-space: 6.5rem;
   }
 }
 
 body {
-  background: #0a0a0a;
+  background: var(--bg);
   color: #fff;
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   position: relative;
 }
 
-/* 커서를 아주 은은하게 따라가는 포인트 그라디언트 — 완전 평면 탈피, 남발 금지선(opacity 4%)은 지킨다 */
+/* 글래스가 읽히도록 깔아 두는 분위기 레이어 */
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 20%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 85% 75%, rgba(99, 102, 241, 0.12), transparent 50%),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(255, 255, 255, 0.03), transparent 45%),
+    var(--bg);
+}
+
+.ambient::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 70% 15%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 35%),
+    radial-gradient(circle at 20% 80%, rgba(167, 139, 250, 0.08), transparent 40%);
+  animation: ambientDrift 28s ease-in-out infinite alternate;
+}
+
+@keyframes ambientDrift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(-2%, 3%, 0) scale(1.05); }
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  border: 0.5px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(32px) saturate(150%);
+  -webkit-backdrop-filter: blur(32px) saturate(150%);
+  border: 0.5px solid var(--glass-highlight);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-soft {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(18px) saturate(130%);
+  -webkit-backdrop-filter: blur(18px) saturate(130%);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-ios {
+  background: rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  border: 0.5px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.1),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.28);
+}
+
+/* transform 조상(섹션 슬라이더) 안에서는 backdrop-filter가 깨져 전체가 흐려 보임 */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.07);
+  border: 0.5px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.12),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* 모달용 — 밝은 글래스 + 약한 틴트로 가독성 확보 */
+.glass-modal {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 0.5px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.28),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.28);
+}
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  box-shadow: var(--glass-shadow);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-strong,
+  .glass-soft,
+  .glass-nav,
+  .glass-ios,
+  .glass-modal {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(28, 28, 36, 0.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient::after {
+    animation: none;
+  }
+}
+
 .cursor-glow {
   position: fixed;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: radial-gradient(600px circle at var(--mx) var(--my), color-mix(in srgb, var(--accent) 4%, transparent), transparent 70%);
+  background: radial-gradient(600px circle at var(--mx) var(--my), color-mix(in srgb, var(--accent) 6%, transparent), transparent 70%);
 }
 
 .section-title {
@@ -89,6 +209,37 @@ html {
   animation: textGlow 5s ease-in-out infinite;
 }
 
+.social-gh:hover {
+  border-color: #fff;
+  color: #0a0a0a;
+  background: #fff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+.unlock-track {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 0.5px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.22),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -0.5px 0 rgba(255, 255, 255, 0.06);
+}
+
+.unlock-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 0.5px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.25),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.55);
+  color: #fff;
+}
+
 .social-ig:hover {
   border-color: transparent;
   color: #fff;
@@ -100,6 +251,9 @@ html {
     #d6249f 60%,
     #285aeb 90%
   );
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
 }
 
 @keyframes shimmer-sweep {
@@ -107,7 +261,6 @@ html {
   100% { transform: translateX(-200%); }
 }
 
-/* 스크롤바 숨김 */
 * {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -116,7 +269,6 @@ html {
   display: none;
 }
 
-/* 노이즈 오버레이 */
 .noise::before {
   content: "";
   position: fixed;

@@ -27,13 +27,13 @@ const TIMELINE = [
 
 export default function AboutMe() {
   return (
-    <section className="min-h-full pb-24 pl-[var(--content-pl)] pr-[var(--content-pr)] sm:pb-0 lg:h-full">
+    <section className="min-h-full pb-10 pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[var(--header-space)] lg:h-full">
     <div className="mx-auto flex min-h-full max-w-[var(--content-max)] flex-col lg:h-full lg:flex-row">
 
       {/* ── 1열: 사진 ── */}
       <div className="flex flex-col items-center justify-center gap-6 border-white/[0.08] px-8 py-12 lg:flex-1 lg:border-r lg:py-0">
         <div className="flex flex-col items-center gap-6 lg:-translate-y-12">
-          <div className="relative w-48 aspect-[3/4] overflow-hidden rounded-3xl border border-white/[0.12] bg-white/[0.03] shadow-2xl transition-transform duration-300 hover:scale-[1.02]">
+          <div className="relative w-48 aspect-[3/4] overflow-hidden rounded-3xl glass-ios shadow-2xl transition-transform duration-300 hover:scale-[1.02]">
             <Image
               src="/profile.png"
               alt="장경진 프로필 사진"
@@ -45,7 +45,7 @@ export default function AboutMe() {
           </div>
           <div className="text-center">
             <p className="text-lg font-semibold text-white/80">장경진</p>
-            <p className="text-xs text-white/35 mt-1">Publisher / Front-end / Fullstack</p>
+            <p className="text-xs text-white/35 mt-1">Publisher / Front-End / Full-Stack</p>
           </div>
         </div>
       </div>
@@ -54,11 +54,11 @@ export default function AboutMe() {
       <div className="flex flex-col justify-center border-t border-white/[0.08] px-8 py-12 lg:flex-1 lg:border-t-0 lg:border-r lg:px-10 lg:py-0">
         <div className="flex w-full flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
           <div className="flex flex-col justify-start lg:min-h-[136px]">
-            <h2 className="section-title">About</h2>
+            <h2 className="section-title">About Me</h2>
             <p className="mt-2 text-sm text-white/45 leading-6">
-              사용자 경험을 세심하게 고민하는 개발자.<br />
-              인터랙션과 애니메이션에 관심이 많으며<br />
-              플랫폼을 가리지 않고 도전합니다.
+              웹, 데스크톱 앱, 모바일 앱 그리고 AI까지<br />
+              다양한 분야에 호기심을 가지고 공부하고 있어요.<br />
+              뛰어난 습득력과 적용력을 바탕으로 더욱 발전하는 중이에요.
             </p>
           </div>
 
@@ -66,7 +66,7 @@ export default function AboutMe() {
 
           <div className="flex flex-col gap-2.5">
             {INFO.map(({ icon, label, value }) => (
-              <div key={label} className="flex items-center gap-4 px-5 py-3.5 rounded-xl border border-white/[0.1] bg-white/[0.04]">
+              <div key={label} className="glass-ios flex items-center gap-4 rounded-2xl px-5 py-3.5">
                 <span className="text-white/35 shrink-0">{icon}</span>
                 <span className="text-[10px] text-white/25 uppercase tracking-widest w-16 shrink-0">{label}</span>
                 <span className="text-sm text-white/65">{value}</span>
@@ -76,13 +76,13 @@ export default function AboutMe() {
         </div>
       </div>
 
-      {/* ── 3열: 걸어온 길 ── */}
+      {/* ── 3열: History ── */}
       <div className="flex flex-col justify-center border-t border-white/[0.08] px-8 py-12 lg:flex-1 lg:border-t-0 lg:px-10 lg:py-0">
         <div className="flex w-full flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
           <div className="flex flex-col justify-start lg:min-h-[136px]">
             <h2 className="section-title">History</h2>
             <p className="mt-2 text-sm text-white/35 leading-6">
-              과정
+              경험
             </p>
           </div>
 
@@ -94,7 +94,6 @@ export default function AboutMe() {
 
             {TIMELINE.map((item, i) => (
               <div key={i} className="relative flex gap-6 pb-8 last:pb-0">
-                {/* 도트 — self-start 없으면 flex row가 이 wrapper를 행 전체 높이로 늘려서 글로우가 줄처럼 길어짐 */}
                 <div className="relative w-2.5 h-2.5 shrink-0 self-start mt-[5px]">
                   {item.current ? (
                     <>
@@ -118,7 +117,7 @@ export default function AboutMe() {
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="text-xs font-mono text-white/30">{item.year}</span>
                     {item.current && (
-                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.07] border border-white/[0.12] text-white/45 uppercase tracking-widest">현재</span>
+                      <span className="glass-soft text-[9px] px-2 py-0.5 rounded-full text-white/45 uppercase tracking-widest">현재</span>
                     )}
                   </div>
                   <p className="text-base font-semibold text-white/80 leading-snug">{item.title}</p>

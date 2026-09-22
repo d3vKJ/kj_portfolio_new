@@ -4,12 +4,14 @@ import Projects from "@/components/Projects";
 import Skills from "@/components/Skills";
 import Contact from "@/components/Contact";
 import SectionSlider from "@/components/SectionSlider";
-import Sidebar from "@/components/Sidebar";
+import Header from "@/components/Header";
+import MobileTopButton from "@/components/MobileTopButton";
 
 export default function Home() {
   return (
     <main>
-      <Sidebar />
+      <Header />
+      <MobileTopButton />
       <Hero />
       <SectionSlider>
         <AboutMe />

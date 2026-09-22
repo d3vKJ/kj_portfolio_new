@@ -68,6 +68,38 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
       setSliding(false);
       s.current.animating = false;
       s.current.wheelLockUntil = performance.now() + WHEEL_COOLDOWN_MS;
+      bindSlideScroll();
+    };
+
+    const emitHeaderHide = () => {
+      const el = slideRefs.current[s.current.cur];
+      const mobile = window.matchMedia("(max-width: 639px)").matches;
+      const scrollTop = el?.scrollTop ?? 0;
+      // Projects: 항상 / About: 모바일에서만 스크롤 시 헤더 숨김
+      const hideOnScroll = s.current.cur === 1 || (s.current.cur === 0 && mobile);
+      const hide = s.current.locked && hideOnScroll && scrollTop > 32;
+      window.dispatchEvent(new CustomEvent("header-auto-hide", { detail: { hide } }));
+      window.dispatchEvent(
+        new CustomEvent("slide-scroll-state", {
+          detail: { showTop: s.current.locked && mobile && scrollTop > 80 },
+        }),
+      );
+    };
+
+    const onSlideScroll = () => emitHeaderHide();
+
+    const bindSlideScroll = () => {
+      slideRefs.current.forEach((el) => {
+        el?.removeEventListener("scroll", onSlideScroll);
+      });
+      const active = slideRefs.current[s.current.cur];
+      active?.addEventListener("scroll", onSlideScroll, { passive: true });
+      emitHeaderHide();
+    };
+
+    const onScrollTop = () => {
+      const el = slideRefs.current[s.current.cur];
+      el?.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const lock = () => {
@@ -83,6 +115,7 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
       document.body.style.cssText =
         `position:fixed;top:-${top}px;width:100%;overflow:hidden`;
       emitChange(s.current.cur, true);
+      bindSlideScroll();
     };
 
     const unlock = () => {
@@ -94,6 +127,9 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
       document.body.style.cssText = "";
       emitChange(s.current.cur, false);
       window.dispatchEvent(new CustomEvent("hero-crossfade", { detail: { t: 0 } }));
+      window.dispatchEvent(new CustomEvent("header-auto-hide", { detail: { hide: false } }));
+      window.dispatchEvent(new CustomEvent("slide-scroll-state", { detail: { showTop: false } }));
+      slideRefs.current.forEach((el) => el?.removeEventListener("scroll", onSlideScroll));
       setTimeout(() => { s.current.cooldown = false; }, 500);
     };
 
@@ -111,6 +147,8 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
         lock();
         return;
       }
+      // 모바일은 Slide to enter로만 진입 — 위로 스와이프 스크롤로 sentinel 잠금 방지
+      if (window.matchMedia("(max-width: 639px)").matches) return;
       const r = sentinel.getBoundingClientRect();
       if (r.top <= 0 && r.bottom >= window.innerHeight) lock();
     };
@@ -125,7 +163,6 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
 
       const down = e.deltaY > 0;
 
-      // 현재 슬라이드 내부에 아직 스크롤할 내용이 남아있으면, 섹션을 전환하지 않고 그 스크롤을 먼저 소진시킨다
       const activeSlide = slideRefs.current[s.current.cur];
       if (activeSlide && hasScrollRoom(activeSlide, down)) {
         return;
@@ -172,11 +209,14 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("navigate-section", onNavigate);
     window.addEventListener("hero-crossfade", onCrossfade);
+    window.addEventListener("slide-scroll-top", onScrollTop);
     return () => {
       window.removeEventListener("scroll", check);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("navigate-section", onNavigate);
       window.removeEventListener("hero-crossfade", onCrossfade);
+      window.removeEventListener("slide-scroll-top", onScrollTop);
+      slideRefs.current.forEach((el) => el?.removeEventListener("scroll", onSlideScroll));
       if (state.locked) {
         state.locked = false;
         document.body.style.cssText = "";
@@ -188,10 +228,10 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <div ref={sentinelRef} className="relative h-[100dvh] bg-[#0a0a0a]" aria-hidden />
+      <div ref={sentinelRef} className="relative h-[100dvh] bg-transparent" aria-hidden />
 
       <div
-        className="fixed left-0 top-0 z-10 w-full overflow-hidden bg-[#0a0a0a]"
+        className="fixed left-0 top-0 z-10 w-full overflow-hidden bg-transparent"
         style={{
           height: "100dvh",
           opacity: locked ? 1 : reveal,
