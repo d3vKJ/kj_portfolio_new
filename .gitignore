@@ -40,6 +40,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# cloudflare / opennext
+.open-next/
+.wrangler/
+.dev.vars
+
 # local agent / skill tooling (keep on disk, never push)
 .agents/
 .claude/
