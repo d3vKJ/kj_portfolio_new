@@ -52,3 +52,7 @@ next-env.d.ts
 skills-lock.json
 AGENTS.md
 CLAUDE.md
+
+# design notes (local only)
+DESIGN.md
+REDESIGN-PLAN.md
