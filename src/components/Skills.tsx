@@ -133,14 +133,14 @@ export default function Skills() {
 
   return (
     <section className="pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[var(--header-space)] pb-12">
-      <div className="mb-8 flex max-w-[var(--content-max)] flex-wrap items-baseline gap-x-4 gap-y-1">
+      <div className="mx-auto mb-8 flex max-w-[var(--content-max)] flex-wrap items-baseline gap-x-4 gap-y-1">
         <h2 className="section-title">Skills</h2>
         <p className="text-sm text-white/40 sm:text-base">사용 가능한 기술 스택들이에요.</p>
       </div>
 
       <div
         ref={tabScrollRef}
-        className="mb-10 flex max-w-[var(--content-max)] justify-start gap-2 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="mx-auto mb-10 flex max-w-[var(--content-max)] justify-start gap-2 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ scrollSnapType: "none" }}
       >
         {GROUPS.map((g, i) => {
@@ -164,7 +164,7 @@ export default function Skills() {
         })}
       </div>
 
-      <div className="max-w-[var(--content-max)]">
+      <div className="mx-auto max-w-[var(--content-max)]">
         <AnimatePresence mode="wait" custom={dir}>
           <motion.div
             key={group.label}

@@ -56,42 +56,44 @@ export default function Header() {
         className="pointer-events-none absolute inset-x-0 top-0 h-[var(--header-space)] bg-gradient-to-b from-[#040404]/92 via-[#040404]/5 to-transparent"
       />
 
-      <div className="relative mx-auto flex h-14 max-w-[var(--content-max)] items-center justify-between gap-3 px-[var(--content-pl)] pr-[var(--content-pr)] pt-[max(0.5rem,env(safe-area-inset-top))] sm:h-16">
-        <button
-          onClick={goHome}
-          className="group flex shrink-0 items-center opacity-90 transition-opacity duration-200 hover:opacity-100 focus:outline-none"
-          title="홈으로"
-          aria-label="홈으로"
-        >
-          <Image
-            src="/logo.png"
-            alt="JINSNATION"
-            width={120}
-            height={40}
-            className="h-8 w-auto object-contain transition-transform duration-200 group-hover:scale-105 sm:h-9"
-            priority
-          />
-        </button>
+      <div className="relative pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[max(0.5rem,env(safe-area-inset-top))]">
+        <div className="mx-auto flex h-14 w-full max-w-[var(--content-max)] items-center justify-between gap-3 sm:h-16">
+          <button
+            onClick={goHome}
+            className="group flex shrink-0 items-center opacity-90 transition-opacity duration-200 hover:opacity-100 focus:outline-none"
+            title="홈으로"
+            aria-label="홈으로"
+          >
+            <Image
+              src="/logo.png"
+              alt="JINSNATION"
+              width={120}
+              height={40}
+              className="h-8 w-auto object-contain transition-transform duration-200 group-hover:scale-105 sm:h-9"
+              priority
+            />
+          </button>
 
-        <nav className="flex items-center gap-1.5 sm:gap-2" aria-label="섹션 이동">
-          {SECTIONS.map((s) => {
-            const isActive = active === s.index;
-            return (
-              <button
-                key={s.index}
-                onClick={() => goSection(s.index)}
-                className="glass-ios rounded-full px-3 py-1.5 text-[13px] font-medium transition-all duration-200 sm:px-4 sm:py-2 sm:text-[15px]"
-                style={{
-                  color: isActive ? "#fff" : "rgba(255,255,255,0.55)",
-                  background: isActive ? "rgba(255,255,255,0.1)" : undefined,
-                  borderColor: isActive ? "rgba(255,255,255,0.24)" : undefined,
-                }}
-              >
-                {s.label}
-              </button>
-            );
-          })}
-        </nav>
+          <nav className="flex items-center gap-1.5 sm:gap-2" aria-label="섹션 이동">
+            {SECTIONS.map((s) => {
+              const isActive = active === s.index;
+              return (
+                <button
+                  key={s.index}
+                  onClick={() => goSection(s.index)}
+                  className="glass-ios rounded-full px-3 py-1.5 text-[13px] font-medium transition-all duration-200 sm:px-4 sm:py-2 sm:text-[15px]"
+                  style={{
+                    color: isActive ? "#fff" : "rgba(255,255,255,0.55)",
+                    background: isActive ? "rgba(255,255,255,0.1)" : undefined,
+                    borderColor: isActive ? "rgba(255,255,255,0.24)" : undefined,
+                  }}
+                >
+                  {s.label}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
       </div>
     </header>
   );

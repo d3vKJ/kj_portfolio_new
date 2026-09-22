@@ -81,9 +81,9 @@ export default function AboutMe() {
         <div className="flex w-full flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
           <div className="flex flex-col justify-start lg:min-h-[136px]">
             <h2 className="section-title">History</h2>
-            <p className="mt-2 text-sm text-white/35 leading-6">
+            {/* <p className="mt-2 text-sm text-white/35 leading-6">
               경험
-            </p>
+            </p> */}
           </div>
 
           <div className="h-px bg-white/[0.08]" />
