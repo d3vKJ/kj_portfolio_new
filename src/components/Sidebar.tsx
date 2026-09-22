@@ -58,7 +58,7 @@ export default function Sidebar() {
     <>
     {/* 모바일(sm 미만): 하단 탭 바 — 좌측 컬럼은 폭이 좁은 화면에서 본문과 겹치므로 별도 레이아웃 사용 */}
     <nav
-      className="sm:hidden fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-white/[0.08] bg-[#0a0a0a]/95 px-2 py-2.5 backdrop-blur"
+      className="sm:hidden fixed inset-x-0 bottom-0 z-40 flex items-center justify-around gap-1 border-t border-white/[0.08] bg-[#0a0a0a]/95 px-2 pb-[max(0.625rem,env(safe-area-inset-bottom))] pt-2.5 backdrop-blur"
       style={{
         opacity: inSlider ? 1 : 0,
         transform: inSlider ? "translateY(0)" : "translateY(12px)",
@@ -70,7 +70,15 @@ export default function Sidebar() {
       {SECTIONS.map((s) => {
         const isActive = active === s.index;
         return (
-          <button key={s.index} onClick={() => goSection(s.index)} className="flex flex-col items-center gap-1 px-3 py-1">
+          <button
+            key={s.index}
+            onClick={() => goSection(s.index)}
+            className="flex flex-1 flex-col items-center gap-1 rounded-xl border px-3 py-2 transition-colors duration-200 active:scale-95"
+            style={{
+              borderColor: isActive ? "color-mix(in srgb, var(--accent) 40%, transparent)" : "transparent",
+              background: isActive ? "color-mix(in srgb, var(--accent) 10%, transparent)" : "rgba(255,255,255,0.04)",
+            }}
+          >
             <span
               className="block h-1.5 w-1.5 rounded-full transition-colors duration-300"
               style={{ background: isActive ? "var(--accent)" : "rgba(255,255,255,0.25)" }}

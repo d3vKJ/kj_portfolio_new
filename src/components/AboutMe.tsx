@@ -27,8 +27,8 @@ const TIMELINE = [
 
 export default function AboutMe() {
   return (
-    <section className="h-full pb-24 pl-[var(--content-pl)] pr-[var(--content-pr)] sm:pb-0">
-    <div className="mx-auto flex h-full max-w-[var(--content-max)] flex-col lg:flex-row">
+    <section className="min-h-full pb-24 pl-[var(--content-pl)] pr-[var(--content-pr)] sm:pb-0 lg:h-full">
+    <div className="mx-auto flex min-h-full max-w-[var(--content-max)] flex-col lg:h-full lg:flex-row">
 
       {/* ── 1열: 사진 ── */}
       <div className="flex flex-col items-center justify-center gap-6 border-white/[0.08] px-8 py-12 lg:flex-1 lg:border-r lg:py-0">

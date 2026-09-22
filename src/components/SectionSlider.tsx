@@ -188,11 +188,12 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <div ref={sentinelRef} className="relative h-screen bg-[#0a0a0a]" aria-hidden />
+      <div ref={sentinelRef} className="relative h-[100dvh] bg-[#0a0a0a]" aria-hidden />
 
       <div
-        className="fixed inset-0 z-10 overflow-hidden bg-[#0a0a0a]"
+        className="fixed left-0 top-0 z-10 w-full overflow-hidden bg-[#0a0a0a]"
         style={{
+          height: "100dvh",
           opacity: locked ? 1 : reveal,
           visibility: showLayer ? "visible" : "hidden",
           pointerEvents: locked ? "auto" : "none",

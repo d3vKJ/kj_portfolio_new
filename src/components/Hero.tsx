@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 const LOGO_OUT_END = 0.1;
@@ -21,12 +21,22 @@ export default function Hero() {
   const stickyRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const lastT = useRef(-1);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 모바일(터치 기기)에서는 영상 스크럽 대신 탭 한 번으로 바로 About 진입
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    setIsMobile(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   // 로고 커서 틸트 — 정지 화면(오버레이)에서만, 마우스 위치에 살짝 반응
   useEffect(() => {
     const sticky = stickyRef.current;
     const logo = logoRef.current;
-    if (!sticky || !logo) return;
+    if (!sticky || !logo || isMobile) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const onMove = (e: MouseEvent) => {
@@ -38,14 +48,14 @@ export default function Hero() {
 
     sticky.addEventListener("mousemove", onMove);
     return () => sticky.removeEventListener("mousemove", onMove);
-  }, []);
+  }, [isMobile]);
 
   useEffect(() => {
     const video = videoRef.current;
     const section = sectionRef.current;
     const overlay = overlayRef.current;
     const sticky = stickyRef.current;
-    if (!video || !section || !overlay || !sticky) return;
+    if (isMobile || !video || !section || !overlay || !sticky) return;
 
     let targetTime = 0;
     let rafPending = false;
@@ -109,7 +119,35 @@ export default function Hero() {
 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [isMobile]);
+
+  const goAbout = () =>
+    window.dispatchEvent(new CustomEvent("navigate-section", { detail: { action: "go", index: 0 } }));
+
+  if (isMobile) {
+    return (
+      <section className="relative z-20 h-[100dvh]">
+        <button
+          onClick={goAbout}
+          aria-label="탭해서 About으로 이동"
+          className="flex h-full w-full flex-col items-center justify-center bg-[#0a0a0a] active:opacity-80"
+        >
+          <Image src="/logo.png" alt="logo" width={220} height={220} className="object-contain" priority />
+          <p className="mt-1 px-4 text-center text-[10px] tracking-[0.12em] uppercase text-white/60">
+            Publisher | Front-End | Full-Stack
+          </p>
+
+          <div className="absolute bottom-16 flex flex-col items-center gap-2 text-white/40">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="animate-pulse">
+              <circle cx="12" cy="12" r="9" strokeOpacity="0.5" />
+              <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" />
+            </svg>
+            <span className="text-[10px] tracking-[0.2em] uppercase">Tap</span>
+          </div>
+        </button>
+      </section>
+    );
+  }
 
   return (
     <section ref={sectionRef} className="relative z-20 h-[950vh]">
@@ -132,11 +170,11 @@ export default function Hero() {
           <div ref={logoRef} style={{ transition: "transform 200ms ease-out", transformStyle: "preserve-3d" }}>
             <Image src="/logo.png" alt="logo" width={280} height={280} className="object-contain" priority />
           </div>
-          <p className="mt-1 text-[13px] tracking-[0.3em] uppercase text-white/60">
-            Front End Developer
+          <p className="mt-1 px-4 text-center text-[13px] tracking-[0.3em] uppercase text-white/60">
+            Publisher | Front-End | Full-Stack
           </p>
 
-          <div className="absolute bottom-24 flex flex-col items-center gap-2 text-white/40 sm:bottom-10">
+          <div className="absolute bottom-10 flex flex-col items-center gap-2 text-white/40">
             <svg width="16" height="26" viewBox="0 0 16 26" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="0.75" y="0.75" width="14.5" height="24.5" rx="7.25" stroke="currentColor" strokeWidth="1.5" />
               <line x1="8" y1="0.75" x2="8" y2="10" stroke="currentColor" strokeWidth="1" strokeOpacity="0.4" />
