@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 const INFO = [
   {
     icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.4}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5A2.25 2.25 0 0012.75 4.5h-1.5A2.25 2.25 0 009 6.75v1.5M8.25 21h7.5A2.25 2.25 0 0018 18.75v-7.5A2.25 2.25 0 0015.75 9h-7.5A2.25 2.25 0 006 11.25v7.5A2.25 2.25 0 008.25 21z" /></svg>,
@@ -20,96 +22,115 @@ const INFO = [
 ];
 
 const TIMELINE = [
-  { year: "2026", title: "프리랜서 개발자", desc: "자동차 카본 파츠 업체 외주 — 풀스택 단독 구현", current: true },
-  { year: "2025", title: "자체 프로젝트 다수 완성", desc: "Airport Typing Game, Genesis, Apple 클론 제작 및 배포" },
-  { year: "2024", title: "프론트엔드 개발 시작", desc: "React, Next.js 독학 및 첫 프로젝트 배포" },
+  { year: "2026", title: "SBS아카데미컴퓨터아트학원 대구", desc: "Chat GPT & React 활용 스마트 UIUX 반응형 웹디자인 과정 수료 (예정)", current: true },
 ];
 
 export default function AboutMe() {
   return (
-    <section className="h-full flex pl-40 overflow-hidden">
+    <section className="h-full pb-24 pl-[var(--content-pl)] pr-[var(--content-pr)] sm:pb-0">
+    <div className="mx-auto flex h-full max-w-[var(--content-max)] flex-col lg:flex-row">
 
       {/* ── 1열: 사진 ── */}
-      <div className="flex-1 flex flex-col items-center justify-center border-r border-white/[0.08] gap-6 px-8">
-        <div className="w-48 aspect-[3/4] rounded-3xl border-2 border-dashed border-white/[0.15] bg-white/[0.03] flex flex-col items-center justify-center gap-3 text-white/20 hover:border-white/30 hover:bg-white/[0.05] transition-all cursor-pointer">
-          <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-          </svg>
-          <span className="text-[9px] tracking-[0.2em] uppercase">Photo</span>
-        </div>
-        <div className="text-center">
-          <p className="text-lg font-semibold text-white/80">장경진</p>
-          <p className="text-xs text-white/35 mt-1">Frontend Developer</p>
+      <div className="flex flex-col items-center justify-center gap-6 border-white/[0.08] px-8 py-12 lg:flex-1 lg:border-r lg:py-0">
+        <div className="flex flex-col items-center gap-6 lg:-translate-y-12">
+          <div className="relative w-48 aspect-[3/4] overflow-hidden rounded-3xl border border-white/[0.12] bg-white/[0.03] shadow-2xl transition-transform duration-300 hover:scale-[1.02]">
+            <Image
+              src="/profile.png"
+              alt="장경진 프로필 사진"
+              fill
+              sizes="192px"
+              className="object-cover object-center"
+              priority
+            />
+          </div>
+          <div className="text-center">
+            <p className="text-lg font-semibold text-white/80">장경진</p>
+            <p className="text-xs text-white/35 mt-1">Publisher / Front-end / Fullstack</p>
+          </div>
         </div>
       </div>
 
       {/* ── 2열: 내 정보 ── */}
-      <div className="flex-1 flex flex-col justify-center border-r border-white/[0.08] px-10 gap-5">
-        <div>
-          <h2 className="text-3xl font-semibold tracking-tight">About</h2>
-          <p className="mt-2 text-sm text-white/45 leading-6">
-            사용자 경험을 세심하게 고민하는 개발자.<br />
-            인터랙션과 애니메이션에 관심이 많으며<br />
-            플랫폼을 가리지 않고 도전합니다.
-          </p>
-        </div>
+      <div className="flex flex-col justify-center border-t border-white/[0.08] px-8 py-12 lg:flex-1 lg:border-t-0 lg:border-r lg:px-10 lg:py-0">
+        <div className="flex w-full flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
+          <div className="flex flex-col justify-start lg:min-h-[136px]">
+            <h2 className="section-title">About</h2>
+            <p className="mt-2 text-sm text-white/45 leading-6">
+              사용자 경험을 세심하게 고민하는 개발자.<br />
+              인터랙션과 애니메이션에 관심이 많으며<br />
+              플랫폼을 가리지 않고 도전합니다.
+            </p>
+          </div>
 
-        <div className="h-px bg-white/[0.08]" />
+          <div className="h-px bg-white/[0.08]" />
 
-        <div className="flex flex-col gap-2.5">
-          {INFO.map(({ icon, label, value }) => (
-            <div key={label} className="flex items-center gap-4 px-5 py-3.5 rounded-xl border border-white/[0.1] bg-white/[0.04]">
-              <span className="text-white/35 shrink-0">{icon}</span>
-              <span className="text-[10px] text-white/25 uppercase tracking-widest w-16 shrink-0">{label}</span>
-              <span className="text-sm text-white/65">{value}</span>
-            </div>
-          ))}
+          <div className="flex flex-col gap-2.5">
+            {INFO.map(({ icon, label, value }) => (
+              <div key={label} className="flex items-center gap-4 px-5 py-3.5 rounded-xl border border-white/[0.1] bg-white/[0.04]">
+                <span className="text-white/35 shrink-0">{icon}</span>
+                <span className="text-[10px] text-white/25 uppercase tracking-widest w-16 shrink-0">{label}</span>
+                <span className="text-sm text-white/65">{value}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* ── 3열: 걸어온 길 ── */}
-      <div className="flex-1 flex flex-col justify-center px-10 gap-5 overflow-y-auto py-12">
-        <div>
-          <h2 className="text-3xl font-semibold tracking-tight">History</h2>
-          <p className="mt-2 text-sm text-white/35">걸어온 길</p>
-        </div>
+      <div className="flex flex-col justify-center border-t border-white/[0.08] px-8 py-12 lg:flex-1 lg:border-t-0 lg:px-10 lg:py-0">
+        <div className="flex w-full flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
+          <div className="flex flex-col justify-start lg:min-h-[136px]">
+            <h2 className="section-title">History</h2>
+            <p className="mt-2 text-sm text-white/35 leading-6">
+              과정
+            </p>
+          </div>
 
-        <div className="h-px bg-white/[0.08]" />
+          <div className="h-px bg-white/[0.08]" />
 
-        <div className="relative flex flex-col gap-0">
-          {/* 수직 선 */}
-          <div className="absolute left-[5px] top-2 bottom-2 w-px bg-white/[0.1]" />
+          <div className="relative flex flex-col gap-0">
+            {/* 수직 선 */}
+            <div className="absolute left-[5px] top-2 bottom-2 w-px bg-white/[0.1]" />
 
-          {TIMELINE.map((item, i) => (
-            <div key={i} className="relative flex gap-6 pb-8 last:pb-0">
-              {/* 도트 */}
-              <div className="relative shrink-0 mt-[5px]">
-                {item.current ? (
-                  <>
-                    <span className="absolute -inset-2 rounded-full bg-white/[0.07] animate-ping" style={{ animationDuration: "2.5s" }} />
-                    <span className="relative block w-2.5 h-2.5 rounded-full bg-white/80" />
-                  </>
-                ) : (
-                  <span className="block w-2.5 h-2.5 rounded-full border border-white/25" />
-                )}
-              </div>
-
-              {/* 내용 */}
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-xs font-mono text-white/30">{item.year}</span>
-                  {item.current && (
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.07] border border-white/[0.12] text-white/45 uppercase tracking-widest">현재</span>
+            {TIMELINE.map((item, i) => (
+              <div key={i} className="relative flex gap-6 pb-8 last:pb-0">
+                {/* 도트 — self-start 없으면 flex row가 이 wrapper를 행 전체 높이로 늘려서 글로우가 줄처럼 길어짐 */}
+                <div className="relative w-2.5 h-2.5 shrink-0 self-start mt-[5px]">
+                  {item.current ? (
+                    <>
+                      <span
+                        className="absolute -inset-2.5 rounded-full"
+                        style={{
+                          background: "radial-gradient(circle, var(--accent) 0%, transparent 70%)",
+                          filter: "blur(3px)",
+                          animation: "dotGlow 2.4s ease-in-out infinite",
+                        }}
+                      />
+                      <span className="relative block w-2.5 h-2.5 rounded-full" style={{ background: "var(--accent)" }} />
+                    </>
+                  ) : (
+                    <span className="block w-2.5 h-2.5 rounded-full border border-white/25" />
                   )}
                 </div>
-                <p className="text-base font-semibold text-white/80 leading-snug">{item.title}</p>
-                <p className="text-sm text-white/40 mt-1.5 leading-6">{item.desc}</p>
+
+                {/* 내용 */}
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="text-xs font-mono text-white/30">{item.year}</span>
+                    {item.current && (
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.07] border border-white/[0.12] text-white/45 uppercase tracking-widest">현재</span>
+                    )}
+                  </div>
+                  <p className="text-base font-semibold text-white/80 leading-snug">{item.title}</p>
+                  <p className="text-sm text-white/40 mt-1.5 leading-6">{item.desc}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
+    </div>
     </section>
   );
 }

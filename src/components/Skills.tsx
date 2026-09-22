@@ -1,3 +1,9 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
+
 type IconInfo = { slug?: string; color: string; light?: boolean; svg?: string };
 
 const ICONS: Record<string, IconInfo> = {
@@ -34,38 +40,156 @@ function Icon({ name }: { name: string }) {
   const info = ICONS[name];
   if (!info) return null;
   if (info.svg) return (
-    <span dangerouslySetInnerHTML={{ __html: info.svg.replace("<svg ", `<svg width="28" height="28" `) }} />
+    <span dangerouslySetInnerHTML={{ __html: info.svg.replace("<svg ", `<svg width="40" height="40" `) }} />
   );
-  return <img src={`https://cdn.simpleicons.org/${info.slug}/${info.color.replace("#", "")}`} width={28} height={28} alt={name} className="object-contain" />;
+  return <Image src={`https://cdn.simpleicons.org/${info.slug}/${info.color.replace("#", "")}`} width={40} height={40} alt={name} unoptimized className="object-contain" />;
 }
 
+const PROXIMITY_RADIUS = 140;
+
 export default function Skills() {
+  const [active, setActive] = useState(0);
+  const [dir, setDir] = useState(1);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const tabScrollRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const underlineRef = useRef<HTMLSpanElement>(null);
+
+  // 탭 활성 언더라인 위치 갱신 + 모바일에서 잘리지 않게 가로 스크롤만 이동
+  // (scrollIntoView는 window까지 스크롤을 전파시켜 SectionSlider의 스크롤 하이재킹과 충돌하므로 사용하지 않는다)
+  useEffect(() => {
+    const tab = tabRefs.current[active];
+    const underline = underlineRef.current;
+    const scroller = tabScrollRef.current;
+    if (!tab || !underline) return;
+    underline.style.transform = `translateX(${tab.offsetLeft}px)`;
+    underline.style.width = `${tab.offsetWidth}px`;
+
+    if (scroller) {
+      const tabLeft = tab.offsetLeft;
+      const tabRight = tabLeft + tab.offsetWidth;
+      if (tabLeft < scroller.scrollLeft) {
+        scroller.scrollTo({ left: tabLeft - 16, behavior: "smooth" });
+      } else if (tabRight > scroller.scrollLeft + scroller.clientWidth) {
+        scroller.scrollTo({ left: tabRight - scroller.clientWidth + 16, behavior: "smooth" });
+      }
+    }
+  }, [active]);
+
+  // 커서에서 가까운 아이콘일수록 살짝 확대/부상 — 반경 140px 이내만 반응
+  useEffect(() => {
+    const root = gridRef.current;
+    if (!root) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let raf = 0;
+    const onMove = (e: MouseEvent) => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const cards = root.querySelectorAll<HTMLDivElement>("[data-skill-card]");
+        cards.forEach((card) => {
+          const r = card.getBoundingClientRect();
+          const cx = r.left + r.width / 2;
+          const cy = r.top + r.height / 2;
+          const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+          const f = Math.max(0, 1 - dist / PROXIMITY_RADIUS);
+          card.style.transform = `translateY(${-6 * f}px) scale(${1 + 0.06 * f})`;
+        });
+      });
+    };
+    const onLeave = () => {
+      root.querySelectorAll<HTMLDivElement>("[data-skill-card]").forEach((card) => {
+        card.style.transform = "translateY(0) scale(1)";
+      });
+    };
+
+    root.addEventListener("mousemove", onMove);
+    root.addEventListener("mouseleave", onLeave);
+    return () => {
+      root.removeEventListener("mousemove", onMove);
+      root.removeEventListener("mouseleave", onLeave);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [active]);
+
+  const group = GROUPS[active];
+
   return (
-    <section className="h-full flex flex-col pl-44 pr-10 py-12 overflow-hidden">
-      <div className="mb-8 shrink-0">
-        <h2 className="text-3xl font-semibold tracking-tight">Skills</h2>
-        <p className="mt-1.5 text-white/35 text-xs">사용 가능한 기술 스택</p>
+    <section className="pl-[var(--content-pl)] pr-[var(--content-pr)] pt-12 pb-24 sm:pb-12">
+      <div className="mb-8 max-w-[var(--content-max)]">
+        <h2 className="section-title">Skills</h2>
+        <p className="mt-1.5 text-xs text-white/35">사용 가능한 기술 스택</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto flex flex-col gap-10">
-        {GROUPS.map(g => (
-          <div key={g.label}>
-            <p className="text-[10px] text-white/25 uppercase tracking-[0.2em] mb-4">{g.label}</p>
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-2">
-              {g.skills.map(name => (
-                <div
-                  key={name}
-                  className="flex flex-col items-center gap-2 py-4 px-2 rounded-2xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/[0.16] transition-all cursor-default group"
-                >
-                  <div className="opacity-80 group-hover:opacity-100 transition-opacity">
-                    <Icon name={name} />
+      {/* 카테고리 탭 */}
+      <div ref={tabScrollRef} className="relative mb-10 max-w-[var(--content-max)] overflow-x-auto border-b border-white/[0.08]">
+        <div className="flex gap-1">
+          {GROUPS.map((g, i) => (
+            <button
+              key={g.label}
+              ref={(el) => { tabRefs.current[i] = el; }}
+              onClick={() => { setDir(i > active ? 1 : -1); setActive(i); }}
+              className="shrink-0 whitespace-nowrap px-4 py-3 text-sm transition-colors duration-200"
+              style={{ color: active === i ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.35)" }}
+            >
+              {g.label}
+              <span className="ml-2 text-xs text-white/25">{g.skills.length}</span>
+            </button>
+          ))}
+        </div>
+        <span
+          ref={underlineRef}
+          className="absolute bottom-0 left-0 h-[2px] transition-all duration-300"
+          style={{ background: "var(--accent)", transitionTimingFunction: "cubic-bezier(0.34, 1.2, 0.64, 1)" }}
+        />
+      </div>
+
+      {/* 활성 카테고리 카드 그리드 — 탭 전환 시 방향에 따라 살짝 회전하며 슬라이드(단순 페이드 대신) */}
+      <div className="max-w-[var(--content-max)]" style={{ perspective: 1200 }}>
+        <AnimatePresence mode="wait" custom={dir}>
+          <motion.div
+            key={group.label}
+            ref={gridRef}
+            custom={dir}
+            initial={{ opacity: 0, x: dir * 60, rotateY: dir * -10 }}
+            animate={{ opacity: 1, x: 0, rotateY: 0 }}
+            exit={{ opacity: 0, x: dir * -60, rotateY: dir * 10 }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-4">
+              {group.skills.map((name, i) => {
+                const info = ICONS[name];
+                return (
+                  <div
+                    key={name}
+                    data-skill-card
+                    className="group relative flex flex-col items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-7 hover:bg-white/[0.06]"
+                    style={{
+                      "--icon-color": info?.color ?? "var(--accent)",
+                      transition: "transform 150ms ease-out, background-color 200ms, border-color 200ms, box-shadow 250ms",
+                      animation: `cardIn 350ms ease-out ${i * 40}ms both`,
+                    } as React.CSSProperties}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "color-mix(in srgb, var(--icon-color) 45%, transparent)";
+                      e.currentTarget.style.boxShadow = "0 0 32px -8px var(--icon-color)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = "";
+                      e.currentTarget.style.boxShadow = "";
+                    }}
+                  >
+                    <div className="opacity-85 transition-opacity group-hover:opacity-100">
+                      <Icon name={name} />
+                    </div>
+                    <span className="text-center text-xs leading-tight text-white/50 transition-colors group-hover:text-white/80">{name}</span>
                   </div>
-                  <span className="text-[10px] text-white/45 group-hover:text-white/70 transition-colors text-center leading-tight">{name}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
-          </div>
-        ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </section>
   );

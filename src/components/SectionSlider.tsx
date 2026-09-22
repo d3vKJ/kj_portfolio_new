@@ -2,6 +2,12 @@
 
 import { Children, ReactNode, useEffect, useRef, useState } from "react";
 
+/** 현재 슬라이드가 아직 끝까지 스크롤되지 않았다면 true — 이 경우 휠을 섹션 전환 대신 내부 스크롤에 양보한다 */
+function hasScrollRoom(el: HTMLElement, down: boolean) {
+  if (el.scrollHeight <= el.clientHeight + 1) return false;
+  return down ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 1;
+}
+
 function emitChange(index: number, inSlider: boolean) {
   window.dispatchEvent(new CustomEvent("section-change", { detail: { index, inSlider } }));
 }
@@ -20,6 +26,7 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
   const [sliding, setSliding] = useState(false);
   const [reveal, setReveal] = useState(0);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const s = useRef({
     locked: false,
     animating: false,
@@ -38,8 +45,9 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
+    const state = s.current;
 
-    s.current.reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    state.reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const wait = (ms: number) => new Promise<void>(r => setTimeout(r, ms));
 
@@ -117,6 +125,12 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
 
       const down = e.deltaY > 0;
 
+      // 현재 슬라이드 내부에 아직 스크롤할 내용이 남아있으면, 섹션을 전환하지 않고 그 스크롤을 먼저 소진시킨다
+      const activeSlide = slideRefs.current[s.current.cur];
+      if (activeSlide && hasScrollRoom(activeSlide, down)) {
+        return;
+      }
+
       if (down && s.current.cur < n - 1) {
         e.preventDefault();
         void runTransition(s.current.cur + 1);
@@ -163,8 +177,8 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("navigate-section", onNavigate);
       window.removeEventListener("hero-crossfade", onCrossfade);
-      if (s.current.locked) {
-        s.current.locked = false;
+      if (state.locked) {
+        state.locked = false;
         document.body.style.cssText = "";
       }
     };
@@ -174,27 +188,16 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <div ref={sentinelRef} className="relative h-screen bg-black" aria-hidden />
+      <div ref={sentinelRef} className="relative h-screen bg-[#0a0a0a]" aria-hidden />
 
       <div
-        className="fixed inset-0 z-10 overflow-hidden bg-black"
+        className="fixed inset-0 z-10 overflow-hidden bg-[#0a0a0a]"
         style={{
           opacity: locked ? 1 : reveal,
           visibility: showLayer ? "visible" : "hidden",
           pointerEvents: locked ? "auto" : "none",
         }}
       >
-        {locked && (
-          <div className="pointer-events-none absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2">
-            {slides.map((_, i) => (
-              <div
-                key={i}
-                className={`h-1 rounded-full transition-all duration-300 ${i === cur ? "w-6 bg-white/50" : "w-1.5 bg-white/20"}`}
-              />
-            ))}
-          </div>
-        )}
-
         <div
           className="flex h-full"
           style={{
@@ -204,7 +207,12 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
           }}
         >
           {slides.map((slide, i) => (
-            <div key={i} className="h-full overflow-auto" style={{ width: "100vw" }}>
+            <div
+              key={i}
+              ref={(el) => { slideRefs.current[i] = el; }}
+              className="h-full overflow-auto"
+              style={{ width: "100vw" }}
+            >
               {slide}
             </div>
           ))}
