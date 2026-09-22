@@ -42,9 +42,9 @@ export default function Contact() {
 
       <a
         href={`mailto:${EMAIL}`}
-        className="group mt-10 inline-flex items-center gap-2 border-b border-white/20 pb-1.5 font-mono text-lg text-white/80 transition-colors duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] sm:text-2xl"
+        className="group mt-10 inline-flex max-w-full items-center gap-2 border-b border-white/20 pb-1.5 font-mono text-sm text-white/80 transition-colors duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] sm:text-2xl"
       >
-        {EMAIL}
+        <span className="min-w-0 break-all">{EMAIL}</span>
         <svg className="h-4 w-4 shrink-0 text-white/25 transition-colors group-hover:text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
         </svg>

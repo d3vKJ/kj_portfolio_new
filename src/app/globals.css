@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --content-pl: clamp(1.25rem, 4vw, 3rem);
-  --content-pr: clamp(1.25rem, 4vw, 3rem);
+  --content-pl: clamp(0.75rem, 3.5vw, 3rem);
+  --content-pr: clamp(0.75rem, 3.5vw, 3rem);
   --accent: #c4b5fd;
   --mx: 50%;
   --my: 50%;

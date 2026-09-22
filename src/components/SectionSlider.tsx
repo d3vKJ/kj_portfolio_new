@@ -147,8 +147,8 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
         lock();
         return;
       }
-      // 모바일은 Slide to enter로만 진입 — 위로 스와이프 스크롤로 sentinel 잠금 방지
-      if (window.matchMedia("(max-width: 639px)").matches) return;
+      // 폰/태블릿은 제스처로만 진입 — 스크롤로 sentinel 잠금 방지
+      if (window.matchMedia("(max-width: 1023px)").matches) return;
       const r = sentinel.getBoundingClientRect();
       if (r.top <= 0 && r.bottom >= window.innerHeight) lock();
     };
