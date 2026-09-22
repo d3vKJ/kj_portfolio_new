@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
@@ -79,13 +79,23 @@ function CardThumb({ item }: { item: (typeof PROJECTS)[number] }) {
 export default function Projects() {
   const [filterCat, setFilterCat] = useState<Category>("All");
   const [selected, setSelected] = useState<number | null>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const lastFocusRef = useRef<HTMLElement | null>(null);
 
-  // 모달 열려있을 때 Esc로 닫기
+  // 모달 열려있을 때 Esc로 닫기 + 포커스 이동
   useEffect(() => {
     if (selected === null) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setSelected(null); };
+    lastFocusRef.current = document.activeElement as HTMLElement | null;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelected(null);
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    const id = window.setTimeout(() => closeBtnRef.current?.focus(), 0);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.clearTimeout(id);
+      lastFocusRef.current?.focus?.();
+    };
   }, [selected]);
 
   const list = filterCat === "All" ? PROJECTS : PROJECTS.filter(p => p.category === filterCat);
@@ -100,14 +110,16 @@ export default function Projects() {
         </div>
 
         {/* 카테고리 필터 */}
-        <div className="mb-8 flex gap-2 overflow-x-auto py-1">
+        <div className="mb-8 flex gap-2 overflow-x-auto py-1" role="group" aria-label="프로젝트 카테고리">
           {CATEGORIES.map((cat) => {
             const isActive = filterCat === cat;
             return (
               <button
                 key={cat}
+                type="button"
                 onClick={() => { setFilterCat(cat); setSelected(null); }}
-                className="glass-ios shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200"
+                aria-pressed={isActive}
+                className="glass-ios shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                 style={{
                   color: isActive ? "var(--accent)" : "rgba(255,255,255,0.45)",
                   background: isActive ? "color-mix(in srgb, var(--accent) 14%, transparent)" : undefined,
@@ -128,8 +140,10 @@ export default function Projects() {
             {list.map((item, i) => (
               <button
                 key={item.name}
+                type="button"
                 onClick={() => setSelected(i)}
-                className="group glass-ios flex flex-col overflow-hidden rounded-2xl text-left transition-colors duration-200 hover:border-[var(--accent)]/40"
+                aria-label={`${item.nameKo} 상세 보기`}
+                className="group glass-ios flex flex-col overflow-hidden rounded-2xl text-left transition-colors duration-200 hover:border-[var(--accent)]/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                 style={{ animation: `cardIn 400ms ease-out ${i * 60}ms both` }}
               >
                 <CardThumb item={item} />
@@ -162,9 +176,13 @@ export default function Projects() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={() => setSelected(null)}
+            role="presentation"
           >
             <motion.div
-              className="glass-modal max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={`project-title-${p.name}`}
+              className="glass-modal max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl outline-none"
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.97 }}
@@ -180,18 +198,20 @@ export default function Projects() {
                   <Image src={p.image} alt={`${p.nameKo} 대표 스크린샷`} fill sizes="672px" className="object-cover object-top" />
                 ) : (
                   <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-white/[0.02] text-white/20">
-                    <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                    <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1} aria-hidden>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
                     <span className="text-[10px] uppercase tracking-[0.2em]">Coming Soon</span>
                   </div>
                 )}
                 <button
+                  ref={closeBtnRef}
+                  type="button"
                   onClick={() => setSelected(null)}
                   aria-label="닫기"
-                  className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/85 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.2)] backdrop-blur-md transition-colors hover:border-white/35 hover:bg-black/45 hover:text-white"
+                  className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/85 shadow-[inset_0_0.5px_0_rgba(255,255,255,0.2)] backdrop-blur-md transition-colors hover:border-white/35 hover:bg-black/45 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                 >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -199,7 +219,7 @@ export default function Projects() {
 
             <div className="p-6 sm:p-8">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <h3 className="text-2xl font-semibold tracking-tight text-white">{p.nameKo}</h3>
+                <h3 id={`project-title-${p.name}`} className="text-2xl font-semibold tracking-tight text-white">{p.nameKo}</h3>
                 <span className="text-base text-white/35">{p.name}</span>
               </div>
               <p className="mt-1 text-sm text-white/35">{p.year}{p.solo ? " · 1인 작업" : ""}</p>
@@ -224,9 +244,9 @@ export default function Projects() {
                     href={p.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="glass-ios inline-flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-white/75 transition-all duration-200 hover:border-[var(--accent)]/40 hover:text-[var(--accent)]"
+                    className="glass-ios inline-flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-white/75 transition-all duration-200 hover:border-[var(--accent)]/40 hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                   >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                     </svg>
                     사이트
@@ -241,9 +261,9 @@ export default function Projects() {
                     href={p.code}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="glass-ios inline-flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-white/75 transition-all duration-200 hover:border-[var(--accent)]/40 hover:text-[var(--accent)]"
+                    className="glass-ios inline-flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-white/75 transition-all duration-200 hover:border-[var(--accent)]/40 hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                   >
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                       <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.004.071 1.532 1.032 1.532 1.032.892 1.529 2.341 1.087 2.912.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
                     </svg>
                     코드

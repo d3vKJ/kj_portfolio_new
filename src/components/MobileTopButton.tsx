@@ -44,7 +44,9 @@ export default function MobileTopButton() {
       type="button"
       onClick={goTop}
       aria-label="맨 위로"
-      className="glass-ios fixed right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full text-white/80 transition-all duration-200 sm:hidden"
+      aria-hidden={!visible}
+      tabIndex={visible ? 0 : -1}
+      className="glass-ios fixed right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full text-white/80 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] sm:hidden"
       style={{
         bottom: "max(1.25rem, env(safe-area-inset-bottom))",
         opacity: visible ? 1 : 0,

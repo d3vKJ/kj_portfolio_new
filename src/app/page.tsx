@@ -7,20 +7,24 @@ import SectionSlider from "@/components/SectionSlider";
 import Header from "@/components/Header";
 import MobileTopButton from "@/components/MobileTopButton";
 import MobileSectionRemote from "@/components/MobileSectionRemote";
+import SkipToSections from "@/components/SkipToSections";
 
 export default function Home() {
   return (
     <main>
+      <SkipToSections />
       <Header />
       <MobileTopButton />
       <MobileSectionRemote />
       <Hero />
-      <SectionSlider>
-        <AboutMe />
-        <Projects />
-        <Skills />
-        <Contact />
-      </SectionSlider>
+      <div id="main-sections">
+        <SectionSlider>
+          <AboutMe />
+          <Projects />
+          <Skills />
+          <Contact />
+        </SectionSlider>
+      </div>
     </main>
   );
 }

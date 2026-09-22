@@ -15,6 +15,7 @@ export default function Header() {
   const [inSlider, setInSlider] = useState(false);
   const [autoHidden, setAutoHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [kbdReveal, setKbdReveal] = useState(false);
 
   useEffect(() => {
     const onSectionChange = (e: Event) => {
@@ -51,7 +52,14 @@ export default function Header() {
     if (autoHidden) setMenuOpen(false);
   }, [autoHidden]);
 
-  const visible = inSlider && !autoHidden;
+  const visible = (inSlider && !autoHidden) || kbdReveal;
+
+  const handleFocus = () => setKbdReveal(true);
+  const handleBlur = (e: React.FocusEvent<HTMLElement>) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+      setKbdReveal(false);
+    }
+  };
 
   const goHome = () => {
     setMenuOpen(false);
@@ -72,17 +80,20 @@ export default function Header() {
         transition: "opacity 0.28s ease, transform 0.28s ease",
         pointerEvents: visible ? "auto" : "none",
       }}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[var(--header-space)] bg-gradient-to-b from-[#040404]/92 via-[#040404]/5 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[var(--header-space)] bg-gradient-to-b from-[#000]/92 via-[#000]/5 to-transparent"
       />
 
       <div className="relative pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[max(0.5rem,env(safe-area-inset-top))]">
         <div className="mx-auto flex h-14 w-full max-w-[var(--content-max)] items-center justify-between gap-3 sm:h-16">
           <button
+            type="button"
             onClick={goHome}
-            className="group flex shrink-0 items-center opacity-90 transition-opacity duration-200 hover:opacity-100 focus:outline-none"
+            className="group flex shrink-0 items-center opacity-90 transition-opacity duration-200 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
             title="홈으로"
             aria-label="홈으로"
           >
@@ -96,15 +107,17 @@ export default function Header() {
             />
           </button>
 
-          {/* 데스크톱 내비 */}
+          {/* 데스크톱 내비 — 히어로에서도 키보드로 도달 가능하도록 항상 탭 가능 */}
           <nav className="hidden items-center gap-2 sm:flex" aria-label="섹션 이동">
             {SECTIONS.map((s) => {
-              const isActive = active === s.index;
+              const isActive = inSlider && active === s.index;
               return (
                 <button
                   key={s.index}
+                  type="button"
                   onClick={() => goSection(s.index)}
-                  className="glass-ios rounded-full px-4 py-2 text-[15px] font-medium transition-all duration-200"
+                  aria-current={isActive ? "page" : undefined}
+                  className="glass-ios rounded-full px-4 py-2 text-[15px] font-medium transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                   style={{
                     color: isActive ? "#fff" : "rgba(255,255,255,0.55)",
                     background: isActive ? "rgba(255,255,255,0.1)" : undefined,
@@ -120,13 +133,14 @@ export default function Header() {
           {/* 모바일 햄버거 — 배경 상자 없음 */}
           <button
             type="button"
-            className="relative flex h-10 w-10 items-center justify-center sm:hidden"
+            className="relative flex h-10 w-10 items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] sm:hidden"
             aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"}
             aria-expanded={menuOpen}
+            aria-controls="mobile-section-menu"
             onClick={() => setMenuOpen((o) => !o)}
           >
             <span className="sr-only">{menuOpen ? "닫기" : "메뉴"}</span>
-            <span className="relative block h-3.5 w-4">
+            <span className="relative block h-3.5 w-4" aria-hidden>
               <span
                 className="absolute left-0 block h-0.5 w-full rounded-full bg-white/85 transition-all duration-200"
                 style={{
@@ -152,6 +166,7 @@ export default function Header() {
 
         {/* 모바일 드롭다운 — 어두운 글래스 */}
         <div
+          id="mobile-section-menu"
           className="mx-auto mt-1.5 w-full max-w-[var(--content-max)] overflow-hidden sm:hidden"
           style={{
             maxHeight: menuOpen ? 280 : 0,
@@ -159,18 +174,21 @@ export default function Header() {
             transition: "max-height 0.28s ease, opacity 0.2s ease",
             pointerEvents: menuOpen ? "auto" : "none",
           }}
+          hidden={!menuOpen}
         >
           <nav
             className="glass-menu flex flex-col gap-0.5 rounded-3xl p-2"
             aria-label="모바일 섹션 이동"
           >
             {SECTIONS.map((s) => {
-              const isActive = active === s.index;
+              const isActive = inSlider && active === s.index;
               return (
                 <button
                   key={s.index}
+                  type="button"
                   onClick={() => goSection(s.index)}
-                  className="rounded-xl px-4 py-3 text-left text-[15px] font-medium transition-colors duration-200"
+                  aria-current={isActive ? "page" : undefined}
+                  className="rounded-xl px-4 py-3 text-left text-[15px] font-medium transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                   style={{
                     color: isActive ? "#fff" : "rgba(255,255,255,0.6)",
                     background: isActive ? "rgba(255,255,255,0.08)" : "transparent",
