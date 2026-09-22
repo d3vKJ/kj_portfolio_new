@@ -24,7 +24,7 @@ const SOCIALS = [
   },
 ];
 
-const EMAIL = "nova021206@gmail.com";
+const EMAIL = "nova021206@kakao.com";
 
 export default function Contact() {
   return (
