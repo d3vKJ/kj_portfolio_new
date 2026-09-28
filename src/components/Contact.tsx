@@ -39,7 +39,7 @@ export default function Contact() {
     const el = videos.current[label];
     if (!el) return;
     el.currentTime = 0;
-    void el.play();
+    void el.play().catch(() => {});
   };
 
   const hide = () => setActive(null);

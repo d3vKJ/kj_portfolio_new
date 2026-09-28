@@ -293,7 +293,7 @@ export default function Hero() {
                 (video.duration || 0),
             );
             video.playbackRate = rate;
-            void video.play();
+            void video.play().catch(() => {});
           } catch {
             /* autoplay 정책 등 */
           }
