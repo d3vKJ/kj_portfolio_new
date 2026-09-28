@@ -1,9 +1,12 @@
 "use client";
 
+import { useRef, useState } from "react";
+
 const SOCIALS = [
   {
     label: "GitHub",
     href: "https://github.com/d3vkj",
+    video: "/social/github.mp4",
     hoverClass: "social-gh",
     icon: (
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -14,6 +17,7 @@ const SOCIALS = [
   {
     label: "Instagram",
     href: "https://instagram.com/jinsnation",
+    video: "/social/instagram.mp4",
     hoverClass:
       "social-ig",
     icon: (
@@ -27,8 +31,51 @@ const SOCIALS = [
 const EMAIL = "nova021206@kakao.com";
 
 export default function Contact() {
+  const [active, setActive] = useState<string | null>(null);
+  const videos = useRef<Record<string, HTMLVideoElement | null>>({});
+
+  const show = (label: string) => {
+    setActive(label);
+    const el = videos.current[label];
+    if (!el) return;
+    el.currentTime = 0;
+    void el.play();
+  };
+
+  const hide = () => setActive(null);
+
   return (
-    <section className="flex min-h-full flex-col items-center justify-center px-6 pb-24 pt-[var(--header-space)] text-center sm:pb-10">
+    <section className="relative flex min-h-full flex-col items-center justify-center overflow-hidden px-6 pb-24 pt-[var(--header-space)] text-center sm:pb-10">
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        {SOCIALS.map((s) => (
+          <div
+            key={s.label}
+            className="absolute inset-0 transition-opacity duration-700 ease-out motion-reduce:transition-none"
+            style={{ opacity: active === s.label ? 1 : 0 }}
+            onTransitionEnd={() => {
+              if (active === s.label) return;
+              const el = videos.current[s.label];
+              if (el) {
+                el.pause();
+                el.currentTime = 0;
+              }
+            }}
+          >
+            <video
+              ref={(el) => { videos.current[s.label] = el; }}
+              className="h-full w-full object-cover brightness-[0.38]"
+              src={s.video}
+              muted
+              loop
+              playsInline
+              preload="metadata"
+            />
+            <div className="absolute inset-0 bg-black/45" />
+          </div>
+        ))}
+      </div>
+
+      <div className="relative z-[1] flex flex-col items-center">
       <span className="text-[10px] uppercase tracking-[0.35em] text-white/30">Contact</span>
 
       <h2 className="headline-glow mt-1 max-w-3xl text-[clamp(1.75rem,5vw,3.5rem)] font-bold leading-[1.15] tracking-tight">
@@ -60,6 +107,8 @@ export default function Contact() {
             aria-label={s.label}
             title={s.label}
             className={`glass-ios flex h-11 w-11 items-center justify-center rounded-full text-white/50 transition-all duration-200 ${s.hoverClass}`}
+            onMouseEnter={() => show(s.label)}
+            onMouseLeave={hide}
           >
             {s.icon}
           </a>
@@ -67,6 +116,7 @@ export default function Contact() {
       </div>
 
       <p className="mt-16 text-xs text-white/20">© 2026 Jang Kyungjin<br/>본 프로젝트는 개인 포트폴리오 목적으로 공개되었습니다.<br/>코드를 무단으로 사용하지 말아주세요.</p>
+      </div>
     </section>
   );
 }

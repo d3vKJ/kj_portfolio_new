@@ -3,10 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import Wave from "react-wavify";
 
 type IconInfo = { slug?: string; color: string; light?: boolean; svg?: string };
 
 const ICONS: Record<string, IconInfo> = {
+  "HTML":          { slug: "html5",        color: "#E34F26" },
+  "CSS":           { slug: "css",          color: "#1572B6" },
+  "JavaScript":    { slug: "javascript",   color: "#F7DF1E" },
+  "jQuery":        { slug: "jquery",       color: "#0769AD" },
   "React":         { slug: "react",        color: "#61DAFB" },
   "Next.js":       { slug: "nextdotjs",    color: "#ffffff", light: true },
   "TypeScript":    { slug: "typescript",   color: "#3178C6" },
@@ -20,21 +25,59 @@ const ICONS: Record<string, IconInfo> = {
   "Git":           { slug: "git",          color: "#F05032" },
   "Vite":          { slug: "vite",         color: "#646CFF" },
   "ESLint":        { slug: "eslint",       color: "#4B32C3" },
+  "Electron":      { slug: "electron",     color: "#47848F" },
+  "React Native":  { slug: "react",        color: "#61DAFB" },
+  "Kotlin":        { slug: "kotlin",       color: "#7F52FF" },
   "Node.js":       { slug: "nodedotjs",    color: "#339933" },
   "Supabase":      { slug: "supabase",     color: "#3FCF8E" },
   "Cloudflare":    { slug: "cloudflare",   color: "#F38020" },
   "Vercel":        { slug: "vercel",       color: "#ffffff", light: true },
+  "Cursor AI":     { slug: "cursor",       color: "#ffffff", light: true },
   "Claude":        { slug: "claude",       color: "#D97757" },
   "Codex":         { color: "#ffffff", svg: `<svg viewBox="0 0 24 24" fill="#ffffff"><path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073z"/></svg>` },
 };
 
+const LEVELS: Record<string, number> = {
+  "HTML": 90,
+  "CSS": 88,
+  "JavaScript": 86,
+  "jQuery": 74,
+  "React": 88,
+  "Next.js": 86,
+  "TypeScript": 84,
+  "Tailwind CSS": 86,
+  "Framer Motion": 76,
+  "GSAP": 78,
+  "Sass": 80,
+  "Swiper": 74,
+  "Figma": 72,
+  "Photoshop": 70,
+  "Git": 82,
+  "Vite": 78,
+  "ESLint": 72,
+  "Electron": 72,
+  "React Native": 74,
+  "Kotlin": 72,
+  "Node.js": 76,
+  "Supabase": 78,
+  "Cloudflare": 74,
+  "Vercel": 72,
+  "Cursor AI": 84,
+  "Claude": 76,
+  "Codex": 72,
+};
+
 const GROUPS = [
-  { label: "Frontend",      skills: ["React","Next.js","TypeScript","Tailwind CSS","Framer Motion","GSAP","Sass","Swiper"] },
+  { label: "Frontend",      skills: ["HTML","CSS","JavaScript","jQuery","React","Next.js","TypeScript","Tailwind CSS","Framer Motion","GSAP","Sass","Swiper"] },
   { label: "Design",        skills: ["Figma","Photoshop"] },
-  { label: "Tools & DX",    skills: ["Git","Vite","ESLint"] },
+  { label: "Tools & DX",    skills: ["Git","Vite","ESLint","Electron"] },
+  { label: "Mobile",        skills: ["React Native","Kotlin"] },
   { label: "Backend/Infra", skills: ["Node.js","Supabase","Cloudflare","Vercel"] },
-  { label: "AI",            skills: ["Claude","Codex"] },
+  { label: "AI",            skills: ["Cursor AI","Claude","Codex"] },
 ];
+
+const ALL_SKILLS = GROUPS.flatMap((g) => g.skills);
+const TABS = [{ label: "전체", skills: ALL_SKILLS }, ...GROUPS];
 
 function Icon({ name }: { name: string }) {
   const info = ICONS[name];
@@ -46,6 +89,93 @@ function Icon({ name }: { name: string }) {
 }
 
 const PROXIMITY_RADIUS = 140;
+
+function SkillCard({ name, i }: { name: string; i: number }) {
+  const info = ICONS[name];
+  const level = LEVELS[name] ?? 70;
+  const color = info?.color ?? "var(--accent)";
+  const [open, setOpen] = useState(false);
+  const [live, setLive] = useState(false);
+  const [touch, setTouch] = useState(false);
+  const openRef = useRef(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: none)");
+    const sync = () => {
+      const coarse = mq.matches;
+      setTouch(coarse);
+      if (coarse) setLive(true);
+    };
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const shown = open || touch;
+
+  return (
+    <div
+      data-skill-card
+      className="glass-panel group relative flex flex-col items-center gap-3 overflow-hidden rounded-2xl px-4 py-7"
+      style={{
+        "--icon-color": color,
+        transition: "transform 150ms ease-out, border-color 200ms, box-shadow 250ms",
+        animation: `cardIn 350ms ease-out ${i * 40}ms both`,
+      } as React.CSSProperties}
+      onMouseEnter={(e) => {
+        openRef.current = true;
+        setOpen(true);
+        setLive(true);
+        e.currentTarget.style.borderColor = "color-mix(in srgb, var(--icon-color) 45%, transparent)";
+        e.currentTarget.style.boxShadow = "0 0 32px -8px var(--icon-color)";
+      }}
+      onMouseLeave={(e) => {
+        openRef.current = false;
+        setOpen(false);
+        e.currentTarget.style.borderColor = "";
+        e.currentTarget.style.boxShadow = "";
+      }}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 overflow-hidden transition-[height] duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+        style={{ height: shown ? `${level}%` : 0 }}
+        onTransitionEnd={(e) => {
+          if (e.propertyName === "height" && !openRef.current && !touch) setLive(false);
+        }}
+      >
+        {live && (
+          <Wave
+            fill={`color-mix(in srgb, ${color} 42%, transparent)`}
+            paused={!shown}
+            options={{ height: 0, amplitude: 20, speed: 0.08, points: 3 }}
+            style={{ display: "block", width: "100%", height: "100%" }}
+          />
+        )}
+      </div>
+      <span
+        className="pointer-events-none absolute right-2.5 top-2.5 z-[1] font-mono text-[10px] tabular-nums text-white/55 transition-opacity duration-300"
+        style={{ opacity: shown ? 1 : 0 }}
+      >
+        {level}%
+      </span>
+      <div className="relative z-[1] opacity-85 transition-opacity group-hover:opacity-100">
+        <Icon name={name} />
+      </div>
+      <span className="relative z-[1] text-center text-xs leading-tight text-white/50 transition-colors group-hover:text-white/80">{name}</span>
+    </div>
+  );
+}
+
+function SkillGrid({ skills }: { skills: string[] }) {
+  return (
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-4">
+      {skills.map((name, i) => (
+        <SkillCard key={name} name={name} i={i} />
+      ))}
+    </div>
+  );
+}
 
 export default function Skills() {
   const [active, setActive] = useState(0);
@@ -75,7 +205,7 @@ export default function Skills() {
     }
   }, [active]);
 
-  // Skills 섹션 진입 시 Frontend부터 보이도록 리셋
+  // Skills 섹션 진입 시 전체부터 보이도록 리셋
   useEffect(() => {
     const onSection = (e: Event) => {
       const { index, inSlider } = (e as CustomEvent).detail as {
@@ -129,7 +259,8 @@ export default function Skills() {
     };
   }, [active]);
 
-  const group = GROUPS[active];
+  const tab = TABS[active];
+  const showAll = active === 0;
 
   return (
     <section className="pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[var(--header-space)] pb-24 sm:pb-12">
@@ -143,7 +274,7 @@ export default function Skills() {
         className="mx-auto mb-10 flex max-w-[var(--content-max)] justify-start gap-2 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ scrollSnapType: "none" }}
       >
-        {GROUPS.map((g, i) => {
+        {TABS.map((g, i) => {
           const isActive = active === i;
           return (
             <button
@@ -167,7 +298,7 @@ export default function Skills() {
       <div className="mx-auto max-w-[var(--content-max)]">
         <AnimatePresence mode="wait" custom={dir}>
           <motion.div
-            key={group.label}
+            key={tab.label}
             ref={gridRef}
             custom={dir}
             initial={{ opacity: 0, x: dir * 24 }}
@@ -175,36 +306,18 @@ export default function Skills() {
             exit={{ opacity: 0, x: dir * -24 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-4">
-              {group.skills.map((name, i) => {
-                const info = ICONS[name];
-                return (
-                  <div
-                    key={name}
-                    data-skill-card
-                    className="glass-panel group relative flex flex-col items-center gap-3 rounded-2xl px-4 py-7"
-                    style={{
-                      "--icon-color": info?.color ?? "var(--accent)",
-                      transition: "transform 150ms ease-out, background-color 200ms, border-color 200ms, box-shadow 250ms",
-                      animation: `cardIn 350ms ease-out ${i * 40}ms both`,
-                    } as React.CSSProperties}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = "color-mix(in srgb, var(--icon-color) 45%, transparent)";
-                      e.currentTarget.style.boxShadow = "0 0 32px -8px var(--icon-color)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = "";
-                      e.currentTarget.style.boxShadow = "";
-                    }}
-                  >
-                    <div className="opacity-85 transition-opacity group-hover:opacity-100">
-                      <Icon name={name} />
-                    </div>
-                    <span className="text-center text-xs leading-tight text-white/50 transition-colors group-hover:text-white/80">{name}</span>
+            {showAll ? (
+              <div className="flex flex-col gap-10">
+                {GROUPS.map((g) => (
+                  <div key={g.label}>
+                    <h3 className="mb-4 text-[13px] font-medium tracking-wide text-white/40">{g.label}</h3>
+                    <SkillGrid skills={g.skills} />
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <SkillGrid skills={tab.skills} />
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
