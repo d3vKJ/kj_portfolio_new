@@ -8,10 +8,12 @@ import Header from "@/components/Header";
 import MobileTopButton from "@/components/MobileTopButton";
 import MobileSectionRemote from "@/components/MobileSectionRemote";
 import SkipToSections from "@/components/SkipToSections";
+import PearlBg from "@/components/PearlBg";
 
 export default function Home() {
   return (
     <main>
+      <PearlBg />
       <SkipToSections />
       <Header />
       <MobileTopButton />

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+// 모바일 맨 위로 버튼
 export default function MobileTopButton() {
   const [visible, setVisible] = useState(false);
 
@@ -36,6 +37,7 @@ export default function MobileTopButton() {
     };
   }, []);
 
+  // 현재 슬라이드 맨 위로 스크롤
   const goTop = () =>
     window.dispatchEvent(new CustomEvent("slide-scroll-top"));
 
@@ -46,7 +48,7 @@ export default function MobileTopButton() {
       aria-label="맨 위로"
       aria-hidden={!visible}
       tabIndex={visible ? 0 : -1}
-      className="glass-ios fixed right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full text-white/80 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] sm:hidden"
+      className="glass-ios fixed right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full text-ink/80 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] sm:hidden"
       style={{
         bottom: "max(1.25rem, env(safe-area-inset-bottom))",
         opacity: visible ? 1 : 0,
