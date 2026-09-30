@@ -151,6 +151,7 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
       s.current.reveal = 1;
       s.current.wheelLockUntil = performance.now() + ENTER_HOLD_MS;
 
+      // 페이지 스크롤 차단
       const top = window.scrollY + sentinel.getBoundingClientRect().top;
       window.scrollTo(0, top);
       document.body.style.cssText =
@@ -161,7 +162,7 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
 
     const unlock = () => {
       s.current.locked = false;
-      s.current.cooldown = true;
+      s.current.cooldown = true; // 재진입 방지 쿨다운
       setLocked(false);
       setReveal(0);
       s.current.reveal = 0;
@@ -342,8 +343,10 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
 
   return (
     <>
+      {/* 슬라이더 진입 감지용 sentinel */}
       <div ref={sentinelRef} className="relative h-[100dvh] bg-transparent" aria-hidden />
 
+      {/* 슬라이드 컨테이너 */}
       <div
         className="fixed left-0 top-0 z-10 w-full overflow-hidden bg-transparent"
         style={{

@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
-const LOGO_OUT_END = 0.1;
-const VIDEO_IN_START = 0.1;
-const VIDEO_IN_END = 0.2;
-const SCRUB_END = 0.9;
-const FADE_OUT_END = 0.96;
+// 스크롤 progress(0~1) 타임라인
+const LOGO_OUT_END = 0.1;    // 로고 fade out
+const VIDEO_IN_START = 0.1;  // 비디오 fade in 시작
+const VIDEO_IN_END = 0.2;    // 비디오 fade in 완료
+const SCRUB_END = 0.9;       // 비디오 scrub 끝
+const FADE_OUT_END = 0.96;   // 비디오 fade out 완료
 const ENTER_MS = 1000;
 
 type HeroMode = "phone" | "tablet" | "desktop";
@@ -113,7 +114,7 @@ export default function Hero() {
       setHeroHintsVisible(on);
     };
 
-    /** seek 진행 중이면 대기, 끝나면 최신 target만 적용 — seek 폭주 방지 */
+    /** 비디오 seek 큐잉 */
     const flushSeek = () => {
       scrubRaf = 0;
       if (!isFinite(video.duration) || isSeeking) return;
@@ -149,7 +150,7 @@ export default function Hero() {
       }
     };
 
-    /** 로고/투명도/스케일만 (영상 프레임은 seek 또는 play로 따로) */
+    /** 스크롤 progress 비주얼 적용 */
     const applyVisual = (progress: number) => {
       const p = Math.max(0, Math.min(1, progress));
 
@@ -408,7 +409,7 @@ export default function Hero() {
     playAllFnRef.current?.();
   };
 
-  // 폰/태블릿: 스크롤로 섹션 넘어가는 것 차단
+  // 폰/태블릿 스크롤 차단
   useEffect(() => {
     if (mode === "desktop") return;
 
@@ -466,7 +467,7 @@ export default function Hero() {
     };
   }, [mode]);
 
-  // 폰: Slide to enter
+  // 폰 슬라이드 잠금 해제
   useEffect(() => {
     if (mode !== "phone") return;
     const track = unlockTrackRef.current;
@@ -600,11 +601,11 @@ export default function Hero() {
     return (
       <section
         ref={touchSectionRef}
-        className="relative z-20 flex h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[#020202] will-change-[opacity]"
+        className="relative z-20 flex h-[100dvh] flex-col items-center justify-center overflow-hidden bg-bg will-change-[opacity]"
         style={{ touchAction: "none" }}
       >
-        <Image src="/logo.png" alt="logo" width={220} height={220} className="object-contain" priority />
-        <p className="mt-1 px-4 text-center text-[10px] tracking-[0.12em] uppercase text-white/60">
+        <Image src="/logo.png" alt="logo" width={220} height={220} className="site-logo object-contain" priority />
+        <p className="mt-1 px-4 text-center text-[10px] tracking-[0.12em] uppercase text-ink/60">
           Publisher | Front-End | Full-Stack
         </p>
 
@@ -616,7 +617,7 @@ export default function Hero() {
           >
             <span
               ref={unlockLabelRef}
-              className="pointer-events-none absolute inset-0 flex items-center justify-center pl-10 text-[13px] tracking-[0.14em] text-white/50"
+              className="pointer-events-none absolute inset-0 flex items-center justify-center pl-10 text-[13px] tracking-[0.14em] text-ink/50"
             >
               Slide to enter
             </span>
@@ -642,7 +643,7 @@ export default function Hero() {
     return (
       <section
         ref={touchSectionRef}
-        className="relative z-20 h-[100dvh] overflow-hidden bg-[#020202] will-change-[opacity]"
+        className="relative z-20 h-[100dvh] overflow-hidden bg-bg will-change-[opacity]"
       >
         <button
           type="button"
@@ -650,12 +651,12 @@ export default function Hero() {
           aria-label="탭해서 About으로 이동"
           className="flex h-full w-full flex-col items-center justify-center"
         >
-          <Image src="/logo.png" alt="logo" width={260} height={260} className="object-contain" priority />
-          <p className="mt-1 px-4 text-center text-[12px] tracking-[0.2em] uppercase text-white/60">
+          <Image src="/logo.png" alt="logo" width={260} height={260} className="site-logo object-contain" priority />
+          <p className="mt-1 px-4 text-center text-[12px] tracking-[0.2em] uppercase text-ink/60">
             Publisher | Front-End | Full-Stack
           </p>
 
-          <div className="absolute bottom-16 flex flex-col items-center gap-2 text-white/40">
+          <div className="absolute bottom-16 flex flex-col items-center gap-2 text-ink/40">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="animate-pulse">
               <circle cx="12" cy="12" r="9" strokeOpacity="0.5" />
               <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" />
@@ -670,7 +671,7 @@ export default function Hero() {
   // 데스크톱: 영상 스크럽
   return (
     <section ref={sectionRef} className="relative z-20 h-[850vh]">
-      <div ref={stickyRef} className="sticky top-0 h-screen overflow-hidden bg-[#020202] will-change-[opacity]">
+      <div ref={stickyRef} className="sticky top-0 h-screen overflow-hidden bg-bg will-change-[opacity]">
         <video
           ref={videoRef}
           className="absolute inset-0 h-full w-full object-cover will-change-[opacity,transform]"
@@ -687,9 +688,9 @@ export default function Hero() {
           style={{ transition: "opacity 0.4s ease" }}
         >
           <div ref={logoRef} style={{ transition: "transform 200ms ease-out", transformStyle: "preserve-3d" }}>
-            <Image src="/logo.png" alt="logo" width={280} height={280} className="object-contain" priority />
+            <Image src="/logo.png" alt="logo" width={280} height={280} className="site-logo object-contain" priority />
           </div>
-          <p className="mt-1 px-4 text-center text-[13px] tracking-[0.3em] uppercase text-white/60">
+          <p className="mt-1 px-4 text-center text-[13px] tracking-[0.3em] uppercase text-ink/60">
             Publisher | Front-End | Full-Stack
           </p>
 
@@ -702,15 +703,15 @@ export default function Hero() {
               onClick={handlePlayAll}
               disabled={playingAll}
               aria-label="Enter — 히어로 연출 후 About으로 이동"
-              className="glass-ios inline-flex min-h-11 items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-medium tracking-wide text-white/80 transition-all duration-200 hover:border-white/30 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] disabled:opacity-50"
+              className="glass-ios inline-flex min-h-11 items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-medium tracking-wide text-ink/80 transition-all duration-200 hover:scale-[1.06] hover:border-ink/30 hover:text-ink active:scale-[0.96] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] disabled:opacity-50"
             >
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
               </svg>
               Enter
             </button>
-            <p className="text-[11px] tracking-[0.14em] text-white/35">
-              휠 또는 <kbd className="rounded px-1 text-white/45">↓</kbd> 키로도 이동
+            <p className="text-[11px] tracking-[0.14em] text-ink/35">
+              휠 또는 <kbd className="rounded px-1 text-ink/45">↓</kbd> 키로도 이동
             </p>
             <span className="sr-only">
               스크롤하거나 아래 방향키, 또는 Enter 버튼으로 영상을 스크럽하며 About으로 이동할 수 있습니다.
