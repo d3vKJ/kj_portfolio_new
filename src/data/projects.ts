@@ -29,7 +29,7 @@ export const PROJECTS: Project[] = [
       { skill: "Cloudflare",    usage: "Workers + Pages 배포 및 엣지 캐싱" },
       { skill: "Swiper",        usage: "제품 상세 이미지 슬라이더" },
     ],
-    href: "https://daimon-web.nova021206.workers.dev/", code: null, image: "/projects/daimon.png",
+    href: "https://adr-works.com", code: null, image: "/projects/daimon.png",
   },
   {
     name: "apple", nameKo: "애플", year: "2026", solo: true, category: "Web",
@@ -69,7 +69,9 @@ export const PROJECTS: Project[] = [
     ],
     href: "http://103.218.172.76:3000", code: "#", image: "/projects/airport-typing.png",
   },
-  { name: "coming-soon-1", nameKo: "다음 프로젝트", year: "—", solo: true, desc: "준비 중인 웹 프로젝트입니다.",       tech: [], techUsage: [], category: "Web",     href: "#", code: "#", image: null },
-  { name: "coming-soon-2", nameKo: "다음 프로젝트", year: "—", solo: true, desc: "준비 중인 데스크톱 프로젝트입니다.", tech: [], techUsage: [], category: "Desktop", href: "#", code: "#", image: null },
-  { name: "coming-soon-3", nameKo: "다음 프로젝트", year: "—", solo: true, desc: "준비 중인 안드로이드 프로젝트입니다.", tech: [], techUsage: [], category: "Android", href: "#", code: "#", image: null },
+  {
+    name: "youtube-music", nameKo: "유튜브 뮤직", year: "2026", solo: true, category: "Desktop",
+    desc: "유튜브 뮤직을 데스크톱에서 재생하는 앱.",
+    tech: [], techUsage: [], href: "#", code: "#", image: null,
+  },
 ];

@@ -22,8 +22,8 @@ export default function Home() {
       <div id="main-sections">
         <SectionSlider>
           <AboutMe />
-          <Projects />
           <Skills />
+          <Projects />
           <Contact />
         </SectionSlider>
       </div>

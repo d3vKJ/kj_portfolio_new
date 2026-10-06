@@ -284,7 +284,7 @@ export default function Skills() {
     <section className="pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[var(--header-space)] pb-24 sm:pb-12">
       <div className="mx-auto mb-8 flex max-w-[var(--content-max)] flex-wrap items-baseline gap-x-4 gap-y-1">
         <h2 className="section-title">Skills</h2>
-        <p className="text-sm text-ink/40 sm:text-base">각 카드에 호버링하면 숙련도와 사용 프로젝트를 확인할 수 있어요.</p>
+        <p className="section-desc text-sm sm:text-base">각 카드에 호버링하면 숙련도와 사용 프로젝트를 확인할 수 있어요.</p>
       </div>
 
       <div
@@ -299,7 +299,7 @@ export default function Skills() {
               key={g.label}
               ref={(el) => { tabRefs.current[i] = el; }}
               onClick={() => { setDir(i > active ? 1 : -1); setActive(i); }}
-              className="glass-panel shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 hover:scale-[1.06] active:scale-[0.96] sm:text-[15px]"
+              className="glass-panel shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 sm:text-[15px]"
               style={{
                 color: isActive ? "var(--accent)" : "color-mix(in srgb, var(--fg) 45%, transparent)",
                 background: isActive ? "color-mix(in srgb, var(--accent) 12%, transparent)" : undefined,

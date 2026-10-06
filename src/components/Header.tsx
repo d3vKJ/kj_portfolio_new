@@ -6,8 +6,8 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 const SECTIONS = [
   { label: "About", index: 0 },
-  { label: "Projects", index: 1 },
-  { label: "Skills", index: 2 },
+  { label: "Skills", index: 1 },
+  { label: "Projects", index: 2 },
   { label: "Contact", index: 3 },
 ];
 

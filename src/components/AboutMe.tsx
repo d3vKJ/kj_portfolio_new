@@ -57,7 +57,7 @@ export default function AboutMe() {
         <div className="flex w-full min-w-0 flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
           <div className="flex flex-col justify-start lg:min-h-[136px]">
             <h2 className="section-title">About Me</h2>
-            <p className="mt-2 text-sm leading-6 text-ink/45 break-keep">
+            <p className="section-desc mt-2 text-sm leading-6 break-keep">
               웹, 데스크톱 앱, 모바일 앱 그리고 AI까지<br />
               다양한 분야에 호기심을 가지고 공부하고 있어요.<br />
               뛰어난 습득력과 적용력을 바탕으로 더욱 발전하는 중이에요.
@@ -126,7 +126,7 @@ export default function AboutMe() {
                     )}
                   </div>
                   <p className="text-base font-semibold leading-snug break-keep text-ink/80">{item.title}</p>
-                  <p className="mt-1.5 text-sm leading-6 break-keep text-ink/40">{item.desc}</p>
+                  <p className="section-desc mt-1.5 text-sm leading-6 break-keep">{item.desc}</p>
                 </div>
               </div>
             ))}

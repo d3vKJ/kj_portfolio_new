@@ -97,7 +97,7 @@ export default function Projects() {
       <div className="mx-auto w-full max-w-[var(--content-max)]">
         <div className="mb-8 flex flex-wrap items-baseline gap-x-4 gap-y-1">
           <h2 className="section-title">Projects</h2>
-          <p className="text-sm text-ink/40 sm:text-base">모든 프로젝트는 1인 작업물이에요.</p>
+          <p className="section-desc text-sm sm:text-base">모든 프로젝트는 1인 작업물이에요.</p>
         </div>
 
         {/* 카테고리 필터 */}
@@ -149,7 +149,7 @@ export default function Projects() {
                     </div>
                     <span className="shrink-0 font-mono text-[11px] text-ink/30">{item.year}</span>
                   </div>
-                  <p className="line-clamp-2 text-sm leading-relaxed text-ink/45">{item.desc}</p>
+                  <p className="section-desc line-clamp-2 text-sm leading-relaxed">{item.desc}</p>
                 </div>
                 </div>
               </button>
@@ -217,7 +217,7 @@ export default function Projects() {
                 <span className="text-base text-ink/35">{p.name}</span>
               </div>
               <p className="mt-1 text-sm text-ink/35">{p.year}{p.solo ? " · 1인 작업" : ""}</p>
-              <p className="mt-4 text-base leading-relaxed text-ink/55">{p.desc}</p>
+              <p className="section-desc mt-4 text-base leading-relaxed">{p.desc}</p>
 
               <div className="mt-6 h-px w-full bg-ink/[0.08]" />
 

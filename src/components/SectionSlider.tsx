@@ -28,7 +28,7 @@ const WHEEL_COOLDOWN_MS = 350;
 /** 히어로 → About 진입 직후, 관성 스크롤로 다음 섹션 넘어가지 않게 */
 const ENTER_HOLD_MS = 1100;
 const EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
-const SLIDE_LABELS = ["About", "Projects", "Skills", "Contact"];
+const SLIDE_LABELS = ["About", "Skills", "Projects", "Contact"];
 
 export default function SectionSlider({ children }: { children: ReactNode }) {
   const slides = Children.toArray(children);
@@ -113,7 +113,7 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
       const noScroll = scrollH <= clientH + 1;
       const atBottom = noScroll || scrollTop + clientH >= scrollH - 56;
       // Projects: 항상 / About: 모바일에서만 스크롤 시 헤더 숨김
-      const hideOnScroll = s.current.cur === 1 || (s.current.cur === 0 && mobile);
+      const hideOnScroll = s.current.cur === 2 || (s.current.cur === 0 && mobile);
       const hide = s.current.locked && hideOnScroll && scrollTop > 32;
       window.dispatchEvent(new CustomEvent("header-auto-hide", { detail: { hide } }));
       window.dispatchEvent(

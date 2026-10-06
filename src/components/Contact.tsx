@@ -100,7 +100,7 @@ export default function Contact() {
         같이 만들어가요
       </h2>
 
-      <p className="mt-4 max-w-md text-sm leading-relaxed text-ink/40 sm:text-base">
+      <p className="section-desc mt-4 max-w-md text-sm leading-relaxed sm:text-base">
         많은 사용자들에게 편리함을 제공하고 싶어요.<br />
         함께 만들고 성장할 기회를 기다립니다.
       </p>

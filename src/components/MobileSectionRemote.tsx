@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const LABELS = ["About", "Projects", "Skills", "Contact"];
+const LABELS = ["About", "Skills", "Projects", "Contact"];
 const LAST = LABELS.length - 1;
 
 // 모바일 섹션 이동 컨트롤
