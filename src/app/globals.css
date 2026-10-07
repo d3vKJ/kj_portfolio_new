@@ -465,27 +465,6 @@ html[data-theme="light"] .site-logo {
   mix-blend-mode: multiply;
 }
 
-.cube-mark {
-  transform-style: preserve-3d;
-  animation: cube-drift 7.5s ease-in-out infinite;
-}
-
-@keyframes cube-drift {
-  0%,
-  100% {
-    transform: rotateX(0deg) rotateY(0deg);
-  }
-  50% {
-    transform: rotateX(12deg) rotateY(-16deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cube-mark {
-    animation: none;
-  }
-}
-
 /* 비디오 배경 위 로고 */
 .logo-on-video,
 html[data-theme="light"] .logo-on-video {
