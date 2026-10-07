@@ -102,7 +102,7 @@ export default function Contact() {
 
       <p className="section-desc mt-4 max-w-md text-sm leading-relaxed sm:text-base">
         많은 사용자들에게 편리함을 제공하고 싶어요.<br />
-        함께 만들고 성장할 기회를 기다립니다.
+        함께 만들고 성장할 기회를 기다려요.
       </p>
 
       <a
@@ -133,7 +133,7 @@ export default function Contact() {
         ))}
       </div>
 
-      <p className="mt-16 text-xs text-ink/60">© 2026 Jang Kyungjin<br/>본 프로젝트는 개인 포트폴리오 목적으로 공개되었습니다.<br/>코드를 무단으로 사용하지 말아주세요.</p>
+      <p className="mt-16 text-xs text-ink/60">© 2026 Jang Kyungjin<br/>이 프로젝트는 개인 포트폴리오를 위해 공개했어요.<br/>코드를 무단으로 사용하지 말아주세요.</p>
       </div>
     </section>
   );

@@ -23,6 +23,36 @@ function isInteractiveTarget(el: EventTarget | null) {
   return Boolean(el.closest("a, button, [role='button'], input, textarea, select, [contenteditable='true']"));
 }
 
+function topDialog() {
+  const dialogs = document.querySelectorAll<HTMLElement>('[role="dialog"][aria-modal="true"]');
+  return dialogs.length > 0 ? dialogs[dialogs.length - 1] : null;
+}
+
+function canScrollOnAxis(el: HTMLElement, delta: number, axis: "x" | "y") {
+  if (delta === 0) return false;
+  const style = getComputedStyle(el);
+  const overflow = axis === "y" ? style.overflowY : style.overflowX;
+  if (overflow !== "auto" && overflow !== "scroll") return false;
+  if (axis === "y") {
+    if (el.scrollHeight <= el.clientHeight + 1) return false;
+    return delta > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 1;
+  }
+  if (el.scrollWidth <= el.clientWidth + 1) return false;
+  return delta > 0 ? el.scrollLeft + el.clientWidth < el.scrollWidth - 1 : el.scrollLeft > 1;
+}
+
+/** 모달 안에서 이 방향으로 아직 스크롤할 수 있는 조상. 끝이면 null — 그때는 뒤 페이지로 넘기지 않는다 */
+function modalScroller(target: EventTarget | null, dialog: HTMLElement, delta: number, axis: "x" | "y") {
+  if (!(target instanceof Element) || !dialog.contains(target)) return null;
+  let el: Element | null = target;
+  while (el && dialog.contains(el)) {
+    if (el instanceof HTMLElement && canScrollOnAxis(el, delta, axis)) return el;
+    if (el === dialog) break;
+    el = el.parentElement;
+  }
+  return null;
+}
+
 const SLIDE_MS = 650;
 const WHEEL_COOLDOWN_MS = 350;
 /** 히어로 → About 진입 직후, 관성 스크롤로 다음 섹션 넘어가지 않게 */
@@ -198,6 +228,15 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
     const onWheel = (e: WheelEvent) => {
       if (!s.current.locked) return;
 
+      const dialog = topDialog();
+      if (dialog) {
+        syncModalScrollLock();
+        const axis = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? "y" : "x";
+        const delta = axis === "y" ? e.deltaY : e.deltaX;
+        if (!modalScroller(e.target, dialog, delta, axis)) e.preventDefault();
+        return;
+      }
+
       if (s.current.animating || performance.now() < s.current.wheelLockUntil) {
         e.preventDefault();
         return;
@@ -242,8 +281,14 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
       if (!s.current.locked) return;
       if (isEditableTarget(e.target)) return;
       if (e.altKey || e.ctrlKey || e.metaKey) return;
-      // 모달 열린 동안에는 섹션 전환 키를 막고 Esc 등에 양보
-      if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+      // 모달 열린 동안에는 섹션 전환·뒤 콘텐츠 스크롤 키를 막는다
+      const dialog = topDialog();
+      if (dialog) {
+        const inside = e.target instanceof Node && dialog.contains(e.target);
+        const scrollKey = ["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight", "PageDown", "PageUp", "Home", "End", " "].includes(e.key);
+        if (!inside && scrollKey) e.preventDefault();
+        return;
+      }
       if (s.current.animating || performance.now() < s.current.wheelLockUntil) {
         if (["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight", "PageDown", "PageUp", "Home", "End", " "].includes(e.key)) {
           e.preventDefault();
@@ -318,15 +363,58 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
       }
     };
 
+    let lockedSlide: HTMLElement | null = null;
+    const syncModalScrollLock = () => {
+      const modalOpen = Boolean(topDialog());
+      const slide = slideRefs.current[s.current.cur] ?? null;
+      if (modalOpen && slide) {
+        if (lockedSlide && lockedSlide !== slide) {
+          lockedSlide.style.overflow = "";
+          delete lockedSlide.dataset.modalScrollLock;
+        }
+        lockedSlide = slide;
+        slide.dataset.modalScrollLock = "1";
+        slide.style.overflow = "hidden";
+        return;
+      }
+      if (lockedSlide) {
+        lockedSlide.style.overflow = "";
+        delete lockedSlide.dataset.modalScrollLock;
+        lockedSlide = null;
+      }
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!s.current.locked) return;
+      const dialog = topDialog();
+      if (!dialog) return;
+      const target = e.target;
+      if (!(target instanceof Element) || !dialog.contains(target)) {
+        e.preventDefault();
+        return;
+      }
+      if (!modalScroller(target, dialog, 1, "y") && !modalScroller(target, dialog, -1, "y") && !modalScroller(target, dialog, 1, "x") && !modalScroller(target, dialog, -1, "x")) {
+        e.preventDefault();
+      }
+    };
+    const modalObserver = new MutationObserver(syncModalScrollLock);
+    modalObserver.observe(document.body, { childList: true });
+
     window.addEventListener("scroll", check, { passive: true });
     window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("navigate-section", onNavigate);
     window.addEventListener("hero-crossfade", onCrossfade);
     window.addEventListener("slide-scroll-top", onScrollTop);
     return () => {
+      modalObserver.disconnect();
+      if (lockedSlide) {
+        lockedSlide.style.overflow = "";
+        delete lockedSlide.dataset.modalScrollLock;
+      }
       window.removeEventListener("scroll", check);
       window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("navigate-section", onNavigate);
       window.removeEventListener("hero-crossfade", onCrossfade);

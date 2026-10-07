@@ -152,8 +152,17 @@ export default function ProposalModal({
 
   useEffect(() => {
     if (!open || !activeId || !dialogRef.current) return;
-    const current = dialogRef.current.querySelector<HTMLElement>(`[aria-current="true"]`);
-    current?.scrollIntoView({ block: "nearest", inline: "nearest" });
+    dialogRef.current.querySelectorAll<HTMLElement>('[aria-current="true"]').forEach((current) => {
+      const scroller = current.closest<HTMLElement>("[data-proposal-toc], nav");
+      if (!scroller) return;
+      const box = scroller.getBoundingClientRect();
+      const item = current.getBoundingClientRect();
+      if (box.height === 0 || box.width === 0) return;
+      if (item.top < box.top) scroller.scrollTop -= box.top - item.top;
+      else if (item.bottom > box.bottom) scroller.scrollTop += item.bottom - box.bottom;
+      if (item.left < box.left) scroller.scrollLeft -= box.left - item.left;
+      else if (item.right > box.right) scroller.scrollLeft += item.right - box.right;
+    });
   }, [open, activeId]);
 
   useEffect(() => {
@@ -194,7 +203,7 @@ export default function ProposalModal({
       {open && (
         <motion.div
           key="proposal-backdrop"
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+          className="fixed inset-0 z-[60] flex items-end justify-center overscroll-none bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -236,7 +245,7 @@ export default function ProposalModal({
 
             <div className="flex min-h-0 flex-1">
               {doc && doc.sections.length > 0 && (
-                <nav aria-label="기획안 목차" className="hidden min-h-0 w-48 shrink-0 overflow-y-auto border-r border-ink/[0.08] px-3 py-5 lg:block">
+                <nav aria-label="기획안 목차" className="hidden min-h-0 w-48 shrink-0 overflow-y-auto overscroll-contain border-r border-ink/[0.08] px-3 py-5 lg:block">
                   <ol className="space-y-0.5">
                     {doc.sections.map((section) => {
                       const active = section.id === activeId;
@@ -262,10 +271,10 @@ export default function ProposalModal({
                 </nav>
               )}
 
-              <div ref={scrollerRef} className="relative min-h-0 flex-1 overflow-y-auto">
+              <div ref={scrollerRef} className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain">
                 {doc && doc.sections.length > 0 && (
                   <div data-proposal-toc className="sticky top-0 z-10 border-b border-ink/[0.08] bg-[var(--modal-bg)] px-4 py-2 backdrop-blur-md lg:hidden">
-                    <div className="flex gap-1.5 overflow-x-auto">
+                    <div className="flex gap-1.5 overflow-x-auto overscroll-contain">
                       {doc.sections.map((section) => {
                         const active = section.id === activeId;
                         return (
@@ -289,8 +298,8 @@ export default function ProposalModal({
                 )}
 
                 <article className="mx-auto w-full max-w-[40rem] px-5 py-7 sm:px-8 sm:py-9">
-                  {error && <p className="text-sm text-ink/50">기획안을 불러오지 못했습니다.</p>}
-                  {!doc && !error && <p className="text-sm text-ink/40">불러오는 중</p>}
+                  {error && <p className="text-sm text-ink/50">기획안을 불러오지 못했어요.</p>}
+                  {!doc && !error && <p className="text-sm text-ink/40">불러오고 있어요.</p>}
                   {doc?.sections.map((section) => (
                     <section key={section.id} id={section.id} className="scroll-mt-4 border-t border-ink/[0.08] py-8 first:border-t-0 first:pt-0">
                       <h3 className="flex items-baseline gap-3 text-lg font-semibold tracking-tight text-ink">

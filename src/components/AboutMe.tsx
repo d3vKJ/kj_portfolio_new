@@ -22,7 +22,7 @@ const INFO = [
 ];
 
 const TIMELINE = [
-  { year: "2026", title: "SBS아카데미컴퓨터아트학원 대구", desc: "Chat GPT & React 활용 스마트 UIUX 반응형 웹디자인 과정 수료 (예정)", current: true },
+  { year: "2026", title: "SBS아카데미컴퓨터아트학원 대구", desc: "Chat GPT와 React를 활용한 스마트 UIUX 반응형 웹디자인 과정을 수료할 예정이에요.", current: true },
 ];
 
 export default function AboutMe() {

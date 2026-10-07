@@ -711,10 +711,10 @@ export default function Hero() {
               Enter
             </button>
             <p className="text-[11px] tracking-[0.14em] text-ink/35">
-              휠 또는 <kbd className="rounded px-1 text-ink/45">↓</kbd> 키로도 이동
+              휠이나 <kbd className="rounded px-1 text-ink/45">↓</kbd> 키로도 이동해요
             </p>
             <span className="sr-only">
-              스크롤하거나 아래 방향키, 또는 Enter 버튼으로 영상을 스크럽하며 About으로 이동할 수 있습니다.
+              스크롤하거나 아래 방향키, 또는 Enter 버튼으로 영상을 넘기며 About으로 이동할 수 있어요.
             </span>
           </div>
         </div>

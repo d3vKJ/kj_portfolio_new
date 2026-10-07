@@ -139,7 +139,7 @@ export default function Projects() {
 
           {/* 카드 갤러리 */}
         {list.length === 0 ? (
-          <p className="py-16 text-center text-ink/30">해당 카테고리에 표시할 프로젝트가 없습니다.</p>
+          <p className="py-16 text-center text-ink/30">해당 카테고리에 표시할 프로젝트가 없어요.</p>
         ) : (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
             {list.map((item, i) => (
@@ -178,7 +178,7 @@ export default function Projects() {
           {p && (
           <motion.div
             key="modal-backdrop"
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center overscroll-none bg-black/40 p-4 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -190,7 +190,7 @@ export default function Projects() {
               role="dialog"
               aria-modal="true"
               aria-labelledby={`project-title-${p.name}`}
-              className="glass-modal max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl outline-none"
+              className="glass-modal max-h-[85vh] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-2xl outline-none"
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.97 }}
@@ -275,7 +275,7 @@ export default function Projects() {
                 )}
                 {p.code === null ? (
                   <p className="text-sm leading-snug text-ink/35">
-                    외주 작업 및 기업에서 운영되는 사이트로 인하여 코드를 공개할 수 없습니다.
+                    외주 작업이라 기업에서 운영 중인 사이트예요. 코드는 공개할 수 없어요.
                   </p>
                 ) : p.code !== "#" ? (
                   <a
