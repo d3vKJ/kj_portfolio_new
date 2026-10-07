@@ -18,6 +18,19 @@ export type Project = {
 
 export const PROJECTS: Project[] = [
   {
+    name: "portfolio", nameKo: "포트폴리오", year: "2026", solo: true, category: "Web",
+    desc: "[개인 프로젝트] 지금 보고 있는 포트폴리오 사이트를 만들었어요.",
+    tech: ["Next.js","TypeScript","Tailwind CSS","Framer Motion","Cloudflare"],
+    techUsage: [
+      { skill: "Next.js",       usage: "App Router로 한 페이지를 구성하고 OpenNext로 배포해요." },
+      { skill: "TypeScript",    usage: "프로젝트 데이터와 컴포넌트 props 타입을 정의했어요." },
+      { skill: "Tailwind CSS",  usage: "레이아웃, 글래스 카드, 라이트·다크 테마를 잡았어요." },
+      { skill: "Framer Motion", usage: "프로젝트 카드가 모달로 이어지게 하고, 스킬 탭을 전환해요." },
+      { skill: "Cloudflare",    usage: "Workers에 이 포트폴리오를 배포해요." },
+    ],
+    href: "/", code: "https://github.com/d3vKJ/kj_portfolio_new", image: "/projects/portfolio.png",
+  },
+  {
     name: "daimon", nameKo: "다이몬", year: "2026", solo: true, category: "Web",
     desc: "[외주 작업] 자동차 카본 파츠 업체의 웹사이트, 제품 정보, 결제까지 모두 만들었어요.",
     tech: ["Next.js","TypeScript","Tailwind CSS","Framer Motion","Supabase","Cloudflare","Swiper"],
@@ -61,7 +74,7 @@ export const PROJECTS: Project[] = [
   },
   {
     name: "airport-typing", nameKo: "에어포트 타이핑", year: "2026", solo: true, category: "Web",
-    desc: "[개인 프로젝트] 메트로 타이핑에 영감을 받아 전 세계 공항 이름을 타이핑하는 게임을 만들었어요.",
+    desc: "[개인 프로젝트] 전 세계 공항 이름을 타이핑하는 게임을 만들었어요.",
     tech: ["React","Vite","GSAP","Sass"],
     techUsage: [
       { skill: "React",  usage: "홈, 설정, 게임, 결과, 랭크, 컬렉션 화면을 상태와 함께 전환해요." },
@@ -70,19 +83,6 @@ export const PROJECTS: Project[] = [
       { skill: "Sass",   usage: "게임 HUD와 홈, 오버레이 스타일을 나눴어요." },
     ],
     href: "http://103.218.172.76:3000", code: "#", image: "/projects/airport-typing.png",
-  },
-  {
-    name: "portfolio", nameKo: "포트폴리오", year: "2026", solo: true, category: "Web",
-    desc: "[개인 프로젝트] 지금 보고 있는 포트폴리오 사이트를 만들었어요.",
-    tech: ["Next.js","TypeScript","Tailwind CSS","Framer Motion","Cloudflare"],
-    techUsage: [
-      { skill: "Next.js",       usage: "App Router로 한 페이지를 구성하고 OpenNext로 배포해요." },
-      { skill: "TypeScript",    usage: "프로젝트 데이터와 컴포넌트 props 타입을 정의했어요." },
-      { skill: "Tailwind CSS",  usage: "레이아웃, 글래스 카드, 라이트·다크 테마를 잡았어요." },
-      { skill: "Framer Motion", usage: "프로젝트 카드가 모달로 이어지게 하고, 스킬 탭을 전환해요." },
-      { skill: "Cloudflare",    usage: "Workers에 이 포트폴리오를 배포해요." },
-    ],
-    href: "/", code: "https://github.com/d3vKJ/kj_portfolio_new", image: "/projects/portfolio.png",
   },
   {
     name: "youtube-music", nameKo: "유튜브 뮤직", year: "2026", solo: true, category: "Desktop",
