@@ -50,32 +50,32 @@ const ICONS: Record<string, IconInfo> = {
 };
 
 const LEVELS: Record<string, number> = {
-  "HTML": 80,
-  "CSS": 80,
-  "JavaScript": 80,
-  "jQuery": 75,
-  "React": 65,
-  "Next.js": 60,
-  "TypeScript": 65,
-  "Tailwind CSS": 50,
-  "Framer Motion": 60,
+  "HTML": 70,
+  "CSS": 70,
+  "JavaScript": 70,
+  "jQuery": 65,
+  "React": 60,
+  "Next.js": 50,
+  "TypeScript": 50,
+  "Tailwind CSS": 40,
+  "Framer Motion": 50,
   "GSAP": 50,
-  "Sass": 60,
-  "Swiper": 60,
+  "Sass": 50,
+  "Swiper": 50,
   "Figma": 80,
   "Photoshop": 80,
   "Git": 60,
-  "Vite": 60,
-  "Electron": 60,
-  "React Native": 20,
+  "Vite": 50,
+  "Electron": 65,
+  "React Native": 10,
   "Kotlin": 20,
   "Node.js": 60,
-  "Supabase": 65,
-  "Cloudflare": 65,
-  "Vercel": 60,
-  "Cursor AI": 90,
-  "Claude": 90,
-  "Codex": 90,
+  "Supabase": 50,
+  "Cloudflare": 50,
+  "Vercel": 50,
+  "Cursor AI": 100,
+  "Claude": 100,
+  "Codex": 100,
 };
 
 const GROUPS = [
@@ -89,6 +89,7 @@ const GROUPS = [
 
 const ALL_SKILLS = GROUPS.flatMap((g) => g.skills);
 const TABS = [{ label: "전체", skills: ALL_SKILLS }, ...GROUPS];
+const USED_IN_PROJECTS = new Set(PROJECTS.flatMap((p) => p.tech));
 
 function Icon({ name }: { name: string }) {
   const info = ICONS[name];
@@ -102,14 +103,14 @@ function Icon({ name }: { name: string }) {
 
 const PROXIMITY_RADIUS = 140;
 
-function SkillCard({ name, i, onHover }: { name: string; i: number; onHover: (name: string | null) => void }) {
+function SkillCard({ name, i, featured, onHover }: { name: string; i: number; featured: boolean; onHover: (name: string | null) => void }) {
   const info = ICONS[name];
   const level = LEVELS[name] ?? 70;
   const color = info?.light ? "var(--fg)" : (info?.color ?? "var(--accent)");
   const [open, setOpen] = useState(false);
-  const [live, setLive] = useState(false); // Wave 마운트 여부
+  const [live, setLive] = useState(false); 
   const [touch, setTouch] = useState(false);
-  const openRef = useRef(false); // stale 클로저 방지용 ref
+  const openRef = useRef(false); 
 
   useEffect(() => {
     // 터치 기기 감지
@@ -129,7 +130,7 @@ function SkillCard({ name, i, onHover }: { name: string; i: number; onHover: (na
   return (
     <div
       data-skill-card
-      className="glass-panel group relative flex flex-col items-center gap-3 overflow-hidden rounded-2xl px-4 py-7"
+      className={`glass-panel group relative flex flex-col items-center overflow-hidden rounded-2xl ${featured ? "gap-3 px-4 py-7" : "gap-1.5 px-2 py-3"}`}
       style={{
         "--icon-color": color,
         transition: "transform 150ms ease-out, border-color 200ms, box-shadow 250ms",
@@ -170,25 +171,38 @@ function SkillCard({ name, i, onHover }: { name: string; i: number; onHover: (na
         )}
       </div>
       <span
-        className="pointer-events-none absolute right-2.5 top-2.5 z-[1] font-mono text-[10px] tabular-nums text-ink/55 transition-opacity duration-300"
+        className="pointer-events-none absolute right-2.5 top-2.5 z-[1] text-[10px] tabular-nums text-ink/55 transition-opacity duration-300"
         style={{ opacity: shown ? 1 : 0 }}
       >
         {level}%
       </span>
-      <div className="relative z-[1] opacity-85 transition-opacity group-hover:opacity-100">
+      <div className={`relative z-[1] opacity-85 transition-opacity group-hover:opacity-100 ${featured ? "" : "scale-[0.62]"}`}>
         <Icon name={name} />
       </div>
-      <span className="relative z-[1] text-center text-xs leading-tight text-ink/50 transition-colors group-hover:text-ink/80">{name}</span>
+      <span className={`relative z-[1] text-center leading-tight text-ink/50 transition-colors group-hover:text-ink/80 ${featured ? "text-xs" : "text-[10px]"}`}>{name}</span>
     </div>
   );
 }
 
 function SkillGrid({ skills, onHover }: { skills: string[]; onHover: (name: string | null) => void }) {
+  const featured = skills.filter((name) => USED_IN_PROJECTS.has(name));
+  const rest = skills.filter((name) => !USED_IN_PROJECTS.has(name));
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-4">
-      {skills.map((name, i) => (
-        <SkillCard key={name} name={name} i={i} onHover={onHover} />
-      ))}
+    <div className="flex flex-col gap-3">
+      {featured.length > 0 && (
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(168px,1fr))] gap-4">
+          {featured.map((name, i) => (
+            <SkillCard key={name} name={name} i={i} featured onHover={onHover} />
+          ))}
+        </div>
+      )}
+      {rest.length > 0 && (
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(92px,1fr))] gap-2">
+          {rest.map((name, i) => (
+            <SkillCard key={name} name={name} i={featured.length + i} featured={false} onHover={onHover} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -211,7 +225,7 @@ export default function Skills() {
       return;
     }
 
-    // 잘린 부분만 최소로 보정 — 왼쪽에 반쯤 묻히지 않게
+
     const pad = 12;
     const sRect = scroller.getBoundingClientRect();
     const tRect = tab.getBoundingClientRect();
@@ -245,7 +259,7 @@ export default function Skills() {
     if (!root) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    // mousemove rAF throttle
+
     let raf = 0;
     const onMove = (e: MouseEvent) => {
       if (raf) return;
@@ -387,7 +401,7 @@ export default function Skills() {
                         <div className="min-w-0">
                           <div className="mb-1.5 flex items-center gap-2">
                             <span className="whitespace-nowrap text-base font-medium text-ink/80">{d.nameKo}</span>
-                            <span className="ml-auto shrink-0 font-mono text-[12px] text-ink/30">{d.year}</span>
+                            <span className="ml-auto shrink-0 text-[12px] text-ink/30">{d.year}</span>
                           </div>
                           <p className="line-clamp-2 text-[13px] leading-relaxed" style={{ color: `color-mix(in srgb, ${color} 80%, var(--fg))` }}>{d.usage}</p>
                         </div>

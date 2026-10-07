@@ -40,7 +40,7 @@ export default function AboutMe() {
         <div className="flex flex-col items-center gap-6 lg:-translate-y-12">
           <div className="relative w-40 aspect-[3/4] overflow-hidden rounded-3xl glass-ios shadow-2xl transition-transform duration-300 hover:scale-[1.02] sm:w-48">
             <Image
-              src="/profile.png"
+              src="/profile.jpg"
               alt="장경진 프로필 사진"
               fill
               sizes="192px"
@@ -50,9 +50,6 @@ export default function AboutMe() {
           </div>
           <div className="px-2 text-center">
             <p className="text-lg font-semibold text-ink/80">장경진</p>
-            <p className="mt-1 text-[11px] leading-relaxed text-ink/35 sm:text-xs">
-              Publisher / Front-End / Full-Stack
-            </p>
           </div>
         </div>
       </div>
@@ -60,30 +57,30 @@ export default function AboutMe() {
       {/* ── 2열: 내 정보 ── */}
       <div className="flex flex-col justify-center border-t border-ink/[0.08] px-4 py-10 sm:px-8 sm:py-12 lg:flex-1 lg:border-t-0 lg:border-r lg:px-10 lg:py-0">
         <div className="flex w-full min-w-0 flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
-          <div className="flex flex-col justify-start lg:min-h-[136px]">
-            <h2 className="section-title">About Me</h2>
-            <p className="section-desc mt-2 text-sm leading-6 break-keep">
-              웹, 데스크톱 앱, 모바일 앱 그리고 AI까지<br />
-              다양한 분야에 호기심을 가지고 공부하고 있어요.<br />
+          <div className="@container flex w-full flex-col justify-start">
+            <p className="text-[10px] uppercase tracking-[0.35em] text-ink/30">About</p>
+            <h2 className="mt-3 text-[clamp(0.75rem,5.25cqw,1.85rem)] font-semibold leading-snug tracking-tight text-ink break-keep">
+              웹, 데스크톱 앱 그리고 AI까지<br />
+              다양한 분야에 호기심을 가지고 공부하고 있어요.
+            </h2>
+            <p className="mt-3 text-base leading-7 text-ink/70 break-keep">
               뛰어난 습득력과 적용력을 바탕으로 더욱 발전하는 중이에요.
             </p>
           </div>
 
           <div className="h-px bg-ink/[0.08]" />
 
-          <div className="flex min-w-0 flex-col gap-2.5">
+          <div className="flex min-w-0 flex-col">
             {INFO.map(({ icon, label, value }) => (
               <div
                 key={label}
-                className="glass-ios flex min-w-0 items-start gap-3 rounded-2xl px-3.5 py-3 sm:items-center sm:gap-4 sm:px-5 sm:py-3.5"
+                className="flex min-w-0 items-center gap-3 border-b border-ink/[0.06] py-2.5 last:border-b-0"
               >
-                <span className="shrink-0 self-center text-ink/35">{icon}</span>
-                <div className="min-w-0 flex-1 sm:flex sm:items-center sm:gap-4">
-                  <span className="mb-0.5 block text-[10px] uppercase tracking-widest text-ink/25 sm:mb-0 sm:w-16 sm:shrink-0">
-                    {label}
-                  </span>
-                  <span className="block break-all text-sm leading-snug text-ink/65">{value}</span>
-                </div>
+                <span className="shrink-0 text-ink/30 [&>svg]:h-4 [&>svg]:w-4">{icon}</span>
+                <span className="w-14 shrink-0 text-[10px] uppercase tracking-widest text-ink/30">
+                  {label}
+                </span>
+                <span className="min-w-0 flex-1 break-all text-sm leading-snug text-ink/55">{value}</span>
               </div>
             ))}
           </div>
@@ -125,7 +122,7 @@ export default function AboutMe() {
 
                 <div className="min-w-0 flex-1">
                   <div className="mb-1.5 flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-xs text-ink/30">{item.year}</span>
+                    <span className="text-xs text-ink/30">{item.year}</span>
                     {item.current && (
                       <span className="glass-soft rounded-full px-2 py-0.5 text-[9px] uppercase tracking-widest text-ink/45">현재</span>
                     )}
@@ -137,24 +134,16 @@ export default function AboutMe() {
             ))}
           </div>
 
-          <div className="flex flex-col gap-3">
-            <h3 className="section-title">Certificates</h3>
-            <div className="h-px bg-ink/[0.08]" />
-          </div>
-
-          <div className="relative flex min-w-0 flex-col">
-            <div className="absolute left-[5px] top-2 bottom-2 w-px bg-ink/[0.1]" />
-            {CERTIFICATES.map((item) => (
-              <div key={item.title} className="relative flex min-w-0 gap-4 pb-6 last:pb-0 sm:gap-6">
-                <div className="relative mt-[5px] h-2.5 w-2.5 shrink-0 self-start">
-                  <span className="block h-2.5 w-2.5 rounded-full border border-ink/25" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <span className="mb-1.5 block font-mono text-xs text-ink/30">{item.year}</span>
-                  <p className="text-base font-semibold leading-snug break-keep text-ink/80">{item.title}</p>
-                </div>
-              </div>
-            ))}
+          <div className="flex flex-col gap-3 border-t border-ink/[0.08] pt-5">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-ink/70">Certificates</h3>
+            <ul className="flex min-w-0 flex-col gap-2">
+              {CERTIFICATES.map((item) => (
+                <li key={item.title} className="glass-soft flex min-w-0 items-center justify-between gap-3 rounded-2xl px-4 py-3">
+                  <span className="min-w-0 text-sm font-medium leading-snug text-ink/90">{item.title}</span>
+                  <span className="shrink-0 text-[11px] text-ink/45">{item.year}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

@@ -1,11 +1,34 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
 import CursorGlow from "@/components/CursorGlow";
 
-export const metadata: Metadata = {
-  title: "장경진 포트폴리오",
-  description: "장경진 포트폴리오",
-};
+const title = "장경진 포트폴리오";
+const description = "웹과 데스크톱 앱을 만드는 장경진의 포트폴리오입니다.";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
+  const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") || host.startsWith("127.") ? "http" : "https");
+  return {
+    metadataBase: new URL(`${proto}://${host}`),
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      locale: "ko_KR",
+      type: "website",
+      images: [{ url: "/og.png", width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["/og.png"],
+    },
+  };
+}
 
 const themeBootScript = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}var el=document.documentElement;el.dataset.theme=t;el.style.colorScheme=t}catch(e){}})();`;
 

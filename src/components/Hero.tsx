@@ -605,9 +605,6 @@ export default function Hero() {
         style={{ touchAction: "none" }}
       >
         <Image src="/logo.png" alt="logo" width={220} height={220} className="site-logo object-contain" priority />
-        <p className="mt-1 px-4 text-center text-[10px] tracking-[0.12em] uppercase text-ink/60">
-          Publisher | Front-End | Full-Stack
-        </p>
 
         <div className="absolute inset-x-0 bottom-0 px-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
           <div
@@ -652,9 +649,6 @@ export default function Hero() {
           className="flex h-full w-full flex-col items-center justify-center"
         >
           <Image src="/logo.png" alt="logo" width={260} height={260} className="site-logo object-contain" priority />
-          <p className="mt-1 px-4 text-center text-[12px] tracking-[0.2em] uppercase text-ink/60">
-            Publisher | Front-End | Full-Stack
-          </p>
 
           <div className="absolute bottom-16 flex flex-col items-center gap-2 text-ink/40">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="animate-pulse">
@@ -690,9 +684,6 @@ export default function Hero() {
           <div ref={logoRef} style={{ transition: "transform 200ms ease-out", transformStyle: "preserve-3d" }}>
             <Image src="/logo.png" alt="logo" width={280} height={280} className="site-logo object-contain" priority />
           </div>
-          <p className="mt-1 px-4 text-center text-[13px] tracking-[0.3em] uppercase text-ink/60">
-            Publisher | Front-End | Full-Stack
-          </p>
 
           <div
             className="absolute bottom-10 flex flex-col items-center gap-3 transition-opacity duration-300"

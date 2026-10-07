@@ -1,4 +1,4 @@
-export type Category = "Web" | "Desktop" | "Android" | "All";
+export type Category = "Web" | "Desktop" | "All";
 export type TechUsage = { skill: string; usage: string };
 
 export type Project = {
@@ -12,6 +12,7 @@ export type Project = {
   category: Category;
   href: string;
   code: string | null;
+  codeNote?: string;
   image: string | null;
   proposal?: string;
 };
@@ -28,7 +29,7 @@ export const PROJECTS: Project[] = [
       { skill: "Framer Motion", usage: "프로젝트 카드가 모달로 이어지게 하고, 스킬 탭을 전환해요." },
       { skill: "Cloudflare",    usage: "Workers에 이 포트폴리오를 배포해요." },
     ],
-    href: "/", code: "https://github.com/d3vKJ/kj_portfolio_new", image: "/projects/portfolio.png",
+    href: "/", code: "https://github.com/d3vKJ/kj_portfolio_new", image: "/projects/portfolio-about.png",
   },
   {
     name: "daimon", nameKo: "다이몬", year: "2026", solo: true, category: "Web",
@@ -43,7 +44,10 @@ export const PROJECTS: Project[] = [
       { skill: "Cloudflare",    usage: "Workers와 Pages로 배포하고 엣지에서 캐시해요." },
       { skill: "Swiper",        usage: "제품 상세 이미지를 슬라이더로 넘겨요." },
     ],
-    href: "https://adr-works.com", code: null, image: "/projects/daimon.png",
+    href: "https://adr-works.com",
+    code: null,
+    codeNote: "외주 작업으로 만든 웹이고, 기업에서 운영하는 사이트라 코드는 공개하기 어려워요. 양해 부탁드려요.",
+    image: "/projects/daimon.png",
     proposal: "/proposals/daimon.md",
   },
   {
@@ -87,6 +91,19 @@ export const PROJECTS: Project[] = [
   {
     name: "youtube-music", nameKo: "유튜브 뮤직", year: "2026", solo: true, category: "Desktop",
     desc: "[개인 프로젝트] 기존 유튜브 뮤직 웹이 불편해서 데스크톱에서 재생하는 앱을 만들었어요.",
-    tech: [], techUsage: [], href: "#", code: "#", image: null,
+    tech: ["Electron","React","Next.js","TypeScript","JavaScript","Tailwind CSS"],
+    techUsage: [
+      { skill: "Electron",     usage: "창, 트레이, 미디어 키, 자동 업데이트를 데스크톱 셸에서 처리해요." },
+      { skill: "React",        usage: "플레이어, 보관함, 설정 화면을 컴포넌트로 구성해요." },
+      { skill: "Next.js",      usage: "메인 화면과 미니 플레이어를 정적 UI로 빌드해요." },
+      { skill: "TypeScript",   usage: "컴포넌트와 재생 상태 타입을 정의해요." },
+      { skill: "JavaScript",   usage: "Electron 메인 프로세스에서 재생, 로그인, 트레이를 다뤄요." },
+      { skill: "Tailwind CSS", usage: "글래스 UI와 다크·라이트 테마를 잡아요." },
+    ],
+    href: "http://103.218.172.76:9140",
+    code: null,
+    codeNote: "사용하시는 분이 많아서 코드는 공개하지 못하고 있어요. 양해 부탁드려요.",
+    image: "/projects/youtube-music.png",
+    proposal: "/proposals/youtube-music.md",
   },
 ];

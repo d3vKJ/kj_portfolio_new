@@ -26,9 +26,11 @@ const ICON_SLUG: Record<string, { slug: string; light?: boolean }> = {
   "Framer Motion":  { slug: "framer" },
   "Cloudflare":     { slug: "cloudflare" },
   "Supabase":       { slug: "supabase" },
+  "Electron":       { slug: "electron" },
+  "JavaScript":     { slug: "javascript" },
 };
 
-const CATEGORIES: Category[] = ["All", "Web", "Desktop", "Android"];
+const CATEGORIES: Category[] = ["All", "Web", "Desktop"];
 
 function TechIcon({ name }: { name: string }) {
   const info = ICON_SLUG[name];
@@ -161,7 +163,7 @@ export default function Projects() {
                       </h3>
                       <p className="mt-0.5 truncate text-[12px] tracking-wide text-ink/35">{item.name}</p>
                     </div>
-                    <span className="shrink-0 font-mono text-[11px] text-ink/30">{item.year}</span>
+                    <span className="shrink-0 text-[11px] text-ink/30">{item.year}</span>
                   </div>
                   <p className="section-desc line-clamp-2 text-sm leading-relaxed">{item.desc}</p>
                 </div>
@@ -273,9 +275,11 @@ export default function Projects() {
                     사이트
                   </a>
                 )}
-                {p.code === null ? (
-                  <p className="text-sm leading-snug text-ink/35">
-                    외주 작업이라 기업에서 운영 중인 사이트예요. 코드는 공개할 수 없어요.
+                {p.codeNote ? (
+                  <p className="text-sm leading-snug text-[var(--accent)]">{p.codeNote}</p>
+                ) : p.code === null ? (
+                  <p className="text-sm leading-snug text-[var(--accent)]">
+                    외주 작업으로 만든 웹이고, 기업에서 운영하는 사이트라 코드는 공개하기 어려워요. 양해 부탁드려요.
                   </p>
                 ) : p.code !== "#" ? (
                   <a

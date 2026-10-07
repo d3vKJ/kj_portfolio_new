@@ -261,7 +261,7 @@ export default function ProposalModal({
                               background: active ? "color-mix(in srgb, var(--accent) 14%, transparent)" : undefined,
                             }}
                           >
-                            <span className="w-5 shrink-0 font-mono text-[11px] tabular-nums">{section.index}</span>
+                            <span className="w-5 shrink-0 text-[11px] tabular-nums">{section.index}</span>
                             <span>{section.title}</span>
                           </button>
                         </li>
@@ -303,7 +303,7 @@ export default function ProposalModal({
                   {doc?.sections.map((section) => (
                     <section key={section.id} id={section.id} className="scroll-mt-4 border-t border-ink/[0.08] py-8 first:border-t-0 first:pt-0">
                       <h3 className="flex items-baseline gap-3 text-lg font-semibold tracking-tight text-ink">
-                        <span className="font-mono text-[12px] font-medium tabular-nums text-ink/35">{section.index}</span>
+                        <span className="text-[12px] font-medium tabular-nums text-ink/35">{section.index}</span>
                         {section.title}
                       </h3>
                       <div className="mt-4 space-y-3">

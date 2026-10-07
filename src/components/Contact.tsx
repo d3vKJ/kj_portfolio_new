@@ -107,7 +107,7 @@ export default function Contact() {
 
       <a
         href={`mailto:${EMAIL}`}
-        className="group mt-10 inline-flex max-w-full items-center gap-2 border-b border-ink/20 pb-1.5 font-mono text-sm text-ink/80 transition-colors duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] sm:text-2xl"
+        className="group mt-10 inline-flex max-w-full items-center gap-2 border-b border-ink/20 pb-1.5 text-sm text-ink/80 transition-colors duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)] sm:text-2xl"
       >
         <span className="min-w-0 break-all">{EMAIL}</span>
         <svg className="h-4 w-4 shrink-0 text-ink/25 transition-colors group-hover:text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
