@@ -13,6 +13,7 @@ export type Project = {
   href: string;
   code: string | null;
   image: string | null;
+  proposal?: string;
 };
 
 export const PROJECTS: Project[] = [
@@ -30,6 +31,7 @@ export const PROJECTS: Project[] = [
       { skill: "Swiper",        usage: "제품 상세 이미지 슬라이더" },
     ],
     href: "https://adr-works.com", code: null, image: "/projects/daimon.png",
+    proposal: "/proposals/daimon.md",
   },
   {
     name: "apple", nameKo: "애플", year: "2026", solo: true, category: "Web",

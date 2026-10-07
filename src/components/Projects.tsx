@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { PROJECTS, type Project, type Category } from "@/data/projects";
+import ProposalModal from "@/components/ProposalModal";
 
 const ICON_SLUG: Record<string, { slug: string; light?: boolean }> = {
   "React":        { slug: "react" },
@@ -70,23 +71,36 @@ function CardThumb({ item }: { item: Project }) {
 export default function Projects() {
   const [filterCat, setFilterCat] = useState<Category>("All");
   const [selected, setSelected] = useState<number | null>(null);
+  const [proposalOpen, setProposalOpen] = useState(false);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const proposalBtnRef = useRef<HTMLButtonElement>(null);
   const lastFocusRef = useRef<HTMLElement | null>(null);
 
-  // 모달 열려있을 때 Esc로 닫기 + 포커스 트랩 (열 때 닫기 버튼으로, 닫을 때 카드로 복귀)
+  // 모달 열려있을 때 닫기 버튼으로 포커스, 닫을 때 카드로 복귀
   useEffect(() => {
     if (selected === null) return;
     lastFocusRef.current = document.activeElement as HTMLElement | null;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setSelected(null);
-    };
-    window.addEventListener("keydown", onKey);
     const id = window.setTimeout(() => closeBtnRef.current?.focus(), 0);
     return () => {
-      window.removeEventListener("keydown", onKey);
       window.clearTimeout(id);
-      lastFocusRef.current?.focus?.(); // 모달 닫힌 뒤 원래 카드로 포커스 복귀
+      lastFocusRef.current?.focus?.();
     };
+  }, [selected]);
+
+  // Esc: 기획안이 열려 있으면 기획안만 닫고, 아니면 프로젝트 모달을 닫는다
+  useEffect(() => {
+    if (selected === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (proposalOpen) setProposalOpen(false);
+      else setSelected(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selected, proposalOpen]);
+
+  useEffect(() => {
+    setProposalOpen(false);
   }, [selected]);
 
   const list = filterCat === "All" ? PROJECTS : PROJECTS.filter(p => p.category === filterCat);
@@ -233,6 +247,19 @@ export default function Projects() {
               )}
 
               <div className="mt-6 flex flex-wrap items-center gap-3">
+                {p.proposal && (
+                  <button
+                    ref={proposalBtnRef}
+                    type="button"
+                    onClick={() => setProposalOpen(true)}
+                    className="glass-ios inline-flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-ink/75 transition-all duration-200 hover:border-[var(--accent)]/40 hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75} aria-hidden>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                    </svg>
+                    기획안
+                  </button>
+                )}
                 {p.href !== "#" && (
                   <a
                     href={p.href}
@@ -270,6 +297,15 @@ export default function Projects() {
           )}
         </AnimatePresence>,
         document.body
+      )}
+
+      {p?.proposal && (
+        <ProposalModal
+          open={proposalOpen}
+          src={p.proposal}
+          onClose={() => setProposalOpen(false)}
+          returnFocusRef={proposalBtnRef}
+        />
       )}
     </section>
   );
