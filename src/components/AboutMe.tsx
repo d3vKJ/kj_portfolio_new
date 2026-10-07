@@ -137,17 +137,24 @@ export default function AboutMe() {
             ))}
           </div>
 
-          <div className="flex min-w-0 flex-col gap-3">
-            <h3 className="text-sm font-semibold tracking-tight text-ink/55">자격증</h3>
+          <div className="flex flex-col gap-3">
+            <h3 className="section-title">Certificates</h3>
             <div className="h-px bg-ink/[0.08]" />
-            <ul className="flex flex-col gap-2.5">
-              {CERTIFICATES.map((item) => (
-                <li key={item.title} className="flex min-w-0 items-baseline gap-3">
-                  <span className="shrink-0 font-mono text-xs text-ink/30">{item.year}</span>
-                  <span className="min-w-0 text-sm font-medium leading-snug break-keep text-ink/75">{item.title}</span>
-                </li>
-              ))}
-            </ul>
+          </div>
+
+          <div className="relative flex min-w-0 flex-col">
+            <div className="absolute left-[5px] top-2 bottom-2 w-px bg-ink/[0.1]" />
+            {CERTIFICATES.map((item) => (
+              <div key={item.title} className="relative flex min-w-0 gap-4 pb-6 last:pb-0 sm:gap-6">
+                <div className="relative mt-[5px] h-2.5 w-2.5 shrink-0 self-start">
+                  <span className="block h-2.5 w-2.5 rounded-full border border-ink/25" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <span className="mb-1.5 block font-mono text-xs text-ink/30">{item.year}</span>
+                  <p className="text-base font-semibold leading-snug break-keep text-ink/80">{item.title}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
