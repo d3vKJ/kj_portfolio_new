@@ -25,6 +25,11 @@ const TIMELINE = [
   { year: "2026", title: "SBS아카데미컴퓨터아트학원 대구", desc: "Chat GPT와 React를 활용한 스마트 UIUX 반응형 웹디자인 과정을 수료할 예정이에요.", current: true },
 ];
 
+const CERTIFICATES = [
+  { year: "2020", title: "운전면허 1종 보통" },
+  { year: "2020", title: "전기 기능사" },
+];
+
 export default function AboutMe() {
   return (
     <section className="min-h-full pb-24 pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[var(--header-space)] sm:pb-10 lg:h-full">
@@ -98,7 +103,7 @@ export default function AboutMe() {
             <div className="absolute left-[5px] top-2 bottom-2 w-px bg-ink/[0.1]" />
 
             {TIMELINE.map((item, i) => (
-              <div key={i} className="relative flex min-w-0 gap-4 pb-8 last:pb-0 sm:gap-6">
+              <div key={i} className="relative flex min-w-0 gap-4 pb-6 last:pb-0 sm:gap-6">
                 <div className="relative mt-[5px] h-2.5 w-2.5 shrink-0 self-start">
                   {item.current ? (
                     <>
@@ -130,6 +135,19 @@ export default function AboutMe() {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="flex min-w-0 flex-col gap-3">
+            <h3 className="text-sm font-semibold tracking-tight text-ink/55">자격증</h3>
+            <div className="h-px bg-ink/[0.08]" />
+            <ul className="flex flex-col gap-2.5">
+              {CERTIFICATES.map((item) => (
+                <li key={item.title} className="flex min-w-0 items-baseline gap-3">
+                  <span className="shrink-0 font-mono text-xs text-ink/30">{item.year}</span>
+                  <span className="min-w-0 text-sm font-medium leading-snug break-keep text-ink/75">{item.title}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
