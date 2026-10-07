@@ -604,7 +604,10 @@ export default function Hero() {
         className="relative z-20 flex h-[100dvh] flex-col items-center justify-center overflow-hidden bg-bg will-change-[opacity]"
         style={{ touchAction: "none" }}
       >
-        <Image src="/logo.png" alt="logo" width={220} height={220} className="site-logo object-contain" priority />
+        <div className="flex flex-col items-center [perspective:800px]">
+          <Image src="/ms-icon-310x310.png" alt="" width={72} height={72} className="cube-mark site-logo h-[72px] w-[72px] object-contain" priority />
+          <Image src="/logo.png" alt="JINS NATION" width={2172} height={724} className="site-logo -mt-[8%] h-auto w-[220px] object-contain" priority />
+        </div>
 
         <div className="absolute inset-x-0 bottom-0 px-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
           <div
@@ -648,7 +651,10 @@ export default function Hero() {
           aria-label="탭해서 About으로 이동"
           className="flex h-full w-full flex-col items-center justify-center"
         >
-          <Image src="/logo.png" alt="logo" width={260} height={260} className="site-logo object-contain" priority />
+          <span className="flex flex-col items-center [perspective:800px]">
+            <Image src="/ms-icon-310x310.png" alt="" width={80} height={80} className="cube-mark site-logo h-20 w-20 object-contain" priority />
+            <Image src="/logo.png" alt="JINS NATION" width={2172} height={724} className="site-logo -mt-[8%] h-auto w-[260px] object-contain" priority />
+          </span>
 
           <div className="absolute bottom-16 flex flex-col items-center gap-2 text-ink/40">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="animate-pulse">
@@ -681,8 +687,9 @@ export default function Hero() {
           className="absolute inset-0 z-10 flex flex-col items-center justify-center"
           style={{ transition: "opacity 0.4s ease" }}
         >
-          <div ref={logoRef} style={{ transition: "transform 200ms ease-out", transformStyle: "preserve-3d" }}>
-            <Image src="/logo.png" alt="logo" width={280} height={280} className="site-logo object-contain" priority />
+          <div ref={logoRef} className="flex flex-col items-center [perspective:800px]" style={{ transition: "transform 200ms ease-out", transformStyle: "preserve-3d" }}>
+            <Image src="/ms-icon-310x310.png" alt="" width={88} height={88} className="cube-mark site-logo h-[88px] w-[88px] object-contain" priority />
+            <Image src="/logo.png" alt="JINS NATION" width={2172} height={724} className="site-logo -mt-[8%] h-auto w-[280px] object-contain" priority />
           </div>
 
           <div
