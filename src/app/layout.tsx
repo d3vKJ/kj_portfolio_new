@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
 import CursorGlow from "@/components/CursorGlow";
+import { siteUrl } from "@/data/site";
 
 const title = "장경진 | 프론트엔드 개발자 포트폴리오";
 const description = "장경진 | 프론트엔드 개발자 포트폴리오";
@@ -14,6 +15,11 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(`${proto}://${host}`),
     title,
     description,
+    alternates: { canonical: siteUrl },
+    robots: { index: true, follow: true },
+    verification: {
+      other: { "naver-site-verification": "f6c114c52d499102a153c073beac088eb6ec1fad" },
+    },
     openGraph: {
       title,
       description,
