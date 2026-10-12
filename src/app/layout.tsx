@@ -3,8 +3,8 @@ import { headers } from "next/headers";
 import "./globals.css";
 import CursorGlow from "@/components/CursorGlow";
 
-const title = "장경진 포트폴리오";
-const description = "웹과 데스크톱 앱을 만드는 장경진의 포트폴리오입니다.";
+const title = "장경진 | 프론트엔드 개발자 포트폴리오";
+const description = "장경진 | 프론트엔드 개발자 포트폴리오";
 
 export async function generateMetadata(): Promise<Metadata> {
   const h = await headers();
@@ -29,12 +29,11 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     icons: {
       icon: [
-        { url: "/favicon.ico" },
-        { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-        { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+        { url: "/android-icon-192x192.png", sizes: "192x192", type: "image/png" },
         { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+        { url: "/favicon.ico", sizes: "96x96", type: "image/x-icon" },
       ],
-      apple: [{ url: "/apple-icon.png", sizes: "192x192", type: "image/png" }],
+      apple: [{ url: "/apple-icon-180x180.png", sizes: "180x180", type: "image/png" }],
     },
     manifest: "/manifest.json",
     other: {

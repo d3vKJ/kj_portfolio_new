@@ -601,6 +601,7 @@ export default function Hero() {
     return (
       <section
         ref={touchSectionRef}
+        data-nosnippet
         className="relative z-20 flex h-[100dvh] flex-col items-center justify-center overflow-hidden bg-bg will-change-[opacity]"
         style={{ touchAction: "none" }}
       >
@@ -640,6 +641,7 @@ export default function Hero() {
     return (
       <section
         ref={touchSectionRef}
+        data-nosnippet
         className="relative z-20 h-[100dvh] overflow-hidden bg-bg will-change-[opacity]"
       >
         <button
@@ -664,7 +666,7 @@ export default function Hero() {
 
   // 데스크톱: 영상 스크럽
   return (
-    <section ref={sectionRef} className="relative z-20 h-[850vh]">
+    <section ref={sectionRef} data-nosnippet className="relative z-20 h-[850vh]">
       <div ref={stickyRef} className="sticky top-0 h-screen overflow-hidden bg-bg will-change-[opacity]">
         <video
           ref={videoRef}
