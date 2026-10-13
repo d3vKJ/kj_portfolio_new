@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { HERO_VIDEO, HERO_VIDEO_CACHE, HERO_VIDEO_CACHE_FLAG } from "@/data/heroVideo";
 
 // 스크롤 progress(0~1) 타임라인
 const LOGO_OUT_END = 0.1;    // 로고 fade out
@@ -23,6 +24,65 @@ function easeOutCubic(t: number) {
 
 const SCROLL_TO_ABOUT_MS = 8000;
 
+async function readVideoBlob(response: Response, onProgress: (ratio: number) => void) {
+  const total = Number(response.headers.get("content-length")) || 0;
+  if (!response.body) {
+    const blob = await response.blob();
+    onProgress(1);
+    return blob;
+  }
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value) {
+      chunks.push(value);
+      received += value.byteLength;
+      if (total > 0) onProgress(Math.min(1, received / total));
+    }
+  }
+  onProgress(1);
+  return new Blob(chunks as BlobPart[], { type: "video/mp4" });
+}
+
+function rememberHeroVideo() {
+  try {
+    localStorage.setItem(HERO_VIDEO_CACHE_FLAG, HERO_VIDEO);
+  } catch {
+    /* 저장 불가면 다음에도 로딩 화면을 보여 준다 */
+  }
+}
+
+function forgetHeroVideo() {
+  try {
+    localStorage.removeItem(HERO_VIDEO_CACHE_FLAG);
+  } catch {
+    /* ignore */
+  }
+  delete document.documentElement.dataset.heroCached;
+}
+
+async function openHeroCache() {
+  if (!("caches" in window)) return null;
+  try {
+    return await caches.open(HERO_VIDEO_CACHE);
+  } catch {
+    return null;
+  }
+}
+
+function warmHeroVideo(video: HTMLVideoElement) {
+  video.muted = true;
+  const played = video.play();
+  if (!played) return;
+  played.then(() => {
+    video.pause();
+    video.playbackRate = 1;
+  }).catch(() => {});
+}
+
 function getHeroMode(): HeroMode {
   if (window.matchMedia("(min-width: 1024px)").matches) return "desktop";
   if (window.matchMedia("(max-width: 639px)").matches) return "phone";
@@ -43,6 +103,9 @@ export default function Hero() {
   const [mode, setMode] = useState<HeroMode>("desktop");
   const [playingAll, setPlayingAll] = useState(false);
   const [heroHintsVisible, setHeroHintsVisible] = useState(true);
+  const [videoSrc, setVideoSrc] = useState<string | null>(null);
+  const [videoReady, setVideoReady] = useState(false);
+  const [forceGate, setForceGate] = useState(false);
 
   const touchSectionRef = useRef<HTMLElement>(null);
   const touchEnteringRef = useRef(false);
@@ -83,9 +146,127 @@ export default function Hero() {
     return () => sticky.removeEventListener("mousemove", onMove);
   }, [mode]);
 
-  // 데스크톱: 영상 스크럽
+  // 데스크톱: 영상 전체를 받은 뒤에만 사이트를 연다
   useEffect(() => {
     if (mode !== "desktop") return;
+    if (!window.matchMedia("(min-width: 1024px)").matches) return;
+
+    let cancelled = false;
+    const ac = new AbortController();
+
+    const reveal = () => {
+      if (cancelled) return;
+      cancelled = true;
+      setVideoReady(true);
+    };
+
+    const timeout = window.setTimeout(() => {
+      setVideoSrc((src) => src ?? HERO_VIDEO);
+      reveal();
+    }, 12000);
+
+    (async () => {
+      try {
+        const cache = await openHeroCache();
+        const hit = cache ? await cache.match(HERO_VIDEO) : undefined;
+        if (hit) {
+          const blob = await hit.blob();
+          if (cancelled) return;
+          if (blob.size > 0) {
+            const url = URL.createObjectURL(blob);
+            setVideoSrc(url);
+            rememberHeroVideo();
+            return;
+          }
+          await cache?.delete(HERO_VIDEO);
+        }
+
+        if (document.documentElement.dataset.heroCached === "1") {
+          forgetHeroVideo();
+          setForceGate(true);
+        }
+
+        const res = await fetch(HERO_VIDEO, { signal: ac.signal, cache: "force-cache" });
+        if (!res.ok) throw new Error("video");
+        const stored = res.clone();
+        const blob = await readVideoBlob(res, () => {});
+        if (cancelled) return;
+        if (cache) {
+          await cache.put(HERO_VIDEO, stored);
+          rememberHeroVideo();
+        }
+        const url = URL.createObjectURL(blob);
+        setVideoSrc(url);
+      } catch {
+        if (!cancelled) setVideoSrc(HERO_VIDEO);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      ac.abort();
+      window.clearTimeout(timeout);
+    };
+  }, [mode]);
+
+  useEffect(() => {
+    if (mode !== "desktop" || videoReady) return;
+    if (!window.matchMedia("(min-width: 1024px)").matches) return;
+    if (document.documentElement.dataset.heroCached === "1" && !forceGate) return;
+
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtml = html.style.overflow;
+    const prevBody = body.style.overflow;
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    html.dataset.heroLoading = "1";
+
+    const blockScroll = (e: Event) => e.preventDefault();
+    window.addEventListener("wheel", blockScroll, { passive: false });
+    window.addEventListener("touchmove", blockScroll, { passive: false });
+
+    return () => {
+      html.style.overflow = prevHtml;
+      body.style.overflow = prevBody;
+      delete html.dataset.heroLoading;
+      window.removeEventListener("wheel", blockScroll);
+      window.removeEventListener("touchmove", blockScroll);
+    };
+  }, [mode, videoReady, forceGate]);
+
+  useEffect(() => {
+    if (mode !== "desktop" || !videoSrc) return;
+    const video = videoRef.current;
+    if (!video) return;
+    let cancelled = false;
+
+    const finish = () => {
+      if (cancelled) return;
+      warmHeroVideo(video);
+      setVideoReady(true);
+    };
+
+    if (video.readyState >= 2 && Number.isFinite(video.duration)) {
+      finish();
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const onReady = () => finish();
+    video.addEventListener("loadeddata", onReady);
+    const giveUp = window.setTimeout(finish, 2500);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(giveUp);
+      video.removeEventListener("loadeddata", onReady);
+    };
+  }, [mode, videoSrc]);
+
+  // 데스크톱: 영상 스크럽
+  useEffect(() => {
+    if (mode !== "desktop" || !videoReady) return;
     const video = videoRef.current;
     const section = sectionRef.current;
     const overlay = overlayRef.current;
@@ -384,6 +565,7 @@ export default function Hero() {
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("section-change", onSection);
@@ -403,7 +585,7 @@ export default function Hero() {
       if (playAllRaf) cancelAnimationFrame(playAllRaf);
       if (scrubRaf) cancelAnimationFrame(scrubRaf);
     };
-  }, [mode]);
+  }, [mode, videoReady]);
 
   const handlePlayAll = () => {
     playAllFnRef.current?.();
@@ -670,13 +852,41 @@ export default function Hero() {
       <div ref={stickyRef} className="sticky top-0 h-screen overflow-hidden bg-bg will-change-[opacity]">
         <video
           ref={videoRef}
-          className="absolute inset-0 h-full w-full object-cover will-change-[opacity,transform]"
+          className="absolute inset-0 h-full w-full object-cover"
           style={{ opacity: 0, transform: "scale(0.5)", transformOrigin: "center center" }}
-          src="/hero_scrub.mp4?v=scrub2"
+          src={videoSrc ?? undefined}
           muted
           playsInline
           preload="auto"
         />
+
+        {mode === "desktop" && !videoReady && (
+          <div
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+            data-hero-loader
+            className="fixed inset-0 z-[400] bg-bg max-lg:hidden"
+          >
+            <div className="flex h-full items-center justify-center">
+              <Image src="/logo.png" alt="" width={280} height={280} className="site-logo object-contain" priority />
+            </div>
+            <div className="absolute inset-x-0 bottom-16 flex flex-col items-center gap-4 px-6">
+              <div className="hero-pour" aria-hidden>
+                {Array.from({ length: 8 }, (_, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      ["--base" as string]: `${(i - 3.5) * 5}deg`,
+                      ["--i" as string]: i,
+                    }}
+                  />
+                ))}
+              </div>
+              <p className="text-base text-ink/70">페이지를 불러오는 중</p>
+            </div>
+          </div>
+        )}
 
         <div
           ref={overlayRef}

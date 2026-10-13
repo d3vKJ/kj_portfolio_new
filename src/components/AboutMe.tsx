@@ -134,7 +134,10 @@ export default function AboutMe() {
             ))}
           </div>
 
-          <div className="flex flex-col gap-3 border-t border-ink/[0.08] pt-5">
+          <div
+            className="flex flex-col gap-3 border-t border-ink/[0.08] pt-5"
+            style={{ fontFamily: '"Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif' }}
+          >
             <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-ink/70">Certificates</h3>
             <ul className="flex min-w-0 flex-col gap-2">
               {CERTIFICATES.map((item) => (

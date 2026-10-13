@@ -61,7 +61,7 @@ export const PROJECTS: Project[] = [
       { skill: "Sass",         usage: "컴포넌트별 스타일과 Reveal 애니메이션을 작성했어요." },
       { skill: "React Router", usage: "/iphone, /support 같은 페이지를 라우팅해요." },
     ],
-    href: "http://103.218.172.76:1004", code: "#", image: "/projects/apple.png",
+    href: "http://103.218.172.76:1004", code: "https://github.com/d3vKJ/kj_portfolio_apple", image: "/projects/apple.png",
   },
   {
     name: "genesis", nameKo: "제네시스", year: "2026", solo: true, category: "Web",
@@ -74,7 +74,7 @@ export const PROJECTS: Project[] = [
       { skill: "GSAP",         usage: "스크롤하면 섹션이 나타나도록 ScrollTrigger를 썼어요." },
       { skill: "Swiper",       usage: "히어로와 카드 캐러셀을 슬라이더로 넘겼어요." },
     ],
-    href: "http://103.218.172.76:6102", code: "#", image: "/projects/genesis.png",
+    href: "http://103.218.172.76:6102", code: "https://github.com/d3vKJ/kj_portfoilio_genesis", image: "/projects/genesis.png",
   },
   {
     name: "airport-typing", nameKo: "에어포트 타이핑", year: "2026", solo: true, category: "Web",
@@ -86,7 +86,7 @@ export const PROJECTS: Project[] = [
       { skill: "GSAP",   usage: "세계지도 줌과 비행 경로 애니메이션을 넣었어요." },
       { skill: "Sass",   usage: "게임 HUD와 홈, 오버레이 스타일을 나눴어요." },
     ],
-    href: "http://103.218.172.76:3000", code: "#", image: "/projects/airport-typing.png",
+    href: "http://103.218.172.76:3000", code: "https://github.com/d3vKJ/kj_portfolio_wat", image: "/projects/airport-typing.png",
   },
   {
     name: "youtube-music", nameKo: "유튜브 뮤직", year: "2026", solo: true, category: "Desktop",

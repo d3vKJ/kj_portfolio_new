@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
 import CursorGlow from "@/components/CursorGlow";
+import { HERO_VIDEO, HERO_VIDEO_CACHE_FLAG } from "@/data/heroVideo";
 import { siteUrl } from "@/data/site";
 
 const title = "장경진 | 프론트엔드 개발자 포트폴리오";
@@ -48,13 +49,15 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const themeBootScript = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}var el=document.documentElement;el.dataset.theme=t;el.style.colorScheme=t}catch(e){}})();`;
+const themeBootScript = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark")t="dark";var el=document.documentElement;el.dataset.theme=t;el.style.colorScheme=t}catch(e){}})();`;
+const heroCacheBootScript = `(function(){try{if(localStorage.getItem(${JSON.stringify(HERO_VIDEO_CACHE_FLAG)})===${JSON.stringify(HERO_VIDEO)})document.documentElement.dataset.heroCached="1"}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" className="h-full antialiased" suppressHydrationWarning>
+    <html lang="ko" data-theme="dark" className="h-full antialiased" style={{ colorScheme: "dark" }} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+        <script dangerouslySetInnerHTML={{ __html: heroCacheBootScript }} />
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"

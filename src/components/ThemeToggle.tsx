@@ -15,19 +15,10 @@ export default function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
-    const current: Theme = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const current: Theme = saved === "light" ? "light" : "dark";
+    applyTheme(current);
     setTheme(current);
-
-    // OS 다크모드 변경 감지
-    const mq = window.matchMedia("(prefers-color-scheme: light)");
-    const onChange = () => {
-      if (localStorage.getItem(STORAGE_KEY)) return;
-      const next: Theme = mq.matches ? "light" : "dark";
-      applyTheme(next);
-      setTheme(next);
-    };
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
   }, []);
 
   const isLight = theme === "light";
