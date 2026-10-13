@@ -529,19 +529,34 @@ export default function Hero() {
       }
     };
 
+    const parkHero = () => {
+      sticky.style.opacity = "0";
+      sticky.style.pointerEvents = "none";
+      section.style.pointerEvents = "none";
+      section.inert = true;
+      overlay.style.pointerEvents = "none";
+      video.style.pointerEvents = "none";
+    };
+
     const onSection = (e: Event) => {
       inSlider = Boolean((e as CustomEvent).detail?.inSlider);
       if (inSlider) {
         playingAllRef.current = false;
         setPlayingAll(false);
         setHints(false);
+        parkHero();
       } else {
         setHints(true);
+        sticky.style.pointerEvents = "";
+        section.style.pointerEvents = "";
+        section.inert = false;
+        overlay.style.pointerEvents = "";
+        video.style.pointerEvents = "";
       }
     };
 
     const onScroll = () => {
-      if (enteringRef.current || playingAllRef.current) return;
+      if (enteringRef.current || playingAllRef.current || inSlider) return;
 
       const progress = Math.max(0, Math.min(1, (window.scrollY - sectionTop) / sectionRange));
 
