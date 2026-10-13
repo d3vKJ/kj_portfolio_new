@@ -190,21 +190,6 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
       bindSlideScroll();
     };
 
-    const unlock = () => {
-      s.current.locked = false;
-      s.current.cooldown = true; // 재진입 방지 쿨다운
-      setLocked(false);
-      setReveal(0);
-      s.current.reveal = 0;
-      document.body.style.cssText = "";
-      emitChange(s.current.cur, false);
-      window.dispatchEvent(new CustomEvent("hero-crossfade", { detail: { t: 0 } }));
-      window.dispatchEvent(new CustomEvent("header-auto-hide", { detail: { hide: false } }));
-      window.dispatchEvent(new CustomEvent("slide-scroll-state", { detail: { showTop: false, showRemote: false } }));
-      slideRefs.current.forEach((el) => el?.removeEventListener("scroll", onSlideScroll));
-      setTimeout(() => { s.current.cooldown = false; }, 500);
-    };
-
     const onCrossfade = (e: Event) => {
       if (s.current.locked || s.current.cooldown) return;
       const t = Math.max(0, Math.min(1, (e as CustomEvent).detail.t as number));
@@ -256,25 +241,16 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
         e.preventDefault();
         void runTransition(s.current.cur - 1);
       } else if (!down && s.current.cur === 0) {
+        // 스크롤 영상이 끝난 뒤에는 히어로로 돌아가지 않는다
         e.preventDefault();
-        unlock();
-        window.scrollTo(0, 0);
-        window.dispatchEvent(new Event("scroll"));
-        setTimeout(() => { s.current.cooldown = false; }, 500);
       } else if (down && s.current.cur === n - 1) {
         e.preventDefault();
       }
     };
 
-    const goPrevOrHome = () => {
-      if (s.current.cur > 0) {
-        void runTransition(s.current.cur - 1);
-        return;
-      }
-      unlock();
-      window.scrollTo(0, 0);
-      window.dispatchEvent(new Event("scroll"));
-      setTimeout(() => { s.current.cooldown = false; }, 500);
+    const goPrev = () => {
+      if (s.current.cur <= 0) return;
+      void runTransition(s.current.cur - 1);
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -339,7 +315,7 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
           return;
         }
         e.preventDefault();
-        goPrevOrHome();
+        goPrev();
       }
     };
 
@@ -347,10 +323,7 @@ export default function SectionSlider({ children }: { children: ReactNode }) {
       const { action, index } = (e as CustomEvent).detail;
       if (action === "home") {
         if (!s.current.locked) return;
-        unlock();
-        window.scrollTo(0, 0);
-        window.dispatchEvent(new Event("scroll"));
-        setTimeout(() => { s.current.cooldown = false; }, 500);
+        void runTransition(0);
       } else if (action === "go" && typeof index === "number") {
         if (!s.current.locked) {
           setReveal(1);

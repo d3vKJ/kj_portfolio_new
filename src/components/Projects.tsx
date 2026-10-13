@@ -150,7 +150,7 @@ export default function Projects() {
                 type="button"
                 onClick={() => setSelected(i)}
                 aria-label={`${item.nameKo} 상세 보기`}
-                className="group glass-ios flex flex-col overflow-hidden rounded-2xl text-left transition-[border-color,box-shadow] duration-300 hover:border-[var(--accent)]/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                className="project-card group glass-ios flex flex-col overflow-hidden rounded-2xl text-left transition-[border-color,box-shadow] duration-300 hover:border-[var(--accent)]/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                 style={{ animation: `cardIn 400ms ease-out ${i * 60}ms both` }}
               >
                 <div className="flex w-full flex-col opacity-70 transition-opacity duration-300 group-hover:opacity-100">
