@@ -28,7 +28,7 @@ const INFO = [
 ];
 
 const TIMELINE = [
-  { year: "2026", title: "SBS아카데미컴퓨터아트학원 대구", desc: "Chat GPT와 React를 활용한 스마트 UIUX 반응형 웹디자인 과정 수료", current: true },
+  { year: "2026", title: "SBS 아카데미 AIX 학원 대구", desc: "Chat GPT와 React를 활용한 스마트 UIUX 반응형 웹디자인 과정 수료", current: true },
   { year: "2025 ~", title: "치즈컴퍼니", desc: "멀티플레이 플랫폼 게임 서버 개발", current: true },
 ];
 
@@ -42,143 +42,143 @@ export default function AboutMe() {
 
   return (
     <section className="min-h-full pb-24 pl-[var(--content-pl)] pr-[var(--content-pr)] pt-[var(--header-space)] sm:pb-10 lg:h-full">
-    <div className="mx-auto flex min-h-full max-w-[var(--content-max)] flex-col lg:h-full lg:flex-row">
+      <div className="mx-auto flex min-h-full max-w-[var(--content-max)] flex-col lg:h-full lg:flex-row">
 
-      {/* ── 1열: 사진 ── */}
-      <div className="flex flex-col items-center justify-center gap-6 border-ink/[0.08] px-4 py-10 sm:px-8 sm:py-12 lg:flex-1 lg:border-r lg:py-0">
-        <div className="flex flex-col items-center gap-6 lg:-translate-y-12">
-          <div className="relative w-40 aspect-[3/4] overflow-hidden rounded-3xl glass-ios shadow-2xl transition-transform duration-300 hover:scale-[1.02] sm:w-48">
-            <Image
-              src="/profile.jpg"
-              alt="장경진 프로필 사진"
-              fill
-              sizes="192px"
-              className="object-cover object-center"
-              priority
-            />
-          </div>
-          <div className="flex flex-col items-center px-2 text-center">
-            <p className="text-lg font-semibold text-ink/80">장경진</p>
-            <p className="hobby-glow mt-3 text-[16px] leading-snug tracking-[-0.02em] break-keep">취미로 사진도 찍고 있어요!</p>
-            <button
-              type="button"
-              onClick={() => setPhotosOpen(true)}
-              className="glass-soft mt-3 inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium text-ink/80 transition-colors hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6} aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 19.5h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zM8.25 8.625a1.125 1.125 0 11-2.25 0 1.125 1.125 0 012.25 0z" />
-              </svg>
-              사진 보기
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ── 2열: 내 정보 ── */}
-      <div className="flex flex-col justify-center border-t border-ink/[0.08] px-4 py-10 sm:px-8 sm:py-12 lg:flex-1 lg:border-t-0 lg:border-r lg:px-10 lg:py-0">
-        <div className="flex w-full min-w-0 flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
-          <div className="@container flex w-full flex-col justify-start">
-            <p className="text-[10px] uppercase tracking-[0.35em] text-ink/30">About</p>
-            <h2 className="mt-3 text-[clamp(0.75rem,5.25cqw,1.85rem)] font-semibold leading-snug tracking-tight text-ink break-keep">
-              웹, 데스크톱 앱 그리고 AI까지<br />
-              다양한 분야에 호기심을 가지고 공부하고 있어요.
-            </h2>
-            <p className="mt-3 text-base leading-7 text-ink/70 break-keep">
-              뛰어난 습득력과 적용력을 바탕으로 더욱 발전하는 중이에요.
-            </p>
-          </div>
-
-          <div className="h-px bg-ink/[0.08]" />
-
-          <div className="flex min-w-0 flex-col">
-            {INFO.map(({ icon, label, value, href }) => (
-              <div
-                key={label}
-                className="flex min-w-0 items-center gap-3 border-b border-ink/[0.06] py-2.5 last:border-b-0"
+        {/* ── 1열: 사진 ── */}
+        <div className="flex flex-col items-center justify-center gap-6 border-ink/[0.08] px-4 py-10 sm:px-8 sm:py-12 lg:flex-1 lg:border-r lg:py-0">
+          <div className="flex flex-col items-center gap-6 lg:-translate-y-12">
+            <div className="relative w-40 aspect-[3/4] overflow-hidden rounded-3xl glass-ios shadow-2xl transition-transform duration-300 hover:scale-[1.02] sm:w-48">
+              <Image
+                src="/profile.jpg"
+                alt="장경진 프로필 사진"
+                fill
+                sizes="192px"
+                className="object-cover object-center"
+                priority
+              />
+            </div>
+            <div className="flex flex-col items-center px-2 text-center">
+              <p className="text-lg font-semibold text-ink/80">장경진</p>
+              <p className="hobby-glow mt-3 text-[16px] leading-snug tracking-[-0.02em] break-keep">취미로 사진도 찍고 있어요!</p>
+              <button
+                type="button"
+                onClick={() => setPhotosOpen(true)}
+                className="glass-soft mt-3 inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium text-ink/80 transition-colors hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
               >
-                <span className="shrink-0 text-ink/30 [&>svg]:h-4 [&>svg]:w-4">{icon}</span>
-                <span className="w-16 shrink-0 text-[10px] uppercase tracking-[0.06em] text-ink/30">
-                  {label}
-                </span>
-                {href ? (
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="min-w-0 flex-1 break-all text-sm leading-snug text-ink/55 underline-offset-2 transition-colors hover:text-ink hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
-                  >
-                    {value}
-                  </a>
-                ) : (
-                  <span className="min-w-0 flex-1 break-all text-sm leading-snug text-ink/55">{value}</span>
-                )}
-              </div>
-            ))}
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6} aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 19.5h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zM8.25 8.625a1.125 1.125 0 11-2.25 0 1.125 1.125 0 012.25 0z" />
+                </svg>
+                사진 보기
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* ── 3열: History ── */}
-      <div className="flex flex-col justify-center border-t border-ink/[0.08] px-4 py-10 sm:px-8 sm:py-12 lg:flex-1 lg:border-t-0 lg:px-10 lg:py-0">
-        <div className="flex w-full min-w-0 flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
-          <div className="flex flex-col gap-3">
-            <h2 className="section-title">History</h2>
+        {/* ── 2열: 내 정보 ── */}
+        <div className="flex flex-col justify-center border-t border-ink/[0.08] px-4 py-10 sm:px-8 sm:py-12 lg:flex-1 lg:border-t-0 lg:border-r lg:px-10 lg:py-0">
+          <div className="flex w-full min-w-0 flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
+            <div className="@container flex w-full flex-col justify-start">
+              <p className="text-[10px] uppercase tracking-[0.35em] text-ink/30">About</p>
+              <h2 className="mt-3 text-[clamp(0.75rem,5.25cqw,1.85rem)] font-semibold leading-snug tracking-tight text-ink break-keep">
+                웹, 데스크톱 앱 그리고 AI까지<br />
+                다양한 분야에 호기심을 가지고 공부하고 있어요.
+              </h2>
+              <p className="mt-3 text-base leading-7 text-ink/70 break-keep">
+                뛰어난 습득력과 적용력을 바탕으로 더욱 발전하는 중이에요.
+              </p>
+            </div>
+
             <div className="h-px bg-ink/[0.08]" />
-          </div>
 
-          <div className="relative flex min-w-0 flex-col gap-0">
-            {/* 수직 선 */}
-            <div className="absolute left-[5px] top-2 bottom-2 w-px bg-ink/[0.1]" />
-
-            {TIMELINE.map((item, i) => (
-              <div key={i} className="relative flex min-w-0 gap-4 pb-6 last:pb-0 sm:gap-6">
-                <div className="relative mt-[5px] h-2.5 w-2.5 shrink-0 self-start">
-                  {item.current ? (
-                    <>
-                      {/* 현재 항목 발광 dot */}
-                      <span
-                        className="absolute -inset-2.5 rounded-full"
-                        style={{
-                          background: "radial-gradient(circle, var(--accent) 0%, transparent 70%)",
-                          filter: "blur(3px)",
-                          animation: "dotGlow 2.4s ease-in-out infinite",
-                        }}
-                      />
-                      <span className="relative block h-2.5 w-2.5 rounded-full" style={{ background: "var(--accent)" }} />
-                    </>
+            <div className="flex min-w-0 flex-col">
+              {INFO.map(({ icon, label, value, href }) => (
+                <div
+                  key={label}
+                  className="flex min-w-0 items-center gap-3 border-b border-ink/[0.06] py-2.5 last:border-b-0"
+                >
+                  <span className="shrink-0 text-ink/30 [&>svg]:h-4 [&>svg]:w-4">{icon}</span>
+                  <span className="w-16 shrink-0 text-[10px] uppercase tracking-[0.06em] text-ink/30">
+                    {label}
+                  </span>
+                  {href ? (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="min-w-0 flex-1 break-all text-sm leading-snug text-ink/55 underline-offset-2 transition-colors hover:text-ink hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                    >
+                      {value}
+                    </a>
                   ) : (
-                    <span className="block h-2.5 w-2.5 rounded-full border border-ink/25" />
+                    <span className="min-w-0 flex-1 break-all text-sm leading-snug text-ink/55">{value}</span>
                   )}
                 </div>
-
-                <div className="min-w-0 flex-1">
-                  <p className="mb-1.5 text-xs text-ink/30">{item.year}</p>
-                  <p className="text-base font-semibold leading-snug break-keep text-ink/80">{item.title}</p>
-                  <p className="section-desc mt-1.5 text-sm leading-6 break-keep">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div
-            className="flex flex-col gap-3 border-t border-ink/[0.08] pt-5"
-            style={{ fontFamily: '"Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif' }}
-          >
-            <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-ink/70">Certificates</h3>
-            <ul className="flex min-w-0 flex-col gap-2">
-              {CERTIFICATES.map((item) => (
-                <li key={item.title} className="glass-soft flex min-w-0 items-center justify-between gap-3 rounded-2xl px-4 py-3">
-                  <span className="min-w-0 text-sm font-medium leading-snug text-ink/90">{item.title}</span>
-                  <span className="shrink-0 text-[11px] text-ink/45">{item.year}</span>
-                </li>
               ))}
-            </ul>
+            </div>
           </div>
         </div>
-      </div>
 
-    </div>
-    <PhotoCarousel open={photosOpen} onClose={() => setPhotosOpen(false)} />
+        {/* ── 3열: History ── */}
+        <div className="flex flex-col justify-center border-t border-ink/[0.08] px-4 py-10 sm:px-8 sm:py-12 lg:flex-1 lg:border-t-0 lg:px-10 lg:py-0">
+          <div className="flex w-full min-w-0 flex-col gap-5 lg:min-h-[410px] lg:-translate-y-12">
+            <div className="flex flex-col gap-3">
+              <h2 className="section-title">History</h2>
+              <div className="h-px bg-ink/[0.08]" />
+            </div>
+
+            <div className="relative flex min-w-0 flex-col gap-0">
+              {/* 수직 선 */}
+              <div className="absolute left-[5px] top-2 bottom-2 w-px bg-ink/[0.1]" />
+
+              {TIMELINE.map((item, i) => (
+                <div key={i} className="relative flex min-w-0 gap-4 pb-6 last:pb-0 sm:gap-6">
+                  <div className="relative mt-[5px] h-2.5 w-2.5 shrink-0 self-start">
+                    {item.current ? (
+                      <>
+                        {/* 현재 항목 발광 dot */}
+                        <span
+                          className="absolute -inset-2.5 rounded-full"
+                          style={{
+                            background: "radial-gradient(circle, var(--accent) 0%, transparent 70%)",
+                            filter: "blur(3px)",
+                            animation: "dotGlow 2.4s ease-in-out infinite",
+                          }}
+                        />
+                        <span className="relative block h-2.5 w-2.5 rounded-full" style={{ background: "var(--accent)" }} />
+                      </>
+                    ) : (
+                      <span className="block h-2.5 w-2.5 rounded-full border border-ink/25" />
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="mb-1.5 text-xs text-ink/30">{item.year}</p>
+                    <p className="text-base font-semibold leading-snug break-keep text-ink/80">{item.title}</p>
+                    <p className="section-desc mt-1.5 text-sm leading-6 break-keep">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div
+              className="flex flex-col gap-3 border-t border-ink/[0.08] pt-5"
+              style={{ fontFamily: '"Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif' }}
+            >
+              <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-ink/70">Certificates</h3>
+              <ul className="flex min-w-0 flex-col gap-2">
+                {CERTIFICATES.map((item) => (
+                  <li key={item.title} className="glass-soft flex min-w-0 items-center justify-between gap-3 rounded-2xl px-4 py-3">
+                    <span className="min-w-0 text-sm font-medium leading-snug text-ink/90">{item.title}</span>
+                    <span className="shrink-0 text-[11px] text-ink/45">{item.year}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <PhotoCarousel open={photosOpen} onClose={() => setPhotosOpen(false)} />
     </section>
   );
 }
