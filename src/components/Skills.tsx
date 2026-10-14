@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { PROJECTS } from "@/data/projects";
@@ -19,30 +19,30 @@ for (const p of PROJECTS) {
 type IconInfo = { slug?: string; color: string; light?: boolean; svg?: string };
 
 const ICONS: Record<string, IconInfo> = {
-  "HTML":          { slug: "html5",        color: "#E34F26" },
-  "CSS":           { slug: "css",          color: "#1572B6" },
-  "JavaScript":    { slug: "javascript",   color: "#F7DF1E" },
-  "jQuery":        { slug: "jquery",       color: "#0769AD" },
-  "React":         { slug: "react",        color: "#61DAFB" },
-  "Next.js":       { slug: "nextdotjs",    color: "#ffffff", light: true },
-  "TypeScript":    { slug: "typescript",   color: "#3178C6" },
-  "Tailwind CSS":  { slug: "tailwindcss",  color: "#06B6D4" },
-  "Framer Motion": { slug: "framer",       color: "#0055FF" },
-  "GSAP":          { slug: "greensock",    color: "#88CE02" },
-  "Sass":          { slug: "sass",         color: "#CC6699" },
-  "Swiper":        { slug: "swiper",       color: "#6330F4" },
-  "Figma":         { slug: "figma",        color: "#F24E1E" },
-  "Photoshop":     { color: "#31A8FF", svg: `<svg viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#001E36"/><text x="12" y="16.5" text-anchor="middle" font-family="Arial" font-weight="700" font-size="11" fill="#31A8FF">Ps</text></svg>` },
-  "Git":           { slug: "git",          color: "#F05032" },
-  "Vite":          { slug: "vite",         color: "#646CFF" },
-  "Electron":      { slug: "electron",     color: "#47848F" },
-  "Node.js":       { slug: "nodedotjs",    color: "#339933" },
-  "Supabase":      { slug: "supabase",     color: "#3FCF8E" },
-  "Cloudflare":    { slug: "cloudflare",   color: "#F38020" },
-  "Vercel":        { slug: "vercel",       color: "#ffffff", light: true },
-  "Cursor AI":     { slug: "cursor",       color: "#ffffff", light: true },
-  "Claude":        { slug: "claude",       color: "#D97757" },
-  "Codex":         { color: "#ffffff", light: true, svg: `<svg viewBox="0 0 24 24" fill="#ffffff"><path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073z"/></svg>` },
+  "HTML": { slug: "html5", color: "#E34F26" },
+  "CSS": { slug: "css", color: "#1572B6" },
+  "JavaScript": { slug: "javascript", color: "#F7DF1E" },
+  "jQuery": { slug: "jquery", color: "#0769AD" },
+  "React": { slug: "react", color: "#61DAFB" },
+  "Next.js": { slug: "nextdotjs", color: "#ffffff", light: true },
+  "TypeScript": { slug: "typescript", color: "#3178C6" },
+  "Tailwind CSS": { slug: "tailwindcss", color: "#06B6D4" },
+  "Framer Motion": { slug: "framer", color: "#0055FF" },
+  "GSAP": { slug: "greensock", color: "#88CE02" },
+  "Sass": { slug: "sass", color: "#CC6699" },
+  "Swiper": { slug: "swiper", color: "#6330F4" },
+  "Figma": { slug: "figma", color: "#F24E1E" },
+  "Photoshop": { color: "#31A8FF", svg: `<svg viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#001E36"/><text x="12" y="16.5" text-anchor="middle" font-family="Arial" font-weight="700" font-size="11" fill="#31A8FF">Ps</text></svg>` },
+  "Git": { slug: "git", color: "#F05032" },
+  "Vite": { slug: "vite", color: "#646CFF" },
+  "Electron": { slug: "electron", color: "#47848F" },
+  "Node.js": { slug: "nodedotjs", color: "#339933" },
+  "Supabase": { slug: "supabase", color: "#3FCF8E" },
+  "Cloudflare": { slug: "cloudflare", color: "#F38020" },
+  "Vercel": { slug: "vercel", color: "#ffffff", light: true },
+  "Cursor AI": { slug: "cursor", color: "#ffffff", light: true },
+  "Claude": { slug: "claude", color: "#D97757" },
+  "Codex": { color: "#ffffff", light: true, svg: `<svg viewBox="0 0 24 24" fill="#ffffff"><path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073z"/></svg>` },
 };
 
 const LEVELS: Record<string, number> = {
@@ -113,7 +113,7 @@ function SkillCard({ name, onHover }: { name: string; onHover: (name: string | n
     <button
       type="button"
       data-skill-card
-      className="glass-panel inline-flex w-full min-w-0 items-center justify-center gap-1.5 rounded-full px-1.5 py-2 text-[13px] text-ink/70 transition-[border-color,box-shadow,color] duration-200 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+      className="glass-panel inline-flex w-full items-center justify-center gap-1.5 rounded-full px-2 py-2 text-[12.5px] leading-tight text-ink/70 transition-[border-color,box-shadow,color,transform] duration-200 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] sm:w-auto sm:px-3 sm:py-1.5"
       style={{ "--icon-color": color } as React.CSSProperties}
       onMouseEnter={(e) => {
         onHover(name);
@@ -127,32 +127,58 @@ function SkillCard({ name, onHover }: { name: string; onHover: (name: string | n
       onFocus={() => onHover(name)}
       onBlur={() => onHover(null)}
     >
-      <span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center">
-        <Icon name={name} size={16} />
+      <span aria-hidden className="flex h-4 w-4 shrink-0 items-center justify-center">
+        <Icon name={name} size={15} />
       </span>
-      <span className="truncate">{name}</span>
+      <span className="truncate sm:whitespace-nowrap">{name}</span>
     </button>
   );
 }
 
+function AnimatedCounter({ target }: { target: number }) {
+  const [count, setCount] = useState(1);
+
+  useEffect(() => {
+    let startTime: number | null = null;
+    let animId: number;
+    const duration = 400; // ms
+
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      const current = Math.round(1 + (target - 1) * ease);
+      setCount(current);
+
+      if (progress < 1) {
+        animId = requestAnimationFrame(step);
+      }
+    };
+
+    animId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animId);
+  }, [target]);
+
+  return <>{count}</>;
+}
+
 function SkillMeta({ name }: { name: string }) {
-  const count = SKILL_DETAILS.get(name)?.length ?? 0;
   const level = LEVELS[name] ?? 70;
   const info = ICONS[name];
-  const color = info?.color ?? "var(--accent)";
+  const color = info?.light ? "var(--fg)" : (info?.color ?? "var(--accent)");
 
   return (
     <div className="flex items-baseline gap-3">
       <span aria-hidden className="section-title inline-flex size-[1em] shrink-0 items-center justify-center self-center [&_img]:size-full [&_img]:object-contain [&_svg]:size-full">
         <Icon name={name} size={64} />
       </span>
-      <span className="section-title">{name}</span>
-      <span className="section-desc text-sm sm:text-base">{level}%</span>
-      {count > 0 && (
-        <span className={`text-sm sm:text-base ${info?.light ? "icon-on-light" : ""}`} style={{ color }}>
-          {count}개 프로젝트
-        </span>
-      )}
+      <span className="section-title shrink-0">{name}</span>
+      <span
+        className={`inline-block min-w-[3.6ch] font-semibold tabular-nums tracking-tight text-[16px] sm:text-[18px] ${info?.light ? "icon-on-light" : ""}`}
+        style={{ color }}
+      >
+        <AnimatedCounter target={level} />%
+      </span>
     </div>
   );
 }
@@ -161,6 +187,7 @@ function SkillStage({ name, fill = false }: { name: string; fill?: boolean }) {
   const details = SKILL_DETAILS.get(name) ?? [];
   const info = ICONS[name];
   const color = info?.light ? "var(--fg)" : (info?.color ?? "var(--accent)");
+  const count = details.length;
 
   return (
     <motion.div
@@ -175,8 +202,15 @@ function SkillStage({ name, fill = false }: { name: string; fill?: boolean }) {
           <SkillMeta name={name} />
         </div>
       )}
+      {count > 0 && (
+        <div className="mb-2.5 flex items-center justify-between text-xs font-medium">
+          <span className={info?.light ? "icon-on-light" : ""} style={{ color }}>
+            {count}개 프로젝트
+          </span>
+        </div>
+      )}
       {details.length > 0 && (
-        <div className={`mt-5 grid grid-cols-2 gap-3 ${fill ? "min-h-0 flex-1 content-start overflow-y-auto overscroll-contain pr-1 pb-1 [scrollbar-width:thin]" : ""}`}>
+        <div className={`grid grid-cols-2 gap-3 ${fill ? "min-h-0 flex-1 content-start overflow-y-auto overscroll-contain pr-1 pb-1 [scrollbar-width:thin]" : ""}`}>
           {details.map((detail, index) => (
             <article key={detail.nameKo + index} className="glass-panel overflow-hidden rounded-2xl">
               {detail.image && (
@@ -230,7 +264,7 @@ export default function Skills() {
             {GROUPS.map((group) => (
               <div key={group.label}>
                 <h3 className="mb-4 text-[13px] font-medium tracking-wide text-ink/40">{group.label}</h3>
-                <div className="grid grid-cols-2 gap-1.5 @min-[520px]:grid-cols-3 @min-[820px]:grid-cols-6">
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
                   {group.skills.map((name) => (
                     <SkillCard key={name} name={name} onHover={setHoveredSkill} />
                   ))}
