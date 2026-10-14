@@ -24,15 +24,16 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description,
+      url: siteUrl,
       locale: "ko_KR",
       type: "website",
-      images: [{ url: "/og.png", width: 1200, height: 630, alt: title }],
+      images: [{ url: `${siteUrl}/og.png?v=2`, width: 1200, height: 630, alt: title, type: "image/png" }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ["/og.png"],
+      images: [`${siteUrl}/og.png?v=2`],
     },
     icons: {
       icon: [
