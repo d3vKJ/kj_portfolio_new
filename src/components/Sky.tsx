@@ -3,9 +3,9 @@
  * 섹션에 isolate를 줘야 -z-10이 섹션 배경 위, 내용 아래에 깔려요.
  */
 const ORBS = [
-  { pos: "-left-[12%] -top-[18%] h-[60vw] w-[60vw]", color: "#cfe6ff", dur: "34s" },
-  { pos: "-right-[14%] top-[20%] h-[50vw] w-[50vw]", color: "#d9f1ff", dur: "42s" },
-  { pos: "bottom-[-25%] left-[30%] h-[45vw] w-[45vw]", color: "#e4e4ff", dur: "50s" },
+  { pos: "-left-[12%] -top-[18%] h-[60vw] w-[60vw]", color: "var(--orb-1)", dur: "34s" },
+  { pos: "-right-[14%] top-[20%] h-[50vw] w-[50vw]", color: "var(--orb-2)", dur: "42s" },
+  { pos: "bottom-[-25%] left-[30%] h-[45vw] w-[45vw]", color: "var(--orb-3)", dur: "50s" },
 ];
 
 export default function Sky() {

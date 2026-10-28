@@ -4,6 +4,7 @@ export const ICONS: Record<string, IconInfo> = {
   "HTML": { slug: "html5", color: "#E34F26" },
   "CSS": { slug: "css", color: "#1572B6" },
   "JavaScript": { slug: "javascript", color: "#F7DF1E" },
+  "Lua": { slug: "lua", color: "#2C2D72" },
   "React": { slug: "react", color: "#61DAFB" },
   "Next.js": { slug: "nextdotjs", color: "#ffffff", light: true },
   "TypeScript": { slug: "typescript", color: "#3178C6" },
@@ -41,6 +42,7 @@ export const LEVELS: Record<string, number> = {
   "HTML": 70,
   "CSS": 70,
   "JavaScript": 70,
+  "Lua": 50,
   "React": 60,
   "Next.js": 50,
   "TypeScript": 50,
@@ -66,8 +68,16 @@ export const LEVELS: Record<string, number> = {
 
 export const GROUPS = [
   {
+    label: "Language",
+    skills: ["HTML", "CSS", "JavaScript", "TypeScript", "Lua"],
+  },
+  {
     label: "Frontend",
-    skills: ["HTML", "CSS", "JavaScript", "React", "Next.js", "TypeScript", "Tailwind CSS", "Framer Motion", "GSAP", "Sass", "Swiper"],
+    skills: ["React", "Next.js", "Tailwind CSS", "Sass"],
+  },
+  {
+    label: "Library",
+    skills: ["Framer Motion", "GSAP", "Swiper"],
   },
   {
     label: "Design",

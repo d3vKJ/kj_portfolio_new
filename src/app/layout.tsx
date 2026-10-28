@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
 import { siteUrl } from "@/data/site";
+import { THEME_SCRIPT } from "@/lib/theme";
 
 const title = "장경진 | 프론트엔드 개발자 포트폴리오";
 const description = "장경진 | 프론트엔드 개발자 포트폴리오";
@@ -52,6 +53,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko" className="h-full antialiased" suppressHydrationWarning>
       <head>
+        {/* 첫 화면이 밝게 번쩍이지 않게 그리기 전에 테마를 정해요 */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
         {/* 여권 서명 손글씨: 좌우명에 쓰는 글자만 받아요 */}
         <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap&text=${encodeURIComponent("도전은무료니까,만큼사치부리자")}`} />

@@ -10,9 +10,12 @@ import SkillIcon from "@/components/SkillIcon";
 import { GROUPS, ICONS } from "@/data/skills";
 import { PROJECTS } from "@/data/projects";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { isNarrow, useNarrow } from "@/lib/media";
 
 const GROUP_META: Record<string, { ko: string; band: string }> = {
+  "Language": { ko: "언어", band: "#fe9800" },
   "Frontend": { ko: "프론트엔드", band: "#3182f6" },
+  "Library": { ko: "라이브러리", band: "#6b7684" },
   "Design": { ko: "디자인", band: "#f04452" },
   "Tools & DX": { ko: "도구", band: "#18a5a7" },
   "Backend/Infra": { ko: "백엔드·인프라", band: "#03b26c" },
@@ -154,7 +157,7 @@ function tagTexture(name: string, color: string) {
 /** 벨트 위 꼬리표: 진짜 글자(HTML)로 그려야 어느 화면에서도 또렷해요 */
 function tagElement(name: string, logo: string, color: string) {
   const el = document.createElement("div");
-  el.className = "pointer-events-auto flex cursor-pointer select-none items-center gap-2 whitespace-nowrap rounded-xl border border-l-[6px] border-[#d1d6db] bg-white py-1.5 pl-2.5 pr-3.5 text-[14px] font-bold text-ink shadow-[0_6px_16px_-8px_rgba(0,29,58,.35)] [transform-origin:50%_100%] max-sm:text-[12px]";
+  el.className = "pointer-events-auto flex cursor-pointer select-none items-center gap-2 whitespace-nowrap rounded-xl border border-l-[6px] border-line bg-card py-1.5 pl-2.5 pr-3.5 text-[14px] font-bold text-ink shadow-[0_6px_16px_-8px_rgba(0,29,58,.35)] [transform-origin:50%_100%] max-sm:text-[12px]";
   el.style.borderLeftColor = color;
   const img = document.createElement("img");
   img.src = logo;
@@ -177,7 +180,7 @@ function SkillCard({ name, onClose }: { name: string; onClose: () => void }) {
     <div
       role="dialog"
       aria-labelledby="skill-card-title"
-      className="pop-in absolute inset-x-3 bottom-3 z-10 flex max-h-[58%] flex-col rounded-3xl bg-white p-6 shadow-[0_30px_60px_-24px_rgba(0,29,58,.35)] md:inset-x-auto md:bottom-auto md:right-[6%] md:top-1/2 md:max-h-[84%] md:w-[400px] md:-translate-y-1/2"
+      className="pop-in absolute inset-x-3 bottom-3 z-10 flex max-h-[58%] flex-col rounded-3xl bg-card p-6 shadow-[0_30px_60px_-24px_rgba(0,29,58,.35)] md:inset-x-auto md:bottom-auto md:right-[6%] md:top-1/2 md:max-h-[84%] md:w-[400px] md:-translate-y-1/2"
     >
       <div className="flex items-center justify-between">
         <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[13px] font-semibold" style={{ background: `color-mix(in srgb, ${meta.band} 12%, white)`, color: meta.band }}>
@@ -225,6 +228,7 @@ export default function Baggage() {
   const [noGL, setNoGL] = useState(false);
   const [picked, setPicked] = useState<string | null>(null);
   const api = useRef<{ close(): void } | null>(null);
+  const narrow = useNarrow();
   focusRef.current = focus;
 
   useGSAP(() => {
@@ -232,6 +236,7 @@ export default function Baggage() {
   }, { scope: root });
 
   useEffect(() => {
+    if (isNarrow()) return; // 폰은 벨트 없이 목록만 보여 줘요
     const el = host.current!;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let renderer: THREE.WebGLRenderer;
@@ -547,7 +552,7 @@ export default function Baggage() {
       renderer.domElement.remove();
       labels.domElement.remove();
     };
-  }, []);
+  }, [narrow]);
 
   return (
     <section id="skills" ref={root} className="relative isolate flex flex-col justify-center bg-floor pb-16 pt-[calc(var(--bar)+48px)] lg:min-h-[100svh] lg:pb-6 lg:pt-[calc(var(--bar)+16px)]">
@@ -556,9 +561,11 @@ export default function Baggage() {
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div data-head>
             <h2 className="text-[clamp(32px,3.6vw,52px)] font-bold leading-[1.15] tracking-[-0.03em]">다룰 수 있는 기술이에요.</h2>
-            <p className="mt-2 text-[17px] text-sub sm:text-[19px]">가방을 누르면 그 기술을 쓴 프로젝트를 보여 줘요.</p>
+            <p className="mt-2 text-[17px] text-sub max-md:hidden sm:text-[19px]">가방을 누르면 그 기술을 쓴 프로젝트를 보여 줘요.</p>
           </div>
           {/* 프로젝트 섹션 토글과 같은 모양. 분류를 고르면 그 분류 가방만 또렷해져요 */}
+          {/* .seg의 display가 레이어 밖이라 감추는 건 바깥 div가 맡아요 */}
+          <div className="max-md:hidden">
           <div className="seg flex-wrap" role="group" aria-label="기술 분류">
             <button type="button" aria-pressed={focus === null} onClick={() => setFocus(null)}>전체</button>
             {GROUPS.map((g) => (
@@ -568,21 +575,22 @@ export default function Baggage() {
               </button>
             ))}
           </div>
+          </div>
         </div>
 
-        <div className="relative mt-[clamp(28px,5svh,64px)]">
+        <div className="relative mt-[clamp(28px,5svh,64px)] max-md:hidden">
           <div ref={host} aria-hidden className="relative h-[min(70svh,720px)] min-h-[420px] w-full [&>canvas]:relative [&>canvas]:h-full [&>canvas]:w-full" />
           {picked && <SkillCard name={picked} onClose={() => api.current?.close()} />}
         </div>
 
-        {/* 화면 읽기 프로그램과 WebGL이 없는 환경은 목록으로 봐요 */}
-        <div className={noGL ? "-mt-[min(70svh,720px)] grid gap-4" : "sr-only"}>
+        {/* 폰, 화면 읽기 프로그램, WebGL이 없는 환경은 목록으로 봐요 */}
+        <div className={noGL ? "-mt-[min(70svh,720px)] grid gap-4 max-md:mt-8" : "mt-8 grid gap-5 md:sr-only"}>
           {GROUPS.map((g) => (
             <div key={g.label}>
               <p className="text-[15px] font-semibold">{GROUP_META[g.label].ko}</p>
               <ul className="mt-2 flex flex-wrap gap-2">
                 {g.skills.map((s) => (
-                  <li key={s} className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-[15px] font-semibold">
+                  <li key={s} className="flex items-center gap-2 rounded-xl bg-card px-3 py-2 text-[15px] font-semibold">
                     <SkillIcon name={s} size={20} onPaper />{s}
                   </li>
                 ))}

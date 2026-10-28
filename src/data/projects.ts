@@ -15,6 +15,8 @@ export type Project = {
   codeNote?: string;
   image: string | null;
   proposal?: string;
+  /** 게임 서버에서 만든 건 2터미널에 서요. 없으면 1터미널 */
+  terminal?: 2;
 };
 
 export const PROJECTS: Project[] = [
@@ -32,7 +34,7 @@ export const PROJECTS: Project[] = [
     href: "/", code: "https://github.com/d3vKJ/kj_portfolio_new", image: "/projects/portfolio-about.png",
   },
   {
-    name: "cheese-request", nameKo: "치즈 신청소", year: "2026", solo: true, category: "Web",
+    name: "cheese-request", nameKo: "치즈 신청소", year: "2026", solo: true, category: "Web", terminal: 2,
     desc: "[실무 도구] 게임 서버를 개발하면서, 유저가 킬피드 이미지를 신청하고 관리자가 수락하면 서버 설정 파일까지 자동으로 고쳐지는 신청 사이트를 만들었어요.",
     tech: ["Next.js","React","JavaScript","Framer Motion","Node.js","MySQL"],
     techUsage: [

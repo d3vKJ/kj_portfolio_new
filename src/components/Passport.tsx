@@ -12,6 +12,58 @@ const Stack = dynamic(() => import("@/components/bits/Stack"), { ssr: false });
 
 const EMAIL = "nova021206@kakao.com";
 
+// 폰에서 도장 대신 보여 주는 경력·자격 목록 (내용은 Stamps와 같아요)
+const CAREER = [
+  { when: "2025 ~", what: "치즈컴퍼니", note: "멀티플레이 플랫폼 게임 서버 개발" },
+  { when: "2026", what: "SBS 아카데미AIX학원 대구 수료", note: "Chat GPT와 React를 활용한 스마트 UIUX 반응형 웹디자인 과정" },
+  { when: "2020", what: "전기기능사", note: "자격" },
+  { when: "2020", what: "운전면허 1종 보통", note: "면허" },
+];
+
+/** 폰 전용: 여권 대신 한눈에 보는 프로필 카드 */
+function Profile() {
+  const links = [
+    { k: "이메일", v: EMAIL, href: `mailto:${EMAIL}` },
+    { k: "GitHub", v: "github.com/d3vkj", href: "https://github.com/d3vkj" },
+    { k: "Instagram", v: "@jinsnation", href: INSTAGRAM_URL },
+  ];
+  return (
+    <div className="rounded-3xl bg-card p-5 md:hidden">
+      <div className="flex items-center gap-4">
+        <div className="relative h-20 w-[60px] shrink-0 overflow-hidden rounded-xl bg-surface">
+          <Image src="/profile.jpg" alt="장경진 프로필 사진" fill sizes="60px" className="object-cover" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-[22px] font-bold leading-tight">장경진</p>
+          <p className="mt-1 text-[15px] text-sub">프론트엔드 개발자 · 대구</p>
+        </div>
+      </div>
+      <dl className="mt-5 divide-y divide-line border-y border-line">
+        {links.map((l) => (
+          <div key={l.k} className="flex flex-wrap items-baseline justify-between gap-x-3 py-3">
+            <dt className="text-[13px] text-muted">{l.k}</dt>
+            <dd className="min-w-0 text-[15px] font-semibold [overflow-wrap:anywhere]">
+              <a href={l.href} target={l.href.startsWith("mailto") ? undefined : "_blank"} rel="noreferrer">{l.v}</a>
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <p className="mt-5 text-[13px] font-semibold text-muted">경력 · 자격</p>
+      <ul className="mt-2 space-y-2">
+        {CAREER.map((c) => (
+          <li key={c.what} className="rounded-2xl bg-surface px-4 py-3">
+            <p className="flex items-baseline justify-between gap-3">
+              <span className="font-semibold">{c.what}</span>
+              <span className="shrink-0 text-[12px] text-muted">{c.when}</span>
+            </p>
+            <p className="mt-0.5 text-[14px] leading-6 text-sub">{c.note}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function Field({ k, v, className = "" }: { k: string; v: React.ReactNode; className?: string }) {
   return (
     <div className={className}>
@@ -185,7 +237,7 @@ export default function Passport() {
     mm.add("(min-width: 1024px) and (prefers-reduced-motion: reduce)", () => {
       gsap.set("[data-cover]", { rotateY: -180, z: 2 });
     });
-    mm.add("(max-width: 1023px) and (prefers-reduced-motion: no-preference)", () => {
+    mm.add("(min-width: 768px) and (max-width: 1023px) and (prefers-reduced-motion: no-preference)", () => {
       gsap.from("[data-mobile-pages] [data-stamp]", {
         scale: 2.2, opacity: 0, duration: 0.45, stagger: 0.15, ease: "back.out(2.5)",
         scrollTrigger: { trigger: "[data-mobile-pages] [data-stamp]", start: "top 85%" },
@@ -222,7 +274,8 @@ export default function Passport() {
   return (
     <section id="about" ref={root} className="relative isolate bg-terminal lg:h-[100svh]">
       <Sky />
-      <div className="mx-auto flex h-full max-w-[1600px] flex-col gap-14 px-5 pb-16 pt-[calc(var(--bar)+48px)] sm:px-8 lg:flex-row lg:items-center lg:gap-12 lg:pb-0 lg:pt-[var(--bar)]">
+      <div className="mx-auto flex h-full max-w-[1600px] flex-col gap-14 max-md:gap-10 px-5 pb-16 pt-[calc(var(--bar)+48px)] sm:px-8 lg:flex-row lg:items-center lg:gap-12 lg:pb-0 lg:pt-[var(--bar)]">
+        <Profile />
         <div data-copy className="lg:w-[32%]">
           {/* 구절 단위(inline-block)로만 줄이 바뀌어요 */}
           <p className="text-balance text-[clamp(24px,2.3vw,34px)] font-semibold leading-[1.45] tracking-[-0.02em] [&>span]:inline-block">
@@ -238,13 +291,21 @@ export default function Passport() {
               <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" className="font-medium text-accent underline underline-offset-4 hover:text-accent-strong">인스타그램</a>에 있어요.
             </p>
           </div>
-          <div data-cards className="mt-7 h-[190px] w-[285px] sm:h-[200px] sm:w-[300px]">
+          {/* 폰: 사진 더미 대신 옆으로 넘기는 줄 */}
+          <ul className="-mx-5 mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 md:hidden">
+            {PHOTOS.map((p) => (
+              <li key={p.src} className="shrink-0 snap-start">
+                <a href={p.href} target="_blank" rel="noreferrer"><img src={p.src} alt={p.alt} width={p.width} height={p.height} loading="lazy" className="h-40 w-auto rounded-xl object-cover" /></a>
+              </li>
+            ))}
+          </ul>
+          <div data-cards className="mt-7 h-[190px] w-[285px] max-md:hidden sm:h-[200px] sm:w-[300px]">
             <Stack cards={cards} layout="pile" visible={4} frame={8} frameColor="#ffffff" radius={2} sendToBackOnClick />
           </div>
         </div>
 
         {/* 펼친 여권의 오른쪽 끝이 헤더 오른쪽 끝(게이트 번호)에 맞아요 */}
-        <div className="passport-scene relative flex flex-1 justify-center lg:justify-end">
+        <div className="passport-scene relative flex flex-1 justify-center max-md:hidden lg:justify-end">
           <div className="relative hidden lg:block">
             {/* 바닥 그림자 */}
             <div data-floor aria-hidden className="pointer-events-none absolute bottom-[4%] left-1/2 h-12 w-[52%] -translate-x-1/2 rounded-[50%] bg-[#191f28]/30 blur-2xl" />

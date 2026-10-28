@@ -6,40 +6,48 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { CSS2DObject, CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-import Toggle from "@/components/Toggle";
 import BoardingPass from "@/components/BoardingPass";
 import { FLIGHTS, KIND_COLOR, KIND_ORDER, type Flight } from "@/lib/flights";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { useDark } from "@/lib/theme";
+import { isNarrow, useNarrow } from "@/lib/media";
+import SkillIcon from "@/components/SkillIcon";
+import ProposalModal from "@/components/ProposalModal";
 
-// 새 프로젝트 자리: 실무 비행기 한 대를 미리 세워 둬요. 프로젝트를 넣으면 이 줄은 지워도 돼요.
+// 인천공항처럼 터미널이 둘이에요: 1터미널은 일반 프로젝트, 2터미널은 게임 서버에서 만든 것.
+// 새 프로젝트 자리: 2터미널에 실무 비행기 한 대를 미리 세워 둬요. 프로젝트를 넣으면 그 줄은 지워도 돼요.
 type Slot = { f: Flight | null; kind: string };
 const rank = (k: string) => KIND_ORDER.indexOf(k);
-const SLOTS: Slot[] = [...FLIGHTS.map((f) => ({ f, kind: f.kind })), { f: null, kind: "실무" }].sort((a, b) => rank(a.kind) - rank(b.kind));
+const slotsOf = (t: number): Slot[] => FLIGHTS.filter((f) => (f.terminal ?? 1) === t).map((f) => ({ f, kind: f.kind }));
 
-// 계류장: 가운데 긴 탑승동 양옆으로 비행기가 코를 대고 서 있고, 오른쪽에 활주로가 있어요
-const PER_SIDE = Math.ceil(SLOTS.length / 2);
+// 계류장: 왼쪽부터 1터미널, 2터미널 탑승동이 나란히 서고 오른쪽 활주로를 같이 써요.
+// 탑승동마다 양옆으로 비행기가 코를 대고 서 있어요.
 const GAP = 3.6; // 게이트 사이 간격
-const PIER_L = PER_SIDE * GAP + 1.4;
+const T_GAP = 3; // 두 탑승동 사이: 바깥 게이트끼리 GAP보다 멀어야 날개가 안 겹쳐요
+const TERMINALS = [
+  { name: "T1", slots: slotsOf(1) },
+  { name: "T2", slots: [...slotsOf(2), { f: null, kind: "실무" }].sort((a, b) => rank(a.kind) - rank(b.kind)) },
+].map((t) => ({ ...t, per: Math.ceil(t.slots.length / 2), len: Math.ceil(t.slots.length / 2) * GAP + 1.4, cx: 0 }));
+TERMINALS.forEach((t, j) => (t.cx = j ? TERMINALS[j - 1].cx + TERMINALS[j - 1].len / 2 + T_GAP + t.len / 2 : 0));
 const PIER_D = 1.5;
 const NOSE_GAP = 0.55; // 탑승동과 비행기 코 사이
 const HALF_LEN = 1.42; // 동체 길이의 반
 const PLANE_Y = 0.62; // 바퀴 위 동체 가운데 높이
 const AD = 2 * (PIER_D / 2 + NOSE_GAP + 2 * HALF_LEN + 2.6);
 const TAXI = AD / 2 - 0.9; // 앞뒤 유도로
-const XT = PIER_L / 2 + 2.1; // 활주로로 이어지는 세로 유도로
+const LAST = TERMINALS[TERMINALS.length - 1];
+const XT = LAST.cx + LAST.len / 2 + 2.1; // 활주로로 이어지는 세로 유도로
 const RW = 2.4; // 활주로 폭
 const XR = XT + 2.4; // 활주로 가운데
-const X0 = -(PIER_L / 2 + 3), X1 = XR + RW / 2 + 0.9; // 바닥 왼쪽·오른쪽 끝
+const X0 = -(TERMINALS[0].len / 2 + 3), X1 = XR + RW / 2 + 0.9; // 바닥 왼쪽·오른쪽 끝
 const AW = X1 - X0;
 const CX = (X0 + X1) / 2;
 
-/** i번째 비행기의 게이트 위치와 방향: 앞줄(카메라 쪽)이 먼저, 뒷줄이 나중 */
-function gateOf(i: number) {
-  const side = i < PER_SIDE ? 1 : -1;
-  const x = ((i % PER_SIDE) - (PER_SIDE - 1) / 2) * GAP;
-  const z = side * (PIER_D / 2 + NOSE_GAP + HALF_LEN);
-  return { x, z, side, yaw: side > 0 ? Math.PI : 0 }; // 코(+z)가 탑승동을 봐요
-}
+/** 모든 게이트: 터미널마다 앞줄(카메라 쪽)이 먼저, 뒷줄이 나중. 코(+z)가 탑승동을 봐요 */
+const GATES = TERMINALS.flatMap(({ slots, per, cx }) => slots.map((slot, i) => {
+  const side = i < per ? 1 : -1;
+  return { ...slot, x: cx + ((i % per) - (per - 1) / 2) * GAP, z: side * (PIER_D / 2 + NOSE_GAP + HALF_LEN), side, yaw: side > 0 ? Math.PI : 0 };
+}));
 
 /** 꺾이는 점들을 지나되 모퉁이는 반지름 r로 둥글게 도는 길 */
 function roundedPath(pts: THREE.Vector3[], r = 0.7) {
@@ -96,8 +104,8 @@ function fuselageGeometry() {
   return geo;
 }
 
-/** 바닥 도색: 회색 계류장에 노란 유도선, 게이트 번호, 오른쪽 활주로 */
-function apronTexture() {
+/** 바닥 도색: 회색 계류장에 노란 유도선, 게이트 번호, 오른쪽 활주로. 밤에는 아스팔트가 어두워요. */
+function apronTexture(dark: boolean) {
   const c = document.createElement("canvas");
   c.width = 2048;
   c.height = Math.round((2048 * AD) / AW);
@@ -105,16 +113,16 @@ function apronTexture() {
   const k = c.width / AW;
   g.scale(k, k);
   g.translate(-X0, AD / 2); // 이제 (x, z) 그대로 그려요
-  g.fillStyle = "#e3e7ec";
+  g.fillStyle = dark ? "#2a2b32" : "#e3e7ec";
   g.beginPath();
   g.roundRect(X0, -AD / 2, AW, AD, 1.2);
   g.fill();
 
   // 활주로: 진한 회색 띠에 흰 테두리선, 가운데 점선, 양 끝 줄무늬
   const top = -AD / 2 + 0.3, len = AD - 0.6;
-  g.fillStyle = "#c3cad3";
+  g.fillStyle = dark ? "#1f2026" : "#c3cad3";
   g.fillRect(XR - RW / 2, top, RW, len);
-  g.fillStyle = "#fff";
+  g.fillStyle = dark ? "#8a8d96" : "#fff";
   for (const s of [-1, 1]) g.fillRect(XR + s * (RW / 2 - 0.12) - 0.03, top + 0.2, 0.06, len - 0.4);
   for (let z = top + 1.9; z < top + len - 1.4; z += 0.9) g.fillRect(XR - 0.04, z, 0.08, 0.48);
   for (const zz of [top + 0.35, top + len - 1.15]) for (let s = -0.8; s <= 0.81; s += 0.2) g.fillRect(XR + s - 0.06, zz, 0.12, 0.8);
@@ -135,8 +143,7 @@ function apronTexture() {
   g.textAlign = "center";
   g.textBaseline = "middle";
   g.font = "700 0.5px Pretendard, system-ui, sans-serif";
-  SLOTS.forEach(({ f }, i) => {
-    const { x, side } = gateOf(i);
+  GATES.forEach(({ f, x, side }) => {
     const edge = side * (PIER_D / 2);
     g.lineWidth = 0.06;
     g.beginPath();
@@ -157,12 +164,107 @@ function apronTexture() {
   return tex;
 }
 
+/** 구분마다 항공사 도색: 로고 대신 색과 태극 같은 무늬만 따 왔어요.
+ *  line은 윗동체·아랫동체 경계 높이(-1~1), stripe는 경계의 줄, bellyRear는 배 뒤쪽 절반 색이에요. */
+type Livery = { top: string; belly: string; line: number; stripe?: string; bellyRear?: string; engine: string; fin: (g: CanvasRenderingContext2D) => void };
+const LIVERY: Record<string, Livery> = {
+  // 대한항공: 하늘색 윗동체와 은회색 아랫동체 사이에 회색 줄, 꼬리도 하늘색에 태극
+  개인: {
+    top: "#8cc6e8", belly: "#c5ccd4", line: -0.15, stripe: "#8b95a1", engine: "#8cc6e8",
+    fin: (g) => {
+      g.fillStyle = "#8cc6e8";
+      g.fillRect(0, 0, 1, 1);
+      const cx = 0.6, cy = 0.56, r = 0.13;
+      const disc = (c: string, x: number, rr: number, a0 = 0, a1 = Math.PI * 2) => (g.fillStyle = c, g.beginPath(), g.arc(x, cy, rr, a0, a1), g.fill());
+      disc("#cd2e3a", cx, r, 0, Math.PI); // 위는 빨강(이 판은 y가 위)
+      disc("#0047a0", cx, r, Math.PI, Math.PI * 2);
+      disc("#cd2e3a", cx - r / 2, r / 2); // 두 작은 원이 S자 경계를 만들어요
+      disc("#0047a0", cx + r / 2, r / 2);
+    },
+  },
+  // 트리니티항공: 흰 동체에 회색 배, 회색 꼬리에 분홍·노랑·파랑 삼각형
+  외주: {
+    top: "#fbfcfd", belly: "#6b727c", line: -0.35, stripe: "#8b95a1", engine: "#6b727c",
+    fin: (g) => {
+      g.fillStyle = "#5c636d";
+      g.fillRect(0, 0, 1, 1);
+      const tri = (c: string, p: number[]) => (g.fillStyle = c, g.beginPath(), g.moveTo(p[0], p[1]), g.lineTo(p[2], p[3]), g.lineTo(p[4], p[5]), g.fill());
+      tri("#f2a7b8", [0.3, 0.3, 0.52, 0.3, 0.41, 0.49]);
+      tri("#f4c95d", [0.41, 0.49, 0.52, 0.3, 0.63, 0.49]);
+      tri("#8fb4e0", [0.52, 0.68, 0.41, 0.49, 0.63, 0.49]);
+    },
+  },
+  // 에어부산: 흰 동체에 배는 앞 절반 남색·뒤 절반 연두, 남색 꼬리에 하늘색·흰 물결
+  실무: {
+    top: "#fbfcfd", belly: "#123f8c", bellyRear: "#a6ce39", line: -0.35, engine: "#123f8c",
+    fin: (g) => {
+      g.fillStyle = "#123f8c";
+      g.fillRect(0, 0, 1, 1);
+      g.lineCap = "round";
+      ([["#5ec2f0", 0.07, 0.42], ["#fbfcfd", 0.035, 0.56]] as const).forEach(([c, w, y]) => {
+        g.strokeStyle = c;
+        g.lineWidth = w;
+        g.beginPath(); // 앞 아래에서 뒤 위로 휘어 오르는 물결
+        g.moveTo(0.2, y - 0.12);
+        g.quadraticCurveTo(0.5, y + 0.1, 0.9, y + 0.05);
+        g.stroke();
+      });
+    },
+  },
+  // 제주항공: 흰 동체에 주황 배, 주황 꼬리·엔진
+  클론: {
+    top: "#fbfcfd", belly: "#ff6c0e", line: -0.35, engine: "#ff6c0e",
+    fin: (g) => {
+      g.fillStyle = "#ff6c0e";
+      g.fillRect(0, 0, 1, 1);
+      g.fillStyle = "#ffa04d"; // 꼬리 아래쪽에 밝은 주황 쐐기
+      g.beginPath();
+      g.moveTo(0, 0); g.lineTo(1, 0); g.lineTo(1, 0.3); g.lineTo(0, 0.12);
+      g.fill();
+    },
+  },
+};
+
+/** 동체 도색: 선반 UV의 u가 둘레를, v가 꼬리(0)에서 코(1)까지 가요. 높이(-cos)로 윗동체·아랫동체를 나눠요. */
+function bodyTexture({ top, belly, line, stripe, bellyRear = belly }: Livery) {
+  const c = document.createElement("canvas");
+  c.width = 512;
+  c.height = 64; // 위 절반이 앞(코), 아래 절반이 뒤. 두 줄만 두면 사이가 번져서 넉넉히 둬요.
+  const g = c.getContext("2d")!;
+  for (let px = 0; px < 512; px++) {
+    const y = -Math.cos((2 * Math.PI * (px + 0.5)) / 512);
+    const band = stripe && y >= line && y <= line + 0.08;
+    g.fillStyle = band ? stripe : y > line ? top : belly;
+    g.fillRect(px, 0, 1, 32);
+    g.fillStyle = band ? stripe : y > line ? top : bellyRear;
+    g.fillRect(px, 32, 1, 32);
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+/** 꼬리날개 도색: 모양 좌표(뒤쪽 x, 위 y, 0~0.8)에 그대로 그려요 */
+function finTexture(draw: (g: CanvasRenderingContext2D) => void) {
+  const c = document.createElement("canvas");
+  c.width = c.height = 256;
+  const g = c.getContext("2d")!;
+  g.translate(0, 256);
+  g.scale(256, -256); // 이제 0~1, 위가 +y
+  draw(g);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.repeat.set(1 / 0.8, 1 / 0.8);
+  tex.anisotropy = 4;
+  return tex;
+}
+
 /** 비행기 위 꼬리표: 진짜 글자(HTML)로 그려야 어느 화면에서도 또렷해요 */
 function tagElement(top: string, name: string, color: string, clickable: boolean) {
   // 바깥 칸은 자리만 잡고, 크기는 안쪽 카드에 줘요. 바깥에 scale을 주면 위치 이동까지 같이 커져요.
   const box = document.createElement("div");
   const el = document.createElement("div");
-  el.className = `${clickable ? "pointer-events-auto cursor-pointer" : ""} select-none whitespace-nowrap rounded-xl border border-l-[6px] border-[#d1d6db] bg-white py-1.5 pl-3 pr-4 shadow-[0_6px_16px_-8px_rgba(0,29,58,.35)] [transform-origin:50%_100%]`;
+  el.className = `${clickable ? "pointer-events-auto cursor-pointer" : ""} select-none whitespace-nowrap rounded-xl border border-l-[6px] border-line bg-card py-1.5 pl-3 pr-4 shadow-[0_6px_16px_-8px_rgba(0,29,58,.35)] [transform-origin:50%_100%]`;
   el.style.borderLeftColor = color;
   box.append(el);
   const t = document.createElement("p");
@@ -175,22 +277,99 @@ function tagElement(top: string, name: string, color: string, clickable: boolean
   return box;
 }
 
+/** 지붕 글자 획: 글자 높이 1 기준 윤곽과 글자 너비. 글꼴 파일 없이 T, 1, 2만 그려요 */
+const GLYPHS: Record<string, { w: number; shape: () => THREE.Shape }> = {
+  T: { w: 0.8, shape: () => shape([[0, 1], [0.8, 1], [0.8, 0.78], [0.51, 0.78], [0.51, 0], [0.29, 0], [0.29, 0.78], [0, 0.78]]) },
+  "1": { w: 0.46, shape: () => shape([[0.04, 0.52], [0.04, 0.8], [0.24, 1], [0.46, 1], [0.46, 0], [0.24, 0], [0.24, 0.72]]) },
+  "2": {
+    w: 0.66,
+    shape: () => {
+      const d = Math.PI / 180;
+      const g = new THREE.Shape();
+      g.moveTo(0, 0);
+      g.lineTo(0.66, 0);
+      g.lineTo(0.66, 0.2);
+      g.lineTo(0.32, 0.2);
+      g.absarc(0.33, 0.68, 0.32, -40 * d, 165 * d, false); // 바깥 고리
+      g.absarc(0.33, 0.68, 0.12, 165 * d, -40 * d, true); // 안쪽 고리
+      g.lineTo(0, 0.2);
+      return g;
+    },
+  },
+};
+
+/** 지붕에 눕힌 글자: 가운데가 원점, 위로 h만큼 솟아요. 글자 위쪽이 뒤(-z)를 봐요 */
+function roofText(text: string, size: number, h: number) {
+  const shapes: THREE.Shape[] = [];
+  let x = 0;
+  for (const ch of text) {
+    const sh = GLYPHS[ch].shape();
+    shapes.push(new THREE.Shape(sh.extractPoints(24).shape.map((v) => v.add(new THREE.Vector2(x, 0)))));
+    x += GLYPHS[ch].w + 0.12;
+  }
+  const geo = new THREE.ExtrudeGeometry(shapes, { depth: h / size, bevelEnabled: false }).rotateX(-Math.PI / 2).scale(size, size, size);
+  geo.center();
+  return geo.translate(0, h / 2, 0);
+}
+
 /** 프로젝트 목록: 계류장 게이트마다 프로젝트 비행기가 서 있어요. 누르면 활주로로 가서 이륙해 화면으로 날아오고, 탑승권이 열려요. */
+/** 폰 전용: 계류장 대신 한눈에 보는 프로젝트 카드 */
+function ProjectCards() {
+  const [proposal, setProposal] = useState<string | null>(null);
+  const opener = useRef<HTMLButtonElement>(null);
+  return (
+    <>
+    <ul className="mt-8 grid gap-4 sm:grid-cols-2 md:hidden">
+      {FLIGHTS.map((f) => (
+        <li key={f.name} className="overflow-hidden rounded-3xl bg-surface">
+          {f.image && <img src={f.image} alt={`${f.nameKo} 화면`} loading="lazy" decoding="async" className="aspect-[16/9] w-full object-cover object-top" />}
+          <div className="p-5">
+            <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted">
+              <span className="rounded-full px-2.5 py-0.5 font-semibold" style={{ color: KIND_COLOR[f.kind], background: `color-mix(in srgb, ${KIND_COLOR[f.kind]} 14%, transparent)` }}>{f.kind}</span>
+              {f.category === "Desktop" ? "데스크톱 앱" : "웹"} · {f.year}
+            </p>
+            <h3 className="mt-2 text-[22px] font-bold leading-tight">{f.nameKo}</h3>
+            <p className="mt-2 text-[15px] leading-7 text-sub">{f.body}</p>
+            <ul className="mt-4 flex flex-wrap gap-1.5">
+              {f.tech.map((t) => (
+                <li key={t} className="flex items-center gap-1.5 rounded-lg bg-card px-2.5 py-1 text-[13px] font-medium"><SkillIcon name={t} size={14} onPaper />{t}</li>
+              ))}
+            </ul>
+            {!f.code && f.codeNote && <p className="mt-4 text-[13px] leading-6 text-muted">{f.codeNote}</p>}
+            <div className="mt-5 flex flex-wrap gap-2 *:h-11 *:min-w-[7.5rem] *:flex-1 *:justify-center">
+              {f.href === "/" ? (
+                <a href="#top" className="btn">지금 이 사이트</a>
+              ) : (
+                <a href={f.href} target="_blank" rel="noreferrer" className="btn">사이트 보기 <span className="arr" aria-hidden>→</span></a>
+              )}
+              {f.code && <a href={f.code} target="_blank" rel="noreferrer" className="btn-line">코드 보기</a>}
+              {f.proposal && <button type="button" onClick={(e) => { opener.current = e.currentTarget; setProposal(f.proposal!); }} className="btn-line">기획서 보기</button>}
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+    {proposal && <ProposalModal open src={proposal} onClose={() => setProposal(null)} returnFocusRef={opener} />}
+    </>
+  );
+}
+
 export default function Departures() {
   const root = useRef<HTMLElement>(null);
   const host = useRef<HTMLDivElement>(null);
-  const [filter, setFilter] = useState<"All" | "Web" | "Desktop">("All");
-  const filterRef = useRef(filter);
-  filterRef.current = filter;
   const [noGL, setNoGL] = useState(false);
   const [pass, setPass] = useState<Flight | null>(null);
   const api = useRef<{ land(): void } | null>(null);
+  const dark = useDark();
+  const narrow = useNarrow();
+  const arrived = useRef(false); // 테마를 바꿔 장면을 다시 만들 때 들어오는 장면을 또 보여 주지 않아요
 
   useGSAP(() => {
     gsap.from("[data-head] > *", { y: 40, opacity: 0, duration: 0.8, ease: "power3.out", stagger: 0.1, scrollTrigger: { trigger: root.current, start: "top 60%" } });
   }, { scope: root });
 
   useEffect(() => {
+    if (isNarrow()) return; // 폰은 계류장 없이 카드만 보여 줘요
     const el = host.current!;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let renderer: THREE.WebGLRenderer;
@@ -223,11 +402,12 @@ export default function Departures() {
     const pmrem = new THREE.PMREMGenerator(renderer);
     const room = new RoomEnvironment();
     scene.environment = track(pmrem.fromScene(room, 0.04).texture);
-    scene.environmentIntensity = 0.45;
+    scene.environmentIntensity = dark ? 0.2 : 0.45;
     room.dispose();
     pmrem.dispose();
-    scene.add(new THREE.HemisphereLight(0xffffff, 0xc9d3df, 0.7));
-    const sun = new THREE.DirectionalLight(0xffffff, 2.2);
+    // 밤에는 푸르스름한 달빛으로 어둡게 비춰요
+    scene.add(dark ? new THREE.HemisphereLight(0x9fb4d8, 0x22252c, 0.45) : new THREE.HemisphereLight(0xffffff, 0xc9d3df, 0.7));
+    const sun = new THREE.DirectionalLight(dark ? 0xc4d2ee : 0xffffff, dark ? 0.9 : 2.2);
     sun.position.set(-6, 12, 7);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
@@ -245,27 +425,97 @@ export default function Departures() {
     };
 
     // 바닥 도색
-    const apron = new THREE.Mesh(track(new THREE.PlaneGeometry(AW, AD).rotateX(-Math.PI / 2)), track(new THREE.MeshStandardMaterial({ map: track(apronTexture()), transparent: true, roughness: 0.95 })));
+    const apron = new THREE.Mesh(track(new THREE.PlaneGeometry(AW, AD).rotateX(-Math.PI / 2)), track(new THREE.MeshStandardMaterial({ map: track(apronTexture(dark)), transparent: true, roughness: 0.95 })));
     apron.position.x = CX;
     apron.receiveShadow = true;
     site.add(apron);
 
-    // 탑승동: 흰 건물에 유리 띠, 왼쪽 끝에 관제탑
+    // 탑승동: 콘크리트 기단 위 흰 건물, 세로 창살이 선 유리벽, 처마가 나온 지붕과 옥상 설비, 지붕에 T1·T2
     const white = mat("#f9fafb", 0.5);
     const glass = mat("#9fc3ea", 0.15, 0.3);
+    if (dark) glass.emissive.set("#ffcf7a"), (glass.emissiveIntensity = 0.55); // 밤에는 터미널 창에 불이 켜져요
     const steel = mat("#d1d6db", 0.4, 0.5);
-    put(track(new RoundedBoxGeometry(PIER_L, 0.9, PIER_D, 3, 0.12)), white, 0, 0.45, 0);
-    put(track(new THREE.BoxGeometry(PIER_L - 0.3, 0.28, PIER_D + 0.02)), glass, 0, 0.55, 0);
-    const tx = -(PIER_L / 2 + 0.9);
-    put(track(new THREE.CylinderGeometry(0.2, 0.28, 2.4, 24)), white, tx, 1.2, 0);
-    put(track(new THREE.CylinderGeometry(0.5, 0.36, 0.45, 8)), glass, tx, 2.62, 0);
-    put(track(new THREE.CylinderGeometry(0.56, 0.56, 0.08, 8)), white, tx, 2.88, 0);
+    const trim = mat("#6b7684", 0.4, 0.6);
+    const concrete = mat(dark ? "#3a3d45" : "#c9cfd6", 0.9);
+    const letter = mat("#8b95a1", 0.6); // 낮이든 밤이든 회색
+    const ROOF = 0.92; // 지붕 윗면 높이
+    const mullionGeo = track(new THREE.BoxGeometry(0.018, 0.42, 0.02));
+    const unitGeo = track(new RoundedBoxGeometry(0.34, 0.1, 0.24, 2, 0.02));
+    const signs = TERMINALS.map((t) => {
+      put(track(new THREE.BoxGeometry(t.len + 0.12, 0.06, PIER_D + 0.12)), concrete, t.cx, 0.03, 0);
+      put(track(new RoundedBoxGeometry(t.len, 0.78, PIER_D, 3, 0.06)), white, t.cx, 0.45, 0);
+      put(track(new THREE.BoxGeometry(t.len - 0.2, 0.42, PIER_D + 0.02)), glass, t.cx, 0.5, 0);
+      const n = Math.floor((t.len - 0.2) / 0.3) + 1;
+      const mullions = new THREE.InstancedMesh(mullionGeo, steel, n * 2);
+      const at = new THREE.Matrix4();
+      for (let m = 0; m < n * 2; m++) mullions.setMatrixAt(m, at.makeTranslation(t.cx - (t.len - 0.2) / 2 + (m % n) * 0.3, 0.5, (m < n ? 1 : -1) * (PIER_D / 2 + 0.012)));
+      site.add(mullions);
+      put(track(new THREE.BoxGeometry(t.len + 0.26, 0.03, PIER_D + 0.32)), trim, t.cx, 0.85, 0); // 처마 밑 띠
+      put(track(new RoundedBoxGeometry(t.len + 0.24, 0.07, PIER_D + 0.3, 2, 0.025)), white, t.cx, ROOF - 0.035, 0);
+      for (const s of [-1, 1]) put(unitGeo, steel, t.cx + s * (t.len / 2 - 0.5), ROOF + 0.05, -0.38);
+      return put(track(roofText(t.name, 0.8, 0.07)), letter, t.cx, ROOF, 0);
+    });
+
+    // 관제탑: 아래가 넓고 위로 갈수록 가늘다가 꼭대기에서 벌어지는 기둥, 바깥으로 기운 유리 관제실, 안테나와 빨간 항공등
+    const tower = new THREE.Group();
+    tower.position.set(-(TERMINALS[0].len / 2 + 1.1), 0, 0);
+    site.add(tower);
+    put(track(new THREE.CylinderGeometry(0.46, 0.5, 0.08, 32)), concrete, 0, 0.04, 0, tower);
+    const shaft = [[0.3, 0.08], [0.25, 0.4], [0.19, 1.3], [0.19, 1.9], [0.26, 2.12], [0.42, 2.26]];
+    put(track(new THREE.LatheGeometry(shaft.map(([r, y]) => new THREE.Vector2(r, y)), 40)), white, 0, 0, 0, tower);
+    for (const y of [0.9, 1.5]) put(track(new THREE.CylinderGeometry(0.205, 0.205, 0.04, 32)), trim, 0, y, 0, tower);
+    put(track(new THREE.CylinderGeometry(0.46, 0.43, 0.06, 32)), white, 0, 2.29, 0, tower);
+    const CAB = { y: 2.5, h: 0.36, r0: 0.42, r1: 0.52, sides: 12 };
+    put(track(new THREE.CylinderGeometry(CAB.r1, CAB.r0, CAB.h, CAB.sides)), glass, 0, CAB.y, 0, tower);
+    const tilt = Math.atan((CAB.r1 - CAB.r0) / CAB.h);
+    const cabMullionGeo = track(new THREE.BoxGeometry(0.02, CAB.h / Math.cos(tilt), 0.02));
+    for (let k = 0; k < CAB.sides; k++) {
+      const g = new THREE.Group();
+      g.rotation.y = (k / CAB.sides) * Math.PI * 2;
+      put(cabMullionGeo, trim, 0, CAB.y, (CAB.r0 + CAB.r1) / 2 + 0.005, g).rotation.x = tilt;
+      tower.add(g);
+    }
+    put(track(new THREE.CylinderGeometry(0.56, 0.52, 0.06, 32)), white, 0, CAB.y + CAB.h / 2 + 0.03, 0, tower);
+    put(track(new THREE.CylinderGeometry(0.26, 0.32, 0.14, 24)), steel, 0, CAB.y + CAB.h / 2 + 0.13, 0, tower);
+    put(track(new THREE.CylinderGeometry(0.012, 0.016, 0.5, 8)), trim, 0, CAB.y + CAB.h / 2 + 0.45, 0, tower);
+    put(track(new THREE.SphereGeometry(0.03, 12, 10)), track(new THREE.MeshBasicMaterial({ color: "#ff3b4a" })), 0, CAB.y + CAB.h / 2 + 0.72, 0, tower);
+
+    // 등불이 번지는 빛: 가운데가 하얗고 바깥으로 흐려지는 동그라미
+    const dot = document.createElement("canvas");
+    dot.width = dot.height = 64;
+    const dg = dot.getContext("2d")!;
+    const grad = dg.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, "rgba(255,255,255,1)");
+    grad.addColorStop(0.2, "rgba(255,255,255,.9)");
+    grad.addColorStop(0.45, "rgba(255,255,255,.35)");
+    grad.addColorStop(1, "rgba(255,255,255,0)");
+    dg.fillStyle = grad;
+    dg.fillRect(0, 0, 64, 64);
+    const glow = track(new THREE.CanvasTexture(dot));
+
+    // 밤에만 활주로 불: 양옆 흰 등, 가운데 등, 들어오는 끝은 초록·나가는 끝은 빨강. 번지는 빛 점(Points)으로 그려요.
+    if (dark) {
+      const pts: number[] = [], cols: number[] = [];
+      const add = (x: number, z: number, hex: string) => {
+        const c = new THREE.Color(hex);
+        pts.push(x, 0.04, z);
+        cols.push(c.r, c.g, c.b);
+      };
+      const top = -AD / 2 + 0.3, len = AD - 0.6;
+      for (let z = top + 0.3; z <= top + len - 0.3; z += 0.55) for (const sx of [-1, 1]) add(XR + sx * (RW / 2 - 0.05), z, "#fff2c6");
+      for (let z = top + 0.9; z <= top + len - 0.9; z += 0.45) add(XR, z, "#dfe9ff");
+      for (let x = -RW / 2 + 0.1; x <= RW / 2 - 0.09; x += 0.2) (add(XR + x, top + 0.1, "#3ee07a"), add(XR + x, top + len - 0.1, "#ff4d5a"));
+      const geo = track(new THREE.BufferGeometry());
+      geo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
+      geo.setAttribute("color", new THREE.Float32BufferAttribute(cols, 3));
+      const lights = new THREE.Points(geo, track(new THREE.PointsMaterial({ size: 0.45, map: glow, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })));
+      site.add(lights);
+    }
 
     // 탑승교: 탑승동에서 비행기 문 옆까지
     const bridgeLen = NOSE_GAP + 0.45;
     const bridgeGeo = track(new RoundedBoxGeometry(0.3, 0.28, bridgeLen, 2, 0.05));
-    SLOTS.forEach((_, i) => {
-      const { x, side } = gateOf(i);
+    GATES.forEach(({ x, side }) => {
       put(bridgeGeo, steel, x - side * 0.38, PLANE_Y, side * (PIER_D / 2 + bridgeLen / 2));
     });
 
@@ -283,20 +533,29 @@ export default function Departures() {
     const cockpitGeo = track(new THREE.BoxGeometry(0.1, 0.014, 0.075));
     const strutGeo = track(new THREE.CylinderGeometry(0.018, 0.018, 0.45, 8).translate(0, -0.225, 0));
     const wheelGeo = [0.07, 0.055].map((r) => track(new THREE.CylinderGeometry(r, r, 0.045, 16).rotateZ(Math.PI / 2)));
-    const beaconGeo = track(new THREE.SphereGeometry(0.035, 10, 8));
-    const beaconMat = track(new THREE.MeshBasicMaterial({ color: "#f04452" }));
+    // 날개 끝 등: 진짜 비행기처럼 왼쪽(+x, 코가 +z라서) 빨강, 오른쪽 초록. 모든 비행기가 재질을 같이 써서 같은 박자로 깜빡여요.
+    const beaconGeo = track(new THREE.SphereGeometry(0.028, 10, 8));
+    const beaconMats = ["#ff3b4a", "#1fdc6a"].map((color) => track(new THREE.MeshBasicMaterial({ color, transparent: true, depthWrite: false })));
+    const haloMats = ["#ff3b4a", "#1fdc6a"].map((color) => track(new THREE.SpriteMaterial({ map: glow, color, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })));
+    // 밤에는 창문에 불이 켜져요: 비행기마다 흐려지기도 해서 재질은 비행기마다 따로 만들어요
+    const windowLit = () => track(new THREE.MeshStandardMaterial({ color: "#ffe6ad", emissive: "#ffc861", emissiveIntensity: 1.1, roughness: 0.4, transparent: true }));
     const dummy = new THREE.Object3D();
 
     const pickables: THREE.Object3D[] = [];
-    const planes = SLOTS.map(({ f, kind }, i) => {
+    const planes = GATES.map(({ f, kind, x, z, side, yaw }, i) => {
       const color = KIND_COLOR[kind];
       const physical = (c: string, rough: number) => track(new THREE.MeshPhysicalMaterial({ color: c, roughness: rough, clearcoat: 0.8, clearcoatRoughness: 0.2, transparent: true }));
+      const lv = LIVERY[kind];
       const bodyMat = physical("#fbfcfd", 0.35);
-      const paintMat = physical(color, 0.38);
+      const paintMat = physical(lv.engine, 0.38);
+      const skinMat = physical("#ffffff", 0.35);
+      skinMat.map = track(bodyTexture(lv));
+      const finMat = physical("#ffffff", 0.38);
+      finMat.map = track(finTexture(lv.fin));
       const darkMat = track(new THREE.MeshStandardMaterial({ color: "#1f2733", roughness: 0.3, metalness: 0.2, transparent: true }));
       const gearMat = track(new THREE.MeshStandardMaterial({ color: "#8b95a1", roughness: 0.4, metalness: 0.6, transparent: true }));
       const plane = new THREE.Group();
-      put(fuselageGeo, bodyMat, 0, 0, 0, plane);
+      put(fuselageGeo, skinMat, 0, 0, 0, plane);
       [1, -1].forEach((s, j) => {
         put(wingGeo[j], bodyMat, 0, -0.13, 0.15, plane).rotation.z = s * DIHEDRAL;
         put(stabGeo[j], bodyMat, 0, 0.12, -1.1, plane).rotation.z = s * 0.12;
@@ -309,9 +568,10 @@ export default function Departures() {
         // 조종석 앞 유리
         put(cockpitGeo, darkMat, s * 0.125, 0.148, 1.07, plane).rotation.z = -s * 0.66;
       });
-      put(finGeo, paintMat, 0, 0.2, -0.75, plane);
+      put(finGeo, finMat, 0, 0.2, -0.75, plane);
       // 객실 창문: 양옆에 한 줄씩
-      const windows = new THREE.InstancedMesh(windowGeo, darkMat, 28);
+      const windowMat = dark ? windowLit() : darkMat;
+      const windows = new THREE.InstancedMesh(windowGeo, windowMat, 28);
       for (let w = 0; w < 28; w++) {
         dummy.position.set((w < 14 ? 1 : -1) * 0.208, 0.075, 0.78 - (w % 14) * 0.105);
         dummy.updateMatrix();
@@ -328,14 +588,19 @@ export default function Departures() {
         plane.add(g);
         return { g, axis, sign };
       });
-      const beacon = new THREE.Mesh(beaconGeo, beaconMat);
-      beacon.position.set(0, 0.23, -0.1);
-      plane.add(beacon);
+      for (const [j, s] of [1, -1].entries()) {
+        const beacon = new THREE.Mesh(beaconGeo, beaconMats[j]);
+        const halo = new THREE.Sprite(haloMats[j]); // 등 둘레로 번지는 빛
+        halo.scale.setScalar(dark ? 0.4 : 0.22);
+        beacon.add(halo);
+        beacon.position.set(s * 1.6, -0.13 + 1.6 * DIHEDRAL + 0.03, -0.37); // 윙렛 앞 끝
+        plane.add(beacon);
+      }
 
       const tag = new CSS2DObject(f ? tagElement(`${f.flight} · ${f.gate}`, f.nameKo, color, true) : tagElement("곧 출발", "새 프로젝트 준비 중", color, false));
       tag.center.set(0.5, 1); // 아래 가운데를 비행기 위에 걸어요
       if (f) { // 준비 중인 비행기는 누를 수 없어요
-        plane.traverse((o) => (o.userData.i = i, o instanceof THREE.Mesh && o !== beacon && pickables.push(o)));
+        plane.traverse((o) => (o.userData.i = i, o instanceof THREE.Mesh && !beaconMats.includes(o.material) && pickables.push(o)));
         tag.element.addEventListener("pointerenter", () => (labelHover = i));
         tag.element.addEventListener("pointerleave", () => (labelHover = -1));
         tag.element.addEventListener("click", (e) => {
@@ -345,11 +610,11 @@ export default function Departures() {
         });
       }
       const holder = new THREE.Group();
-      const gate = gateOf(i);
+      const gate = { x, z, side, yaw };
       holder.rotation.y = gate.yaw;
       holder.add(plane, tag);
       site.add(holder);
-      return { f, gate, holder, plane, tag, beacon, gears, mats: [bodyMat, paintMat, darkMat, gearMat], arrive: reduce ? 1 : 0, lift: 0, alpha: 1, flying: false };
+      return { f, gate, holder, plane, tag, gears, mats: [...new Set([bodyMat, paintMat, skinMat, finMat, darkMat, gearMat, windowMat])], arrive: reduce || arrived.current ? 1 : 0, lift: 0, alpha: 1, flying: false };
     });
     type Plane = (typeof planes)[number];
 
@@ -407,7 +672,7 @@ export default function Departures() {
     // 섹션에 들어오면 비행기가 유도로에서 게이트로 하나씩 들어와요
     const taxiIn = ScrollTrigger.create({
       trigger: el, start: "top 75%", once: true,
-      onEnter: () => !reduce && gsap.to(planes, { arrive: 1, duration: 1.6, ease: "power2.out", stagger: 0.12 }),
+      onEnter: () => (arrived.current = true, !reduce && gsap.to(planes.filter((b) => b.arrive < 1), { arrive: 1, duration: 1.6, ease: "power2.out", stagger: 0.12 })),
     });
 
     // 이륙: 뒤로 밀려 나와 유도로를 따라 활주로로 가서, 달리다 기수를 들고 떠올라 바퀴를 접고 카메라 앞까지 날아와요
@@ -518,6 +783,7 @@ export default function Departures() {
       // 세로 화면은 계류장을 돌려 긴 쪽이 안쪽으로 가게 해요
       const narrow = w / h < 1.1;
       world.rotation.y = narrow ? Math.PI / 2 : 0;
+      for (const m of signs) m.rotation.y = -world.rotation.y; // 지붕 글자는 돌린 화면에서도 똑바로 읽혀요
       const long = AW / 2 - 0.4, short = AD / 2;
       const t = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
       const d = Math.max((narrow ? short : long) / (t * camera.aspect), ((narrow ? long : short) * 0.8 + 1.4) / t);
@@ -566,10 +832,12 @@ export default function Departures() {
       } else hovered = -1;
       el.style.cursor = hovered >= 0 || flight ? "pointer" : "";
 
+      const blink = ((now / 1000) % 1.4) / 0.35; // 1.4초마다 0.35초 동안 부드럽게 켜졌다 꺼져요
+      const pulse = blink < 1 ? Math.sin(Math.PI * blink) : 0;
+      for (const m of beaconMats) m.opacity = 0.3 + 0.7 * pulse;
+      for (const m of haloMats) m.opacity = 0.15 + 0.85 * pulse;
       tugBeacon.visible = (now / 1000) % 0.5 < 0.25; // 토잉카 경광등
-      const filter = filterRef.current;
       planes.forEach((b, i) => {
-        b.beacon.visible = (now / 1000 + i * 0.37) % 1.2 < 0.12; // 위에 빨간 등이 깜빡여요
         if (b.flying) return; // 나는 동안은 이륙 애니메이션이 자리를 잡아요
         const { x, z, side } = b.gate;
         const out = (1 - b.arrive) * 7; // 아직 안 들어온 만큼 바깥에 있어요
@@ -578,8 +846,7 @@ export default function Departures() {
         b.plane.position.y = PLANE_Y + b.lift;
         b.tag.position.y = PLANE_Y + 1.6; // 이만큼 올려야 비스듬히 봐도 기수를 안 가려요. 올려도 꼬리표는 제자리예요.
         (b.tag.element.firstElementChild as HTMLElement).style.scale = String(1 + b.lift * 0.3);
-        const dim = filter !== "All" && b.f?.category !== filter;
-        const want = dim ? 0.15 : b.arrive;
+        const want = b.arrive;
         b.alpha += (want - b.alpha) * k;
         if (Math.abs(want - b.alpha) < 0.005) b.alpha = want;
         // 다 보일 때는 불투명으로 그려야 부품끼리 비쳐 보이지 않아요
@@ -619,7 +886,7 @@ export default function Departures() {
       renderer.domElement.remove();
       labels.domElement.remove();
     };
-  }, []);
+  }, [dark, narrow]);
 
   return (
     <section id="flights" ref={root} className="relative isolate flex flex-col justify-center bg-terminal pb-16 pt-[calc(var(--bar)+48px)] lg:min-h-[100svh] lg:pb-6 lg:pt-[calc(var(--bar)+16px)]">
@@ -628,23 +895,28 @@ export default function Departures() {
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div data-head>
             <h2 className="text-[clamp(32px,3.6vw,52px)] font-bold leading-[1.15] tracking-[-0.03em]">지금까지 만든 프로젝트예요.</h2>
-            <p className="mt-2 text-[17px] text-sub sm:text-[19px]">비행기를 누르면 이륙해서 탑승권을 건네줘요.</p>
+            <p className="mt-2 text-[17px] text-sub max-md:hidden sm:text-[19px]">비행기를 누르면 이륙해서 탑승권을 건네줘요.</p>
           </div>
-          <div className="flex flex-wrap items-center gap-4">
-            <ul className="flex flex-wrap gap-3 text-[13px] font-medium text-sub" aria-label="꼬리날개 색">
+          <div className="flex flex-wrap items-center gap-4 max-md:hidden">
+            <ul className="flex flex-wrap gap-3 text-[13px] font-medium text-sub" aria-label="꼬리표 색">
               {KIND_ORDER.map((k) => (
                 <li key={k} className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: KIND_COLOR[k] }} />{k}</li>
               ))}
             </ul>
-            <Toggle label="프로젝트 분류" value={filter} onChange={setFilter} options={[{ value: "All", label: "전체" }, { value: "Web", label: "웹" }, { value: "Desktop", label: "데스크톱" }]} />
           </div>
         </div>
 
-        <div ref={host} aria-hidden className={`relative mt-[clamp(20px,4svh,48px)] h-[min(72svh,760px)] min-h-[440px] w-full [&>canvas]:relative [&>canvas]:h-full [&>canvas]:w-full ${noGL ? "hidden" : ""}`} />
+      </div>
+
+      {/* 계류장은 내용 폭을 벗어나 화면 끝까지 펼쳐요 */}
+      <div ref={host} aria-hidden className={`relative mt-[clamp(20px,4svh,48px)] h-[min(72svh,760px)] min-h-[440px] w-full max-md:hidden [&>canvas]:relative [&>canvas]:h-full [&>canvas]:w-full ${noGL ? "hidden" : ""}`} />
+
+      <div className="mx-auto w-full max-w-[1600px] px-5 sm:px-8">
 
         {/* 화면 읽기 프로그램과 WebGL이 없는 환경은 목록으로 봐요 */}
-        <ul className={noGL ? "mt-8 grid gap-2 sm:grid-cols-2" : "sr-only"}>
-          {FLIGHTS.filter((f) => filter === "All" || f.category === filter).map((f) => (
+        <ProjectCards />
+        <ul className={noGL ? "mt-8 grid gap-2 max-md:hidden sm:grid-cols-2" : "sr-only max-md:hidden"}>
+          {FLIGHTS.map((f) => (
             <li key={f.name}>
               <button type="button" onClick={() => setPass(f)} className="flex w-full items-center gap-3 rounded-2xl bg-surface px-4 py-3 text-left">
                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: KIND_COLOR[f.kind] }} />

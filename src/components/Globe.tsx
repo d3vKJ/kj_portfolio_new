@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type RefObject } from "react";
+import { isNarrow } from "@/lib/media";
 import * as THREE from "three";
 import { LAND_MASK } from "@/data/land";
 import { KOREA } from "@/data/korea";
@@ -134,6 +135,7 @@ export default function Globe({ zoom, label, sky, className = "" }: Props) {
   const host = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (isNarrow()) return; // 폰은 Hero가 지구본을 빼요. 하이드레이션 직후 한 번 도는 것만 막아요
     const el = host.current!;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let renderer: THREE.WebGLRenderer;

@@ -5,6 +5,7 @@ import { WX_URL, look, parse, wxIcon, wxName, type Look, type Now } from "@/lib/
 import SplitFlap from "@/components/SplitFlap";
 import Globe from "@/components/Globe";
 import { gsap, useGSAP } from "@/lib/gsap";
+import { useNarrow } from "@/lib/media";
 
 export function Plane({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -20,6 +21,7 @@ export default function Hero() {
   const label = useRef<HTMLDivElement>(null);
   const sky = useRef<Look>(null);
   const [now, setNow] = useState<Now | null>(null);
+  const narrow = useNarrow();
 
   // 대구 현재 날씨: 실패하면 날씨 줄만 빠지고 구름은 기본 하늘이에요
   useEffect(() => {
@@ -34,7 +36,8 @@ export default function Hero() {
     gsap.from("[data-in]", { y: 24, opacity: 0, duration: 0.9, ease: "power3.out", stagger: 0.1, delay: 0.5 });
 
     const mm = gsap.matchMedia();
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
+    // 폰에선 지구본 없이 이름만 보여 주는 첫 화면이에요
+    mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
       const z = { v: 0 };
       const tl = gsap.timeline({
         scrollTrigger: { id: "hero", trigger: root.current, start: "top top", end: "+=400%", pin: true, scrub: 1 },
@@ -55,17 +58,17 @@ export default function Hero() {
   }, { scope: root });
 
   return (
-    <section id="top" ref={root} className="relative h-[100svh] min-h-[620px] overflow-hidden bg-[#04050a] text-white">
+    <section id="top" ref={root} className="relative h-[100svh] min-h-[620px] overflow-hidden bg-[#04050a] text-white max-md:h-auto max-md:min-h-0">
       {/* 성운: 별 뒤로 아주 옅게 번지는 빛 */}
       <div data-space className="pointer-events-none absolute inset-0" aria-hidden>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_45%_at_18%_22%,rgba(88,70,160,.22),transparent_70%),radial-gradient(ellipse_55%_50%_at_85%_78%,rgba(40,95,160,.2),transparent_70%),radial-gradient(ellipse_40%_30%_at_70%_15%,rgba(150,70,110,.12),transparent_70%)]" />
         <div className="absolute -inset-x-1/4 top-1/2 h-[38%] -translate-y-1/2 -rotate-[24deg] bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,rgba(190,200,255,.07),transparent_70%)] blur-2xl" />
       </div>
-      <Globe zoom={zoom} label={label} sky={sky} className="absolute inset-0" />
+      {!narrow && <Globe zoom={zoom} label={label} sky={sky} className="absolute inset-0" />}
 
       <div data-haze className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#0e1a2c_0%,#24476f_45%,#6f9cc8_100%)] opacity-0 mix-blend-screen" />
 
-      <div ref={label} className="pointer-events-none absolute left-0 top-0" aria-hidden>
+      <div ref={label} className="pointer-events-none absolute left-0 top-0 max-md:hidden" aria-hidden>
         {/* 작은 화면에선 카드가 핀 바로 아래 가운데로 와요 */}
         <div data-arrive className="absolute left-7 top-7 w-max origin-top-left opacity-0 max-sm:left-0 max-sm:top-8 max-sm:-translate-x-1/2 max-sm:origin-top">
           <div className="h-px w-16 origin-left -translate-x-6 -translate-y-1 rotate-[35deg] bg-white/70 max-sm:hidden" />
@@ -91,7 +94,7 @@ export default function Hero() {
         </div>
       </div>
 
-      <div data-intro className="pointer-events-none absolute inset-0 mx-auto flex max-w-[1600px] flex-col justify-center px-5 pt-[var(--bar)] sm:px-8">
+      <div data-intro className="pointer-events-none absolute inset-0 mx-auto flex max-w-[1600px] flex-col justify-center px-5 pt-[var(--bar)] sm:px-8 max-md:relative max-md:pb-14 max-md:pt-[calc(var(--bar)+56px)]">
         <h1>
           <SplitFlap text="장경진" className="text-[clamp(60px,9vw,128px)] font-semibold" delay={300} />
         </h1>

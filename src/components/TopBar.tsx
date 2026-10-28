@@ -5,6 +5,7 @@ import Image from "next/image";
 import SplitFlap from "@/components/SplitFlap";
 import { Picto, type PictoName } from "@/components/Picto";
 import { ScrollTrigger } from "@/lib/gsap";
+import { toggleTheme, useDark } from "@/lib/theme";
 
 const LINKS: { id: string; gate: string; ko: string; en: string; picto: PictoName }[] = [
   { id: "about", gate: "A1", ko: "여권 심사", en: "Passport", picto: "passport" },
@@ -21,6 +22,7 @@ export default function TopBar() {
   const [solid, setSolid] = useState(false);
   const [dark, setDark] = useState(false); // 마지막 안내 구역 위
   const [open, setOpen] = useState(false);
+  const night = useDark();
 
   useEffect(() => {
     const bar = getComputedStyle(document.documentElement).getPropertyValue("--bar").trim() || "52px";
@@ -72,7 +74,7 @@ export default function TopBar() {
   const light = solid || open; // 흰 바탕 헤더
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-40 h-[var(--bar)] border-b transition-[background-color,border-color] duration-300 ${light ? "border-surface bg-white" : `border-transparent ${dark ? "bg-[linear-gradient(#08090c_0%,rgba(8,9,12,.55)_35%,rgba(8,9,12,0)_100%)] bg-clip-padding" : "bg-transparent"}`}`}>
+    <header className={`fixed inset-x-0 top-0 z-40 h-[var(--bar)] border-b transition-[background-color,border-color] duration-300 ${light ? "border-surface bg-terminal" : `border-transparent ${dark ? "bg-[linear-gradient(#08090c_0%,rgba(8,9,12,.55)_35%,rgba(8,9,12,0)_100%)] bg-clip-padding" : "bg-transparent"}`}`}>
       {/* 마지막 구역에선 위쪽을 사진의 어두운 색으로 덮어요. 화면 배율에 따라 앞 섹션의 흰 바탕이 한 줄 비치는 걸 막아요. */}
       <div className="mx-auto flex h-full max-w-[1600px] items-center gap-4 px-5 sm:px-8">
         <a href="#top" aria-label="맨 위로" className="shrink-0" onClick={(e) => open && go(e, "top")}>
@@ -94,9 +96,28 @@ export default function TopBar() {
             );
           })}
         </nav>
-        <span className="gate ml-auto flex w-12 justify-end text-[16px] md:ml-0 md:w-16 md:text-[18px]" aria-hidden>
+        <span className="gate ml-auto hidden md:ml-0 md:flex md:w-16 md:justify-end md:text-[18px]" aria-hidden>
           {current && <SplitFlap text={current.gate} />}
         </span>
+
+        {/* 다크 모드 전환: 지금이 밤이면 해, 낮이면 달 */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={night ? "밝은 화면으로" : "어두운 화면으로"}
+          className={`max-md:ml-auto grid h-10 w-10 shrink-0 place-items-center rounded-full transition-colors ${light ? "text-sub hover:bg-surface hover:text-ink" : "text-white/75 hover:bg-white/10 hover:text-white"}`}
+        >
+          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            {night ? (
+              <>
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+              </>
+            ) : (
+              <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+            )}
+          </svg>
+        </button>
 
         {/* 모바일 햄버거: 세 줄이 X로 바뀌어요 */}
         <button
@@ -120,7 +141,7 @@ export default function TopBar() {
       <nav
         id="mobile-menu"
         aria-label="구역"
-        className={`fixed inset-x-0 bottom-0 top-[var(--bar)] flex flex-col bg-white px-5 pb-[max(24px,env(safe-area-inset-bottom))] pt-6 transition-[opacity,transform,visibility] duration-300 md:hidden ${open ? "visible translate-y-0 opacity-100" : "invisible -translate-y-2 opacity-0"}`}
+        className={`fixed inset-x-0 bottom-0 top-[var(--bar)] flex flex-col bg-terminal px-5 pb-[max(24px,env(safe-area-inset-bottom))] pt-6 transition-[opacity,transform,visibility] duration-300 md:hidden ${open ? "visible translate-y-0 opacity-100" : "invisible -translate-y-2 opacity-0"}`}
       >
         <ul className="divide-y divide-line border-y border-line">
           {LINKS.map((l, i) => {

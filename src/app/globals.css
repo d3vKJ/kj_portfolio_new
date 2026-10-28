@@ -17,6 +17,7 @@
   --color-go: var(--go);
   --color-paper: var(--paper);
   --color-paper-ink: var(--paper-ink);
+  --color-card: var(--card);
   --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-cond: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-mono: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -39,6 +40,11 @@
   --go: #03b26c;
   --paper: #f8f6f0;
   --paper-ink: #191f28;
+  --card: #ffffff;
+  --seg-on: #ffffff;
+  --orb-1: #cfe6ff;
+  --orb-2: #d9f1ff;
+  --orb-3: #e4e4ff;
   --navy: #1b3349;
   --gold: #cfae6b;
   --bar: 52px;
@@ -46,6 +52,29 @@
   --fg: var(--ink);
   --modal-bg: #fbfaf6;
 }
+
+/* 다크 모드: 토스 앱처럼 어두운 회색 바탕. 여권·탑승권 종이는 진짜 종이라 그대로 둬요. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --terminal: #17171c;
+  --floor: #1e1e24;
+  --card: #2c2c35;
+  --surface: #35353f;
+  --seg-on: #50505c;
+  --ink: #ececef;
+  --sub: #b0b0b8;
+  --muted: #8a8a94;
+  --line: #3a3a44;
+  --sign: #2c2c35;
+  --accent: #4593fc;
+  --accent-strong: #74acff;
+  --accent-soft: #1c2a42;
+  --orb-1: #1b2840;
+  --orb-2: #172a36;
+  --orb-3: #221f3c;
+  --modal-bg: #202027;
+}
+:root[data-theme="dark"] .logo-dark { filter: none; }
 
 /* 데스크톱은 섹션 페이저가 스크롤을 맡아요 */
 @media (max-width: 1023px) { html { scroll-behavior: smooth; } }
@@ -148,12 +177,12 @@ body {
   font-size: 15px;
   transition: background 0.15s;
 }
-.btn-line:hover { background: #c9e2ff; }
+.btn-line:hover { background: color-mix(in srgb, var(--accent) 22%, var(--terminal)); }
 
 /* 토글 */
 .seg { display: inline-flex; gap: 2px; padding: 4px; border-radius: 100px; background: var(--surface); font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif; font-weight: 600; font-size: 14px; }
 .seg button { padding: 7px 16px; border-radius: 100px; color: var(--muted); transition: background 0.15s, color 0.15s; }
-.seg button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0, 29, 58, 0.12); }
+.seg button[aria-pressed="true"] { background: var(--seg-on); color: var(--ink); box-shadow: 0 1px 3px rgba(0, 29, 58, 0.12); }
 .seg button:not([aria-pressed="true"]):hover { color: var(--ink); }
 
 /* ── 여권 ── */
@@ -272,4 +301,4 @@ body {
 
 
 .gate .flap { color: var(--accent); background: var(--surface); }
-.gate .flap::after { background: #fff; }
+.gate .flap::after { background: var(--terminal); }

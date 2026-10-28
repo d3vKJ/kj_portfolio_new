@@ -24,7 +24,8 @@ export default function CheckIn() {
     const mm = gsap.matchMedia();
     // 명언이 가운데에 서서히 떠올랐다가 모래가 되어 날아가고,
     // 가운데에 "같이 만들어가요"가 나타나 왼쪽 제자리로 옮겨 가요
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
+    // 폰에선 명언 연출 없이 연락처만 바로 보여 줘요
+    mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
       const cv = sand.current!, h = head.current!, sec = root.current!;
       let quote: ReturnType<typeof sandText>;
       const toCenter = (axis: "x" | "y") => {
