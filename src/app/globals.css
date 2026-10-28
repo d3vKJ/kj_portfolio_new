@@ -1,0 +1,275 @@
+/* 마지막 섹션 명언 전용 글꼴 */
+@import url('//fonts.googleapis.com/earlyaccess/nanummyeongjo.css');
+@import "tailwindcss";
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-sub: var(--sub);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-terminal: var(--terminal);
+  --color-floor: var(--floor);
+  --color-sign: var(--sign);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-go: var(--go);
+  --color-paper: var(--paper);
+  --color-paper-ink: var(--paper-ink);
+  --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-cond: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+/* 토스 톤 (toss.im CSS에서 확인한 값): 흰 바탕, 회색 카드, 토스 블루 포인트 */
+:root {
+  --terminal: #ffffff;
+  --floor: #eceff3;
+  --surface: #f2f4f6;
+  --ink: #191f28;
+  --sub: #4e5968;
+  --muted: #6b7684;
+  --line: #e5e8eb;
+  --sign: #191f28;
+  --accent: #3182f6;
+  --accent-strong: #1b64da;
+  --accent-soft: #e8f3ff;
+  --accent-on-dark: #64a8ff;
+  --go: #03b26c;
+  --paper: #f8f6f0;
+  --paper-ink: #191f28;
+  --navy: #1b3349;
+  --gold: #cfae6b;
+  --bar: 52px;
+  /* ProposalModal 호환 */
+  --fg: var(--ink);
+  --modal-bg: #fbfaf6;
+}
+
+/* 데스크톱은 섹션 페이저가 스크롤을 맡아요 */
+@media (max-width: 1023px) { html { scroll-behavior: smooth; } }
+body {
+  background: var(--terminal);
+  color: var(--ink);
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  overflow-x: clip;
+  word-break: keep-all;
+}
+/* 스크롤바는 숨기고 스크롤은 그대로 */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; }
+
+::selection { background: var(--accent); color: #fff; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ── 안내 사인 ── */
+.sign {
+  background: var(--sign);
+  color: #fff;
+}
+.picto {
+  display: grid;
+  place-items: center;
+  width: var(--bar);
+  height: var(--bar);
+  flex: none;
+  background: var(--accent);
+  color: #fff;
+}
+.gate {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* ── Split-flap ── */
+.flap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.72em;
+  height: 1.1em;
+  margin-right: 0.05em;
+  border-radius: 0.06em;
+  background: #191f28;
+  color: #f9fafb;
+  overflow: hidden;
+}
+.flap.wide { width: 1.1em; }
+.flap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: max(1px, 0.03em);
+  background: #000;
+}
+.flap-ch {
+  display: block;
+  line-height: 1;
+  animation: flap 0.08s ease-out;
+}
+.flap.blank .flap-ch { opacity: 0; }
+@keyframes flap {
+  from { transform: scaleY(0.2); }
+  to { transform: none; }
+}
+
+/* ── 버튼 ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+  height: 48px;
+  padding: 0 1.1em;
+  border-radius: 100px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.15s, color 0.15s;
+}
+.btn:hover { background: var(--accent-strong); }
+.btn .arr { transition: transform 0.2s; }
+.btn:hover .arr { transform: translateX(3px); }
+.btn-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  height: 48px;
+  padding: 0 1.1em;
+  border-radius: 100px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.15s;
+}
+.btn-line:hover { background: #c9e2ff; }
+
+/* 토글 */
+.seg { display: inline-flex; gap: 2px; padding: 4px; border-radius: 100px; background: var(--surface); font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif; font-weight: 600; font-size: 14px; }
+.seg button { padding: 7px 16px; border-radius: 100px; color: var(--muted); transition: background 0.15s, color 0.15s; }
+.seg button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0, 29, 58, 0.12); }
+.seg button:not([aria-pressed="true"]):hover { color: var(--ink); }
+
+/* ── 여권 ── */
+.passport-scene { perspective: 2200px; }
+.book { position: relative; transform-style: preserve-3d; }
+.pp-page {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(120, 165, 185, 0.16), transparent 45%),
+    radial-gradient(circle at 82% 88%, rgba(205, 150, 160, 0.14), transparent 50%),
+    repeating-linear-gradient(135deg, rgba(27, 51, 73, 0.035) 0 2px, transparent 2px 9px),
+    var(--paper);
+  color: var(--paper-ink);
+}
+.pp-cover {
+  background:
+    radial-gradient(ellipse at 70% 20%, rgba(255, 255, 255, 0.1), transparent 60%),
+    radial-gradient(ellipse at 20% 90%, rgba(0, 0, 40, 0.35), transparent 60%),
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 4px),
+    #24398c;
+  color: #e4e7f1;
+}
+.face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+/* 여권 종이 단면: 겹쳐 쌓아 두께를 만들어요 */
+.pp-edge {
+  background: linear-gradient(90deg, #e9e3d3, #f4f0e5 60%, #ebe5d6);
+  box-shadow: inset 0 0 0 1px rgba(25, 31, 40, 0.06);
+}
+/* 소지인 서명: 회색 펜 손글씨. 잉크가 종이에 살짝 스민 듯 아주 옅은 번짐만 줘요 (.sign은 안내판 색이라 이름을 따로 써요) */
+.motto {
+  font-family: "Nanum Pen Script", cursive;
+  line-height: 1.05;
+  white-space: nowrap;
+  color: #4e5968;
+  text-shadow: 0 0 0.6px rgba(78, 89, 104, 0.5);
+  rotate: -1.5deg;
+  transform-origin: left center;
+}
+.mrz { font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif; letter-spacing: 0.1em; line-height: 1.5; white-space: nowrap; }
+.stamp {
+  --ink-c: #b8342a;
+  color: var(--ink-c);
+  border: 2.5px solid var(--ink-c);
+  mix-blend-mode: multiply;
+  opacity: 0.86;
+  filter: url(#rough);
+  rotate: var(--r, 0deg);
+  cursor: zoom-in;
+  transition: scale 0.35s cubic-bezier(.2, .9, .3, 1.2), rotate 0.35s ease, opacity 0.2s, box-shadow 0.35s;
+}
+/* 도장에 올리면 똑바로 세워 크게 보여 줘요 */
+[data-stamp]:hover { z-index: 10; }
+.stamp:hover {
+  scale: var(--zoom, 1.65);
+  rotate: 0deg;
+  opacity: 1;
+  mix-blend-mode: normal;
+  filter: none;
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.35);
+}
+
+.barcode {
+  background: repeating-linear-gradient(90deg, currentColor 0 1px, transparent 0 3px, currentColor 0 5px, transparent 0 6px, currentColor 0 7px, transparent 0 10px);
+}
+
+
+
+/* 꺼낸 가방 옆 카드: translate는 위치에 쓰니까 scale만 움직여요 */
+.pop-in { animation: pop-in 0.45s cubic-bezier(.2, .9, .3, 1.2) 0.25s both; }
+@keyframes pop-in { from { opacity: 0; scale: 0.92; } }
+
+/* ── 탑승권 ── */
+.ticket {
+  background: var(--paper);
+  color: var(--paper-ink);
+}
+/* 떼는 쪽이 옆에 붙는 넓은 화면에서만 반원 홈을 파요 */
+@media (min-width: 1024px) {
+  .ticket {
+    -webkit-mask:
+      radial-gradient(circle 14px at var(--cut) 0, transparent 98%, #000) top / 100% 51% no-repeat,
+      radial-gradient(circle 14px at var(--cut) 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
+    mask:
+      radial-gradient(circle 14px at var(--cut) 0, transparent 98%, #000) top / 100% 51% no-repeat,
+      radial-gradient(circle 14px at var(--cut) 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
+  }
+}
+
+/* 하늘빛 원: 크게 천천히 떠다녀서 눈에 거슬리지 않아요 */
+.sky-orb { opacity: 0.7; animation: sky-drift 40s ease-in-out infinite alternate; will-change: transform; }
+@keyframes sky-drift {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(6%, 4%) scale(1.08); }
+  100% { transform: translate(-4%, 7%) scale(0.95); }
+}
+
+/* 날씨 아이콘이 둥실 떠 있어요 */
+.float { animation: float 3.2s ease-in-out infinite; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+/* 활주로·터미널 불빛 */
+.twinkle { animation: twinkle 2.4s ease-in-out infinite; }
+@keyframes twinkle { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+/* ProposalModal 호환 */
+.glass-modal { background: var(--modal-bg); border: 1px solid var(--line); box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.5); }
+.glass-ios { background: var(--surface); border: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .flap-ch, .twinkle, .float, .sky-orb, .pop-in { animation: none !important; }
+}
+
+/* 로고: 흰색 원본, 밝은 바탕에선 반전 */
+.logo-dark { filter: invert(1); }
+.logo-gold { filter: brightness(0) saturate(100%) invert(76%) sepia(30%) saturate(520%) hue-rotate(2deg) brightness(0.95); }
+
+
+.gate .flap { color: var(--accent); background: var(--surface); }
+.gate .flap::after { background: #fff; }
