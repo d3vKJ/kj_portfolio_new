@@ -359,6 +359,7 @@ export default function Departures() {
   const host = useRef<HTMLDivElement>(null);
   const [noGL, setNoGL] = useState(false);
   const [pass, setPass] = useState<Flight | null>(null);
+  const help = useRef<HTMLDialogElement>(null);
   const api = useRef<{ land(): void } | null>(null);
   const dark = useDark();
   const narrow = useNarrow();
@@ -903,6 +904,7 @@ export default function Departures() {
                 <li key={k} className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: KIND_COLOR[k] }} />{k}</li>
               ))}
             </ul>
+            <button type="button" onClick={() => help.current?.showModal()} aria-label="터미널 안내" className="grid h-8 w-8 place-items-center rounded-full bg-surface text-[15px] font-bold text-sub transition-colors hover:text-ink">?</button>
           </div>
         </div>
 
@@ -929,6 +931,26 @@ export default function Departures() {
       </div>
 
       {pass && <BoardingPass f={pass} onClose={() => (setPass(null), api.current?.land())} />}
+
+      {/* 터미널 안내: 바깥을 누르거나 Esc로 닫혀요 */}
+      <dialog ref={help} aria-labelledby="help-title" onClick={(e) => e.target === e.currentTarget && help.current?.close()} className="m-auto w-[min(440px,calc(100%-40px))] rounded-3xl bg-terminal text-ink shadow-[0_30px_70px_-20px_rgba(0,0,0,.6)] backdrop:bg-[#191f28]/50">
+        <div className="p-7">
+          <div className="flex items-center justify-between">
+            <h3 id="help-title" className="text-[22px] font-bold">터미널 안내</h3>
+            <button type="button" onClick={() => help.current?.close()} aria-label="안내 닫기" className="grid h-10 w-10 place-items-center rounded-full text-xl text-muted hover:bg-surface hover:text-ink">✕</button>
+          </div>
+          <dl className="mt-5 grid gap-3">
+            <div className="rounded-2xl bg-surface p-4">
+              <dt className="font-bold">T1 · 제1터미널</dt>
+              <dd className="mt-1 text-[15px] leading-6 text-sub">웹사이트와 데스크톱 앱 작업이에요.</dd>
+            </div>
+            <div className="rounded-2xl bg-surface p-4">
+              <dt className="font-bold">T2 · 제2터미널</dt>
+              <dd className="mt-1 text-[15px] leading-6 text-sub">게임 서버를 개발하면서 만든 작업이에요.</dd>
+            </div>
+          </dl>
+        </div>
+      </dialog>
     </section>
   );
 }
