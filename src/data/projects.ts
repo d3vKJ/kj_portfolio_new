@@ -109,7 +109,7 @@ export const PROJECTS: Project[] = [
   },
   {
     name: "youtube-music", nameKo: "유튜브 뮤직", year: "2026", solo: true, category: "Desktop",
-    desc: "[개인 프로젝트] 기존 유튜브 뮤직 웹이 불편해서 데스크톱에서 재생하는 앱을 만들었어요.",
+    desc: "[개인 프로젝트] 기존 유튜브 뮤직 웹이 불편해서 데스크톱에서 재생하는 앱을 만들었어요. 약 20명의 사용자에게 받은 건의 사항과 오류 제보를 모아 하나씩 고쳐 왔고, 지금도 사용자와 소통하며 건의를 받아 계속 다듬고 있어요.",
     tech: ["Electron","React","Next.js","TypeScript","JavaScript","Tailwind CSS"],
     techUsage: [
       { skill: "Electron",     usage: "창, 트레이, 미디어 키, 자동 업데이트를 데스크톱 셸에서 처리해요." },
