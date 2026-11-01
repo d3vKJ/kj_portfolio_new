@@ -66,8 +66,13 @@ export const LEVELS: Record<string, number> = {
   "Antigravity": 99,
 };
 
-/** AI 없이 직접 다룰 수 있는 기술. 나머지는 AI를 적극적으로 활용해 썼어요 */
-export const HANDS_ON = new Set(["HTML", "CSS", "JavaScript", "TypeScript", "React", "Git", "Figma", "Photoshop", "Electron"]);
+/** AI 없이 다룰 수 있는 정도: 직접(파란 체크), 조금(주황 체크). 없으면 AI를 적극적으로 활용해 썼어요 */
+export const HANDS_ON: Record<string, "직접" | "조금"> = {
+  "HTML": "직접", "CSS": "직접", "JavaScript": "직접", "TypeScript": "직접", "React": "직접", "Next.js": "직접", "Vite": "직접",
+  "Git": "직접", "Figma": "직접", "Photoshop": "직접", "Electron": "직접",
+  "Node.js": "직접", "Supabase": "직접", "Cloudflare": "직접", "MySQL": "직접",
+  "Tailwind CSS": "조금", "Sass": "조금",
+};
 
 export const GROUPS = [
   {
