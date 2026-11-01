@@ -164,7 +164,7 @@ function apronTexture(dark: boolean) {
   return tex;
 }
 
-/** 구분마다 항공사 도색: 로고 대신 색과 태극 같은 무늬만 따 왔어요.
+/** 구분마다 도색: 로고 대신 색과 태극 같은 무늬만 따 왔어요.
  *  line은 윗동체·아랫동체 경계 높이(-1~1), stripe는 경계의 줄, bellyRear는 배 뒤쪽 절반 색이에요. */
 type Livery = { top: string; belly: string; line: number; stripe?: string; bellyRear?: string; engine: string; fin: (g: CanvasRenderingContext2D) => void };
 const LIVERY: Record<string, Livery> = {
@@ -319,37 +319,37 @@ function ProjectCards() {
   const opener = useRef<HTMLButtonElement>(null);
   return (
     <>
-    <ul className="mt-8 grid gap-4 sm:grid-cols-2 md:hidden">
-      {FLIGHTS.map((f) => (
-        <li key={f.name} className="overflow-hidden rounded-3xl bg-surface">
-          {f.image && <img src={f.image} alt={`${f.nameKo} 화면`} loading="lazy" decoding="async" className="aspect-[16/9] w-full object-cover object-top" />}
-          <div className="p-5">
-            <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted">
-              <span className="rounded-full px-2.5 py-0.5 font-semibold" style={{ color: KIND_COLOR[f.kind], background: `color-mix(in srgb, ${KIND_COLOR[f.kind]} 14%, transparent)` }}>{f.kind}</span>
-              {f.category === "Desktop" ? "데스크톱 앱" : "웹"} · {f.year}
-            </p>
-            <h3 className="mt-2 text-[22px] font-bold leading-tight">{f.nameKo}</h3>
-            <p className="mt-2 text-[15px] leading-7 text-sub">{f.body}</p>
-            <ul className="mt-4 flex flex-wrap gap-1.5">
-              {f.tech.map((t) => (
-                <li key={t} className="flex items-center gap-1.5 rounded-lg bg-card px-2.5 py-1 text-[13px] font-medium"><SkillIcon name={t} size={14} onPaper />{t}</li>
-              ))}
-            </ul>
-            {!f.code && f.codeNote && <p className="mt-4 text-[13px] leading-6 text-muted">{f.codeNote}</p>}
-            <div className="mt-5 flex flex-wrap gap-2 *:h-11 *:min-w-[7.5rem] *:flex-1 *:justify-center">
-              {f.href === "/" ? (
-                <a href="#top" className="btn">지금 이 사이트</a>
-              ) : (
-                <a href={f.href} target="_blank" rel="noreferrer" className="btn">사이트 보기 <span className="arr" aria-hidden>→</span></a>
-              )}
-              {f.code && <a href={f.code} target="_blank" rel="noreferrer" className="btn-line">코드 보기</a>}
-              {f.proposal && <button type="button" onClick={(e) => { opener.current = e.currentTarget; setProposal(f.proposal!); }} className="btn-line">기획서 보기</button>}
+      <ul className="mt-8 grid gap-4 sm:grid-cols-2 md:hidden">
+        {FLIGHTS.map((f) => (
+          <li key={f.name} className="overflow-hidden rounded-3xl bg-surface">
+            {f.image && <img src={f.image} alt={`${f.nameKo} 화면`} loading="lazy" decoding="async" className="aspect-[16/9] w-full object-cover object-top" />}
+            <div className="p-5">
+              <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted">
+                <span className="rounded-full px-2.5 py-0.5 font-semibold" style={{ color: KIND_COLOR[f.kind], background: `color-mix(in srgb, ${KIND_COLOR[f.kind]} 14%, transparent)` }}>{f.kind}</span>
+                {f.category === "Desktop" ? "데스크톱 앱" : "웹"} · {f.year}
+              </p>
+              <h3 className="mt-2 text-[22px] font-bold leading-tight">{f.nameKo}</h3>
+              <p className="mt-2 text-[15px] leading-7 text-sub">{f.body}</p>
+              <ul className="mt-4 flex flex-wrap gap-1.5">
+                {f.tech.map((t) => (
+                  <li key={t} className="flex items-center gap-1.5 rounded-lg bg-card px-2.5 py-1 text-[13px] font-medium"><SkillIcon name={t} size={14} onPaper />{t}</li>
+                ))}
+              </ul>
+              {!f.code && f.codeNote && <p className="mt-4 text-[13px] leading-6 text-muted">{f.codeNote}</p>}
+              <div className="mt-5 flex flex-wrap gap-2 *:h-11 *:min-w-[7.5rem] *:flex-1 *:justify-center">
+                {f.href === "/" ? (
+                  <a href="#top" className="btn">지금 이 사이트</a>
+                ) : (
+                  <a href={f.href} target="_blank" rel="noreferrer" className="btn">사이트 보기 <span className="arr" aria-hidden>→</span></a>
+                )}
+                {f.code && <a href={f.code} target="_blank" rel="noreferrer" className="btn-line">코드 보기</a>}
+                {f.proposal && <button type="button" onClick={(e) => { opener.current = e.currentTarget; setProposal(f.proposal!); }} className="btn-line">기획서 보기</button>}
+              </div>
             </div>
-          </div>
-        </li>
-      ))}
-    </ul>
-    {proposal && <ProposalModal open src={proposal} onClose={() => setProposal(null)} returnFocusRef={opener} />}
+          </li>
+        ))}
+      </ul>
+      {proposal && <ProposalModal open src={proposal} onClose={() => setProposal(null)} returnFocusRef={opener} />}
     </>
   );
 }
