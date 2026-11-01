@@ -66,6 +66,9 @@ export const LEVELS: Record<string, number> = {
   "Antigravity": 99,
 };
 
+/** AI 없이 직접 다룰 수 있는 기술. 나머지는 AI를 적극적으로 활용해 썼어요 */
+export const HANDS_ON = new Set(["HTML", "CSS", "JavaScript", "TypeScript", "React", "Git", "Figma", "Photoshop", "Electron"]);
+
 export const GROUPS = [
   {
     label: "Language",

@@ -7,7 +7,11 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { CSS2DObject, CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import SkillIcon from "@/components/SkillIcon";
-import { GROUPS, ICONS } from "@/data/skills";
+import { GROUPS, HANDS_ON, ICONS } from "@/data/skills";
+
+/** 직접 다룰 수 있는 기술에 붙는 체크 표시 */
+const CHECK = "grid h-4 w-4 shrink-0 place-items-center rounded-full bg-accent text-[10px] font-bold leading-none text-white";
+const Check = () => <span className={CHECK} aria-label="직접 다뤄요">✓</span>;
 import { PROJECTS } from "@/data/projects";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { isNarrow, useNarrow } from "@/lib/media";
@@ -164,6 +168,12 @@ function tagElement(name: string, logo: string, color: string) {
   img.alt = "";
   img.className = "h-[18px] w-[18px] max-sm:h-4 max-sm:w-4";
   el.append(img, name);
+  if (HANDS_ON.has(name)) {
+    const check = document.createElement("span");
+    check.className = CHECK;
+    check.textContent = "✓";
+    el.append(check);
+  }
   return el;
 }
 
@@ -191,6 +201,9 @@ function SkillCard({ name, onClose }: { name: string; onClose: () => void }) {
       </div>
       <p id="skill-card-title" className="mt-3 flex items-center gap-3 text-[30px] font-bold tracking-[-0.02em]">
         <SkillIcon name={name} size={32} onPaper /> {name}
+      </p>
+      <p className="mt-2 flex items-center gap-1.5 text-[14px] font-medium text-sub">
+        {HANDS_ON.has(name) ? <><Check />직접 다룰 수 있어요.</> : "AI를 적극적으로 활용해 썼어요."}
       </p>
       <p className="mt-5 border-t border-line pt-4 text-[15px] font-semibold text-sub">사용한 프로젝트 <span className="text-ink">{carried.length}개</span></p>
       {carried.length === 0 ? (
@@ -560,8 +573,9 @@ export default function Baggage() {
       <div className="mx-auto w-full max-w-[1600px] px-5 sm:px-8">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div data-head>
-            <h2 className="text-[clamp(32px,3.6vw,52px)] font-bold leading-[1.15] tracking-[-0.03em]">다룰 수 있는 기술이에요.</h2>
-            <p className="mt-2 text-[17px] text-sub max-md:hidden sm:text-[19px]">가방을 누르면 그 기술을 쓴 프로젝트를 보여 줘요.</p>
+            <h2 className="text-[clamp(32px,3.6vw,52px)] font-bold leading-[1.15] tracking-[-0.03em]">프로젝트에서 쓴 기술이에요.</h2>
+            <p className="mt-2 flex flex-wrap items-center gap-x-1.5 text-[17px] text-sub sm:text-[19px]">AI를 적극적으로 활용해 만들었고, <Check /> 표시는 직접 다룰 수 있는 기술이에요.</p>
+            <p className="mt-1 text-[17px] text-sub max-md:hidden sm:text-[19px]">가방을 누르면 그 기술을 쓴 프로젝트를 보여 줘요.</p>
           </div>
           {/* 프로젝트 섹션 토글과 같은 모양. 분류를 고르면 그 분류 가방만 또렷해져요 */}
           {/* .seg의 display가 레이어 밖이라 감추는 건 바깥 div가 맡아요 */}
@@ -591,7 +605,7 @@ export default function Baggage() {
               <ul className="mt-2 flex flex-wrap gap-2">
                 {g.skills.map((s) => (
                   <li key={s} className="flex items-center gap-2 rounded-xl bg-card px-3 py-2 text-[15px] font-semibold">
-                    <SkillIcon name={s} size={20} onPaper />{s}
+                    <SkillIcon name={s} size={20} onPaper />{s}{HANDS_ON.has(s) && <Check />}
                   </li>
                 ))}
               </ul>
