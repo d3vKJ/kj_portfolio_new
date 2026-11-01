@@ -31,7 +31,7 @@ export const PROJECTS: Project[] = [
       { skill: "Framer Motion", usage: "프로젝트 카드가 모달로 이어지게 하고, 스킬 탭을 전환해요." },
       { skill: "Cloudflare",    usage: "Workers에 이 포트폴리오를 배포해요." },
     ],
-    href: "/", code: "https://github.com/d3vKJ/kj_portfolio_new", image: "/projects/portfolio-about.png",
+    href: "/", code: "https://github.com/d3vKJ/kj_portfolio_new", image: "/projects/portfolio.png",
   },
   {
     name: "cheese-request", nameKo: "치즈 신청소", year: "2026", solo: true, category: "Web", terminal: 2,
@@ -48,7 +48,7 @@ export const PROJECTS: Project[] = [
     href: "https://www.oh-cheese.com/request",
     code: null,
     codeNote: "운영 중인 게임 서버의 내부 도구라 코드는 공개하기 어려워요. 양해 부탁드려요.",
-    image: null,
+    image: "/projects/cheese-request.png",
   },
   {
     name: "daimon", nameKo: "다이몬", year: "2026", solo: true, category: "Web",
