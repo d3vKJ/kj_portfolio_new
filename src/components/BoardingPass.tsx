@@ -5,6 +5,7 @@ import Image from "next/image";
 import { createPortal } from "react-dom";
 import SkillIcon from "@/components/SkillIcon";
 import ProposalModal from "@/components/ProposalModal";
+import VideoModal from "@/components/VideoModal";
 import { Plane } from "@/components/Hero";
 import { KIND_COLOR, type Flight } from "@/lib/flights";
 import { gsap, useGSAP } from "@/lib/gsap";
@@ -24,6 +25,7 @@ export default function BoardingPass({ f, onClose }: { f: Flight; onClose: () =>
   const closeBtn = useRef<HTMLButtonElement>(null);
   const proposalBtn = useRef<HTMLButtonElement>(null);
   const [proposalOpen, setProposalOpen] = useState(false);
+  const [videoOpen, setVideoOpen] = useState(false);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -44,10 +46,10 @@ export default function BoardingPass({ f, onClose }: { f: Flight; onClose: () =>
   }, { scope: overlay });
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && !proposalOpen && onClose();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && !proposalOpen && !videoOpen && onClose();
     addEventListener("keydown", onKey);
     return () => removeEventListener("keydown", onKey);
-  }, [onClose, proposalOpen]);
+  }, [onClose, proposalOpen, videoOpen]);
 
   const here = f.href === "/";
 
@@ -129,6 +131,7 @@ export default function BoardingPass({ f, onClose }: { f: Flight; onClose: () =>
             ) : (
               <a href={f.href} target="_blank" rel="noreferrer" className="btn h-12 justify-center text-[15px] sm:h-14 sm:text-[17px]">사이트 보기 <span className="arr">→</span></a>
             )}
+            {f.video && <button type="button" onClick={() => setVideoOpen(true)} className="btn-line h-12 justify-center text-[15px] sm:h-14 sm:text-[17px]">영상 보기</button>}
             {f.code && <a href={f.code} target="_blank" rel="noreferrer" className="btn-line h-12 justify-center text-[15px] sm:h-14 sm:text-[17px]">코드 보기</a>}
             {f.proposal && (
               <button ref={proposalBtn} type="button" onClick={() => setProposalOpen(true)} className="btn-line h-12 justify-center text-[15px] sm:h-14 sm:text-[17px]">기획서 보기</button>
@@ -141,6 +144,7 @@ export default function BoardingPass({ f, onClose }: { f: Flight; onClose: () =>
           </div>
         </div>
       </div>
+      {videoOpen && f.video && <VideoModal src={f.video} title={`${f.nameKo} 시연 영상`} onClose={() => setVideoOpen(false)} />}
       {f.proposal && (
         <div onClick={(e) => e.stopPropagation()}>
           <ProposalModal open={proposalOpen} src={f.proposal} onClose={() => setProposalOpen(false)} returnFocusRef={proposalBtn} />

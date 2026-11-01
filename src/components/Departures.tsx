@@ -13,6 +13,7 @@ import { useDark } from "@/lib/theme";
 import { isNarrow, useNarrow } from "@/lib/media";
 import SkillIcon from "@/components/SkillIcon";
 import ProposalModal from "@/components/ProposalModal";
+import VideoModal from "@/components/VideoModal";
 
 // 인천공항처럼 터미널이 둘이에요: 1터미널은 일반 프로젝트, 2터미널은 게임 서버에서 만든 것.
 // 새 프로젝트 자리: 2터미널에 실무 비행기 한 대를 미리 세워 둬요. 프로젝트를 넣으면 그 줄은 지워도 돼요.
@@ -316,6 +317,7 @@ function roofText(text: string, size: number, h: number) {
 /** 폰 전용: 계류장 대신 한눈에 보는 프로젝트 카드 */
 function ProjectCards() {
   const [proposal, setProposal] = useState<string | null>(null);
+  const [video, setVideo] = useState<Flight | null>(null);
   const opener = useRef<HTMLButtonElement>(null);
   return (
     <>
@@ -342,6 +344,7 @@ function ProjectCards() {
                 ) : (
                   <a href={f.href} target="_blank" rel="noreferrer" className="btn">사이트 보기 <span className="arr" aria-hidden>→</span></a>
                 )}
+                {f.video && <button type="button" onClick={() => setVideo(f)} className="btn-line">영상 보기</button>}
                 {f.code && <a href={f.code} target="_blank" rel="noreferrer" className="btn-line">코드 보기</a>}
                 {f.proposal && <button type="button" onClick={(e) => { opener.current = e.currentTarget; setProposal(f.proposal!); }} className="btn-line">기획서 보기</button>}
               </div>
@@ -350,6 +353,7 @@ function ProjectCards() {
         ))}
       </ul>
       {proposal && <ProposalModal open src={proposal} onClose={() => setProposal(null)} returnFocusRef={opener} />}
+      {video?.video && <VideoModal src={video.video} title={`${video.nameKo} 시연 영상`} onClose={() => setVideo(null)} />}
     </>
   );
 }

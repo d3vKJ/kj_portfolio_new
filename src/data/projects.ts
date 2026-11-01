@@ -15,6 +15,8 @@ export type Project = {
   codeNote?: string;
   image: string | null;
   proposal?: string;
+  /** 시연 영상(유튜브 링크) */
+  video?: string;
   /** 게임 서버에서 만든 건 2터미널에 서요. 없으면 1터미널 */
   terminal?: 2;
 };
@@ -124,5 +126,6 @@ export const PROJECTS: Project[] = [
     codeNote: "사용하시는 분이 많아서 코드는 공개하지 못하고 있어요. 양해 부탁드려요.",
     image: "/projects/youtube-music.png",
     proposal: "/proposals/youtube-music.md",
+    video: "https://youtu.be/EpYEEcRkQuU",
   },
 ];
