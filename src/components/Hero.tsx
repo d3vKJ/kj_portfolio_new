@@ -29,7 +29,7 @@ export default function Hero() {
       if (!n) return;
       sky.current = look(n);
       setNow(n);
-    }).catch(() => {});
+    }).catch(() => { });
   }, []);
 
   useGSAP(() => {
@@ -59,7 +59,7 @@ export default function Hero() {
 
   return (
     <section id="top" ref={root} className="relative h-[100svh] min-h-[620px] overflow-hidden bg-[#04050a] text-white max-md:h-auto max-md:min-h-0">
-      {/* 성운: 별 뒤로 아주 옅게 번지는 빛 */}
+      {/* 별똥별 */}
       <div data-space className="pointer-events-none absolute inset-0" aria-hidden>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_45%_at_18%_22%,rgba(88,70,160,.22),transparent_70%),radial-gradient(ellipse_55%_50%_at_85%_78%,rgba(40,95,160,.2),transparent_70%),radial-gradient(ellipse_40%_30%_at_70%_15%,rgba(150,70,110,.12),transparent_70%)]" />
         <div className="absolute -inset-x-1/4 top-1/2 h-[38%] -translate-y-1/2 -rotate-[24deg] bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,rgba(190,200,255,.07),transparent_70%)] blur-2xl" />
@@ -79,14 +79,14 @@ export default function Hero() {
               <span className="h-1.5 w-1.5 rounded-full bg-[#7dffb0] shadow-[0_0_8px_#7dffb0]" />DESTINATION · TAE
             </p>
             <p className="mt-3 text-[44px] font-bold leading-none tracking-[-0.03em]">대구</p>
-            <p className="mt-2 text-[16px] font-medium text-white/80">Daegu <span className="ml-1 text-white/60">大邱</span></p>
+            <p className="mt-2 text-[16px] font-medium text-white/80">Daegu</p>
             {now && (
               <div className="relative mt-6 flex items-end justify-between">
                 <div>
                   <p className="text-[58px] font-semibold leading-[0.85] tracking-[-0.04em] tabular-nums">{Math.round(now.temp)}°</p>
                   <p className="mt-2 text-[15px] font-semibold">{wxName(now.code)} <span className="font-medium text-white/60">· 지금</span></p>
                 </div>
-                {/* 날씨 아이콘: Iconify Phosphor Light (MIT) */}
+                {/* 날씨 아이콘 */}
                 <img src={wxIcon(now.code)} alt="" className="float h-[64px] w-[64px] opacity-90" />
               </div>
             )}
@@ -99,7 +99,7 @@ export default function Hero() {
           <SplitFlap text="장경진" className="text-[clamp(60px,9vw,128px)] font-semibold" delay={300} />
         </h1>
         <p data-in className="mt-5 text-[clamp(20px,2vw,26px)] font-medium">프론트엔드 개발자</p>
-        <p data-in className="mt-2 max-w-md text-[16px] leading-7 text-white/60">많은 사용자들에게 편리함을 제공하고 싶어요.</p>
+        <p data-in className="mt-2 max-w-md text-[16px] leading-7 text-white/60">많은 사용자들에게 새로운 경험과 편리함을 제공하고 싶어요.</p>
       </div>
 
     </section>
