@@ -105,7 +105,7 @@ export const PROJECTS: Project[] = [
       { skill: "GSAP",   usage: "세계지도 줌과 비행 경로 애니메이션을 넣었어요." },
       { skill: "Sass",   usage: "게임 HUD와 홈, 오버레이 스타일을 나눴어요." },
     ],
-    href: "http://103.218.172.76:3000", code: "https://github.com/d3vKJ/kj_portfolio_wat", image: "/projects/airport-typing.png",
+    href: "http://103.218.172.76:9090", code: "https://github.com/d3vKJ/kj_portfolio_wat", image: "/projects/airport-typing.png",
   },
   {
     name: "youtube-music", nameKo: "유튜브 뮤직", year: "2026", solo: true, category: "Desktop",
