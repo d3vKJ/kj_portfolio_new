@@ -575,8 +575,7 @@ export default function Baggage() {
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div data-head>
             <h2 className="text-[clamp(32px,3.6vw,52px)] font-bold leading-[1.15] tracking-[-0.03em]">프로젝트에서 쓴 기술이에요.</h2>
-            <p className="mt-2 flex flex-wrap items-center gap-x-1.5 text-[17px] text-sub sm:text-[19px]">AI를 적극적으로 활용해 만들었어요. <Check /> 직접 다룰 수 있어요. <Check level="조금" /> 조금 다룰 수 있어요.</p>
-            <p className="mt-1 text-[17px] text-sub max-md:hidden sm:text-[19px]">가방을 누르면 그 기술을 쓴 프로젝트를 보여 줘요.</p>
+            <p className="mt-2 flex flex-wrap items-center gap-x-1.5 text-[17px] text-sub sm:text-[19px]"><Check /> 직접 다룰 수 있어요. <Check level="조금" /> 조금 다룰 수 있어요.</p>
           </div>
           {/* 프로젝트 섹션 토글과 같은 모양. 분류를 고르면 그 분류 가방만 또렷해져요 */}
           {/* .seg의 display가 레이어 밖이라 감추는 건 바깥 div가 맡아요 */}
