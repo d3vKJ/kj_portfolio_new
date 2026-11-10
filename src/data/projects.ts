@@ -36,6 +36,23 @@ export const PROJECTS: Project[] = [
     href: "/", code: "https://github.com/d3vKJ/kj_portfolio_new", image: "/projects/portfolio.png",
   },
   {
+    name: "oh-cheese", nameKo: "치즈서버", year: "2026", solo: true, category: "Web", terminal: 2,
+    desc: "[실무 도구] 운영 중인 게임 서버의 공식 홈페이지를 만들었어요. 공지, 이벤트, 갤러리, 자유시장 글을 디스코드 채널에서 바로 읽어 와서, 관리자는 디스코드에만 올리면 사이트에도 반영돼요.",
+    tech: ["Next.js","React","TypeScript","Tailwind CSS","Framer Motion","Node.js"],
+    techUsage: [
+      { skill: "Next.js",       usage: "App Router로 새소식, 이벤트, 갤러리, 자유시장 페이지를 나누고 Route Handler로 로그인과 서버 상태 API를 만들었어요." },
+      { skill: "React",         usage: "게시판, 갤러리 그리드, 이모지 목록, 서버 상태 카드를 컴포넌트로 만들었어요." },
+      { skill: "TypeScript",    usage: "디스코드 메시지를 공지·이벤트·시장 글 타입으로 바꾸고, 디스코드 마크다운 파서를 직접 짰어요." },
+      { skill: "Tailwind CSS",  usage: "다크 톤 레이아웃과 반응형 화면을 잡았어요." },
+      { skill: "Framer Motion", usage: "스크롤에 따라 섹션이 나타나고 메뉴가 열리는 애니메이션을 넣었어요." },
+      { skill: "Node.js",       usage: "디스코드 봇 API와 OAuth 로그인, 서명된 세션 쿠키, FiveM 접속자 수 조회를 처리하고 pm2와 nginx로 배포했어요." },
+    ],
+    href: "https://www.oh-cheese.com",
+    code: null,
+    codeNote: "운영 중인 게임 서버의 사이트라 코드는 공개하기 어려워요. 양해 부탁드려요.",
+    image: "/projects/cheese-web.png",
+  },
+  {
     name: "cheese-request", nameKo: "치즈 신청소", year: "2026", solo: true, category: "Web", terminal: 2,
     desc: "[실무 도구] 게임 서버를 개발하면서, 유저가 킬피드 이미지를 신청하고 관리자가 수락하면 서버 설정 파일까지 자동으로 고쳐지는 신청 사이트를 만들었어요.",
     tech: ["Next.js","React","JavaScript","Framer Motion","Node.js","MySQL"],

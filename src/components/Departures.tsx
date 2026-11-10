@@ -16,9 +16,8 @@ import ProposalModal from "@/components/ProposalModal";
 import VideoModal from "@/components/VideoModal";
 
 // 인천공항처럼 터미널이 둘이에요: 1터미널은 일반 프로젝트, 2터미널은 게임 서버에서 만든 것.
-// 새 프로젝트 자리: 2터미널에 실무 비행기 한 대를 미리 세워 둬요. 프로젝트를 넣으면 그 줄은 지워도 돼요.
+// 새 프로젝트 자리가 필요하면 슬롯에 { f: null, kind } 를 넣으면 "준비 중" 비행기가 서요.
 type Slot = { f: Flight | null; kind: string };
-const rank = (k: string) => KIND_ORDER.indexOf(k);
 const slotsOf = (t: number): Slot[] => FLIGHTS.filter((f) => (f.terminal ?? 1) === t).map((f) => ({ f, kind: f.kind }));
 
 // 계류장: 왼쪽부터 1터미널, 2터미널 탑승동이 나란히 서고 오른쪽 활주로를 같이 써요.
@@ -27,7 +26,7 @@ const GAP = 3.6; // 게이트 사이 간격
 const T_GAP = 3; // 두 탑승동 사이: 바깥 게이트끼리 GAP보다 멀어야 날개가 안 겹쳐요
 const TERMINALS = [
   { name: "T1", slots: slotsOf(1) },
-  { name: "T2", slots: [...slotsOf(2), { f: null, kind: "실무" }].sort((a, b) => rank(a.kind) - rank(b.kind)) },
+  { name: "T2", slots: slotsOf(2) },
 ].map((t) => ({ ...t, per: Math.ceil(t.slots.length / 2), len: Math.ceil(t.slots.length / 2) * GAP + 1.4, cx: 0 }));
 TERMINALS.forEach((t, j) => (t.cx = j ? TERMINALS[j - 1].cx + TERMINALS[j - 1].len / 2 + T_GAP + t.len / 2 : 0));
 const PIER_D = 1.5;
