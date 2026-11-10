@@ -369,11 +369,11 @@ export default function Globe({ zoom, label, sky, className = "" }: Props) {
     io.observe(el);
 
     const v = new THREE.Vector3(), ahead = new THREE.Vector3(), screen = new THREE.Vector3();
-    const clock = new THREE.Clock();
+    const timer = new THREE.Timer();
     let last = 0;
     renderer.setAnimationLoop(() => {
       if (!visible) return;
-      const t = clock.getElapsedTime();
+      const t = timer.update().getElapsed();
       const dt = Math.min(t - last, 0.05);
       last = t;
       const p = Math.min(zoom.current ?? 0, 1);

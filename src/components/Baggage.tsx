@@ -262,7 +262,7 @@ export default function Baggage() {
     }
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.toneMapping = THREE.NeutralToneMapping;
     el.appendChild(renderer.domElement);
     const labels = new CSS2DRenderer(); // 꼬리표는 캔버스 위에 HTML로 얹어요

@@ -385,7 +385,7 @@ export default function Departures() {
     }
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.toneMapping = THREE.NeutralToneMapping;
     el.appendChild(renderer.domElement);
     const labels = new CSS2DRenderer(); // 꼬리표는 캔버스 위에 HTML로 얹어요
@@ -775,7 +775,8 @@ export default function Departures() {
       land: () => {
         landing?.();
         landing = null;
-        gsap.to(planes.filter((b) => b.arrive < 1), { arrive: 1, duration: 1.4, ease: "power2.out" });
+        const away = planes.filter((b) => b.arrive < 1);
+        if (away.length) gsap.to(away, { arrive: 1, duration: 1.4, ease: "power2.out" });
       },
     };
 
