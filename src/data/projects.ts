@@ -147,7 +147,7 @@ export const PROJECTS: Project[] = [
   },
   {
     name: "wave", nameKo: "Jiniverse Wave", year: "2026", solo: true, category: "Desktop",
-    desc: "[개인 프로젝트] 유튜브 뮤직 계정을 그대로 쓰면서 Windows 데스크톱에서 듣는 음악 앱을 만들었어요. 미니 플레이어, 트레이, 미디어 키, 가사, 이퀄라이저를 넣었고, 친구와 같은 곡을 같은 순간에 듣는 Ripple도 직접 만든 서버로 붙였어요. 약 200명의 사용자에게 받은 건의와 오류 제보를 패치 노트로 하나씩 반영하고 있어요. 앱을 소개하는 사이트는 전부 AI로 만들었어요.",
+    desc: "[개인 프로젝트] 유튜브 뮤직 계정을 그대로 쓰면서 Windows 데스크톱에서 듣는 음악 앱을 만들었어요. 미니 플레이어, 트레이, 미디어 키, 가사, 이퀄라이저를 넣었고, 친구와 같은 곡을 같은 순간에 듣는 Ripple도 직접 만든 서버로 붙였어요. 약 200명의 사용자에게 받은 건의와 오류 제보를 패치 노트로 하나씩 반영하고 있어요.",
     tech: ["Electron", "React", "Next.js", "TypeScript", "JavaScript", "Tailwind CSS", "Node.js"],
     techUsage: [
       { skill: "Electron", usage: "창, 트레이, 미디어 키, 자동 업데이트를 데스크톱 셸에서 처리해요." },
