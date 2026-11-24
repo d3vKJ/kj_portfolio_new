@@ -1,4 +1,4 @@
-# JIN LAB Youtube Music 기획안
+# Jiniverse Wave 기획안
 
 ## 1. 배경
 
